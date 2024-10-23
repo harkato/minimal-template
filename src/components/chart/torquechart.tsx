@@ -1,4 +1,4 @@
-// TorqueChart.js
+// TorqueChart.tsx
 import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -8,33 +8,42 @@ const TorqueChart = () => {
   // Dados do gráfico
   const options = {
     title: {
-      text: 'Gráfico de Torque vs RPM',
+      text: 'Bancos - Taxa de Falha',
     },
     xAxis: {
       title: {
-        text: 'Rotação (RPM)',
+        text: 'Horário',
       },
-      categories: ['1000', '2000', '3000', '4000', '5000', '6000', '7000'],
+      categories: ['10:04', '10:12', '10:19', '10:33', '10:40', '10:48', '10:55', '11:02', '11:09'],
     },
     yAxis: {
       title: {
-        text: 'Torque (Nm)',
+        text: 'Taxa',
       },
       min: 0, // Define o valor mínimo do eixo Y
+      plotLines: [
+        {
+          value: 0.8, // Valor no eixo Y onde a linha será desenhada
+          color: 'red', // Cor da linha
+          dashStyle: 'Dash', // Estilo da linha (pontilhada)
+          width: 2, // Espessura da linha
+
+        },
+      ],
     },
     series: [
       {
-        name: 'Torque',
-        data: [150, 200, 250, 320, 290, 270, 220], // Exemplo de dados do torque para cada RPM
+        name: 'Taxa',
+        data: [0.3, 0.2, 0.2, 0.4, 0.7, 0.9, 0.7, 0.3], // Exemplo de dados do torque para cada RPM
       },
     ],
     tooltip: {
-      valueSuffix: ' Nm', // Mostra a unidade de torque no tooltip
+      valueSuffix: ' Nok/Vin', // Mostra a unidade de torque no tooltip
     },
     plotOptions: {
       line: {
         dataLabels: {
-          enabled: true, // Mostra os valores dos pontos
+          enabled: false, // Mostra os valores dos pontos
         },
         enableMouseTracking: true, // Habilita interatividade com o mouse
       },

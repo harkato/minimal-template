@@ -31,6 +31,7 @@
     "@fontsource/barlow": "^5.0.14",
     "@fontsource/poppins": "^5.1.0",
     "@iconify/react": "^5.0.2",
+    "@mui/icons-material": "^6.1.5",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.7",
     "@mui/x-data-grid": "^7.20.0",
@@ -44,6 +45,7 @@
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",
     "react-router-dom": "^6.26.1",
+    "recharts": "^2.13.0",
     "simplebar-react": "^3.2.6"
   },
   "devDependencies": {

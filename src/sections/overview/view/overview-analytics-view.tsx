@@ -116,21 +116,6 @@ export function OverviewAnalyticsView() {
         { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
       ],
     },
-    {
-      title: 'ZP6',
-      color: '#22c55e',
-      vehicles: 37,
-      nok: 21,
-      nokVin: 0.568,
-      target: 0.8,
-      topIssues: [
-        { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
-        { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
-        { code: '4237 01', description: 'Dobradiças porta traseira LE', occurrences: 2 },
-        { code: '2640 01', description: 'Duto freio agregado hidráulico 740', occurrences: 2 },
-        { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
-      ],
-    },
   ];
 
   return (
@@ -139,7 +124,7 @@ export function OverviewAnalyticsView() {
         Principais Processos
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={5}>
         {cardData.map((data, index) => (
           <Grid xs={12} sm={6} md={6} key={index}>
             <AnalyticsDashboardCard {...data} />
@@ -190,6 +175,10 @@ export function OverviewAnalyticsView() {
             }}
           />
         </Grid> */}
+        
+        <Grid xs={12} md={6} lg={12}>
+          <TorqueChart/>
+        </Grid>
 
         <Grid xs={12} md={6} lg={12}>
           <Card>
@@ -203,10 +192,6 @@ export function OverviewAnalyticsView() {
 
         <Grid xs={12} md={6} lg={12}>
           <LineChart/>
-        </Grid>
-
-        <Grid xs={12} md={6} lg={12}>
-          <TorqueChart/>
         </Grid>
         {/* <Grid xs={12} sm={6} md={3}>
           <LineChart/>
