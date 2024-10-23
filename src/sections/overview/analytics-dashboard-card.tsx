@@ -25,7 +25,7 @@ export function AnalyticsDashboardCard({
   topIssues,
   ...other
 }: Props) {
-  const theme = useTheme();
+  
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -61,10 +61,11 @@ export function AnalyticsDashboardCard({
             <Grid>
               <Typography variant="body2">Veículos: {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
+              <Typography variant="body2">Limite: {target}</Typography>
             </Grid>
             <Grid>
-              <Typography variant="body2">Taxa: {nokVin.toFixed(3)}</Typography>
-              <Typography variant="body2">Limite: {target}</Typography>
+              <Typography variant="h3">Taxa: {nokVin.toFixed(3)}</Typography>
+              
             </Grid>
           </Grid>
           

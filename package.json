@@ -24,6 +24,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",

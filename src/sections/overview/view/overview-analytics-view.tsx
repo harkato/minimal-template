@@ -28,7 +28,7 @@ export function OverviewAnalyticsView() {
   const cardData = [
     {
       title: 'FAHRWERK',
-      color: '#22c55e',
+      color: '#22c57e',
       vehicles: 37,
       nok: 28,
       nokVin: 0.757,
@@ -88,7 +88,7 @@ export function OverviewAnalyticsView() {
     },
     {
       title: 'ZP6',
-      color: '#22c55e',
+      color: '#22c57e',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -103,7 +103,7 @@ export function OverviewAnalyticsView() {
     },
     {
       title: 'ZP6',
-      color: '#22c55e',
+      color: '#22c57e',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -255,7 +255,7 @@ export function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={8}>
+        {/* <Grid xs={12} md={6} lg={8}>
           <AnalyticsNews title="News" list={_posts.slice(0, 5)} />
         </Grid>
 
@@ -277,7 +277,7 @@ export function OverviewAnalyticsView() {
 
         <Grid xs={12} md={6} lg={8}>
           <AnalyticsTasks title="Tasks" list={_tasks} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </DashboardContent>
   );
