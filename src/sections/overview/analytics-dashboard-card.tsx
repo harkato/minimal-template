@@ -50,46 +50,46 @@ export function AnalyticsDashboardCard({
           </IconButton>
         }/>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-      <CardContent
-      sx={{
-        // color: '#FFFFFF',
-      }}>
-      {/* Título */}
-        {/* Informações sobre os veículos */}
-        <Grid container sx={{
-          justifyContent: "space-between"}}>
-          <Grid>
-            <Typography variant="body2">Veículos: {vehicles}</Typography>
-            <Typography variant="body2">NOK: {nok}</Typography>
+        <CardContent
+          sx={{
+            // color: '#FFFFFF',
+          }}>
+          {/* Título */}
+          {/* Informações sobre os veículos */}
+          <Grid container sx={{
+            justifyContent: "space-between"}}>
+            <Grid>
+              <Typography variant="body2">Veículos: {vehicles}</Typography>
+              <Typography variant="body2">NOK: {nok}</Typography>
+            </Grid>
+            <Grid>
+              <Typography variant="body2">Taxa: {nokVin.toFixed(3)}</Typography>
+              <Typography variant="body2">Limite: {target}</Typography>
+            </Grid>
           </Grid>
-          <Grid>
-            <Typography variant="body2">Taxa: {nokVin.toFixed(3)}</Typography>
-            <Typography variant="body2">Limite: {target}</Typography>
-          </Grid>
-        </Grid>
-        
+          
 
-        {/* Título dos Top 5 Quitações */}
-        <Typography variant="h6" component="div" style={{ marginTop: '10px', marginBottom: '10px'}}>
-        Top 5 Quitações:
-        </Typography>
+          {/* Título dos Top 5 Quitações */}
+          <Typography variant="h6" component="div" style={{ marginTop: '10px', marginBottom: '10px'}}>
+          Top 5 Quitações:
+          </Typography>
 
-      {/* Listagem das questões principais */}
-      <TableContainer component={Paper} style={{ backgroundColor: 'white', borderRadius: '5px' }}>
-        <Table>
-          <TableBody>
-            {topIssues.map((issue, index) => (
-              <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
-                <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
-                <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          {/* Listagem das questões principais */}
+          <TableContainer component={Paper} style={{ backgroundColor: 'white', borderRadius: '5px' }}>
+            <Table>
+              <TableBody>
+                {topIssues.map((issue, index) => (
+                  <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                    <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
+                    <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
+                    <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      </CardContent>
+        </CardContent>
       </Collapse>
       
     </Card>
