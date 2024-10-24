@@ -15,6 +15,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
+import { z } from 'zod';
 
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
@@ -24,17 +25,21 @@ import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
-import DataGridDemo from '../data-grid';
 import UserModal from '../dialog';
 import CrudTable from '../crud-table';
 
 // ----------------------------------------------------------------------
 interface User {
   name: string;
-  company: string;
   role: string;
   email: string;
 }
+
+// Esquema de validação para o nome do usuário
+const userNameSchema = z.string()
+  .min(2, { message: 'O nome deve ter no mínimo 2 caracteres.' })
+  .max(50, { message: 'O nome deve ter no máximo 50 caracteres.' })
+  .regex(/^[a-zA-Z\s]+$/, { message: 'O nome deve conter apenas letras e espaços.' });
 
 export function UserView() {
   const table = useTable();
@@ -49,18 +54,91 @@ export function UserView() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [users, setUsers] = useState<User[]>([]);
-
-  const openUserModal = () => setOpenModal(true);
-  const closeUserModal = () => setOpenModal(false);
-
-  const addUser = (newUser: User) => {
-    setUsers([...users, newUser]);
+  const [open, setOpen] = useState(false);
+  const initialFormData = {
+    name: '',
+    email: '',
+    role: '',
   };
+  const [formData, setFormData] = useState(initialFormData);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = () => {
+    // Lógica para cadastrar o usuário
+    try {
+      // Valida o nome usando o Zod
+      userNameSchema.parse(formData.name);
+      console.log('Nome válido:', formData.name);
+      // Aqui você pode processar o envio do formulário
+    } catch (e) {
+      alert('Erro ao criar usuário: nome inválido')
+    } finally {
+      setFormData(initialFormData);
+      handleClose(); // Fecha o diálogo após a submissão
+    }
+  };
+
 
   return (
     <DashboardContent>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Criar Novo Usuário</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            name="name"
+            label="Nome"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.name}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="email"
+            label="Email"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="role"
+            label="Função"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.role}
+            onChange={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            Criar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
           Users
@@ -68,17 +146,16 @@ export function UserView() {
         <Button
           variant="contained"
           color="inherit"
-          onClick={openUserModal}
+          onClick={handleOpen}
           startIcon={<Iconify icon="mingcute:add-line" />}
         >
-          New user
+          Criar novo usuário
         </Button>
       </Box>
-      <Grid container spacing={3}>
+      {/* <Grid container spacing={3}>
         <CrudTable/>
-        {/* <DataGridDemo/> */}
         <h1> texto</h1>
-      </Grid>
+      </Grid> */}
       
       
       <Card>
@@ -107,10 +184,12 @@ export function UserView() {
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
+                  { id: 'id', label: 'UserId' },
+                  { id: 'name', label: 'Nome' },
+                  // { id: 'company', label: 'Companhia' },
+                  { id: 'cracha', label: 'Crachá' },
+                  { id: 'role', label: 'Cargo' },
+                  { id: 'isVerified', label: 'Verificado', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: '' },
                 ]}
@@ -152,42 +231,42 @@ export function UserView() {
         />
       </Card>
 
-      <div style={{ padding: '20px' }}>
-      <h1>Tabela de Usuários</h1>
+        {/* <div style={{ padding: '20px' }}>
+        <h1>Tabela de Usuários</h1>
 
-      <UserModal open={openModal} handleClose={closeUserModal} handleSubmit={addUser} />
+        <UserModal open={openModal} handleClose={closeUserModal} handleSubmit={addUser} />
 
-      <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Companhia</TableCell>
-              <TableCell>Cargo</TableCell>
-              <TableCell>Email</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.length > 0 ? (
-              users.map((user, index) => (
-                <TableRow key={index}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.company}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                </TableRow>
-              ))
-            ) : (
+        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={2} align="center">
-                  Nenhum usuário cadastrado
-                </TableCell>
+                <TableCell>Nome</TableCell>
+                <TableCell>Companhia</TableCell>
+                <TableCell>Cargo</TableCell>
+                <TableCell>Email</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+            </TableHead>
+            <TableBody>
+              {users.length > 0 ? (
+                users.map((user, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.company}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={2} align="center">
+                    Nenhum usuário cadastrado
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div> */}
     </DashboardContent>
   );
 }

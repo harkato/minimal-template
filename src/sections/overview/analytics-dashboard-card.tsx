@@ -50,10 +50,7 @@ export function AnalyticsDashboardCard({
           </IconButton>
         }/>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent
-          sx={{
-            // color: '#FFFFFF',
-          }}>
+        <CardContent>
           {/* Título */}
           {/* Informações sobre os veículos */}
           <Grid container sx={{

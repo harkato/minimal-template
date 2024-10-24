@@ -8,6 +8,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import TorqueChart from 'src/components/chart/torquechart';
 import AreaChart from 'src/components/chart/areachart';
 
+
 import { AnalyticsNews } from '../analytics-news';
 import { AnalyticsTasks } from '../analytics-tasks';
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
@@ -124,12 +125,15 @@ export function OverviewAnalyticsView() {
         Principais Processos
       </Typography>
 
+
       <Grid container spacing={5}>
-        {cardData.map((data, index) => (
-          <Grid xs={12} sm={6} md={6} key={index}>
-            <AnalyticsDashboardCard {...data} />
-          </Grid>
-        ))}
+          {cardData.map((data, index) => (
+            <Grid xs={12} sm={6} md={6} key={index}>
+              <AnalyticsDashboardCard {...data} />
+            </Grid>
+          ))}
+        
+        
       
 
         
@@ -175,7 +179,6 @@ export function OverviewAnalyticsView() {
             }}
           />
         </Grid> */}
-        
         <Grid xs={12} md={6} lg={12}>
           <TorqueChart/>
         </Grid>

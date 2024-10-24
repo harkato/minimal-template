@@ -16,11 +16,16 @@ import { Iconify } from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export type UserProps = {
+  // crachá: string;
+  // perfil: Operador Lider Engenheiro de processo Administrador do sistema Usuário
+  // operador: postos de trabalho
+  userId: string;
   id: string;
   name: string;
+  cracha: string;
   role: string;
   status: string;
-  company: string;
+  // company: string;
   avatarUrl: string;
   isVerified: boolean;
 };
@@ -55,10 +60,11 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             {row.name}
           </Box>
         </TableCell> */}
+        <TableCell>{row.userId}</TableCell>
 
         <TableCell>{row.name}</TableCell>
 
-        <TableCell>{row.company}</TableCell>
+        <TableCell>{row.cracha}</TableCell>
 
         <TableCell>{row.role}</TableCell>
 
