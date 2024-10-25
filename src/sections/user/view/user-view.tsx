@@ -72,6 +72,7 @@ export function UserView() {
 
   const handleClose = () => {
     setOpen(false);
+    setFormData(initialFormData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string | string[]>) => {
