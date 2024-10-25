@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText } from '@mui/material';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -57,10 +57,14 @@ export function UserView() {
   const [open, setOpen] = useState(false);
   const initialFormData = {
     name: '',
-    email: '',
-    role: '',
+    userID: '',
+    password: '',
+    badge: '',
+    profile: '',
+    workStations: [],
   };
   const [formData, setFormData] = useState(initialFormData);
+  const [error, setError] = useState<string | null>(null);
 
   const handleOpen = () => {
     setOpen(true);
@@ -92,6 +96,8 @@ export function UserView() {
       handleClose(); // Fecha o diálogo após a submissão
     }
   };
+  const profiles = ['Operador', 'Lider', 'Engenheiro de processo', 'Administrador do sistema', 'Usuário'];
+  const workStations = ['ABS1', 'ABS2', 'Tacto 1', 'Tacto 13', 'R2 Chicote TC58', 'ZP6'];
 
 
   return (
@@ -99,6 +105,7 @@ export function UserView() {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Criar Novo Usuário</DialogTitle>
         <DialogContent>
+          {/* Nome */}
           <TextField
             margin="dense"
             name="name"
@@ -109,26 +116,76 @@ export function UserView() {
             value={formData.name}
             onChange={handleChange}
           />
+          
+          {/* userID */}
           <TextField
             margin="dense"
-            name="email"
-            label="Email"
-            type="email"
-            fullWidth
-            variant="outlined"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="role"
-            label="Função"
+            name="userID"
+            label="User ID"
             type="text"
             fullWidth
             variant="outlined"
-            value={formData.role}
+            value={formData.userID}
             onChange={handleChange}
           />
+          
+          {/* Senha */}
+          <TextField
+            margin="dense"
+            name="password"
+            label="Senha"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          
+          {/* Crachá */}
+          <TextField
+            margin="dense"
+            name="badge"
+            label="Crachá"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.badge}
+            onChange={handleChange}
+          />
+
+          {/* Perfil */}
+          <FormControl fullWidth margin="dense" variant="outlined">
+            <InputLabel id="profile-label">Perfil</InputLabel>
+            <Select
+              labelId="profile-label"
+              name="profile"
+              value={formData.profile}
+              label="Perfil"
+            >
+              {profiles.map((profile) => (
+                <MenuItem key={profile} value={profile}>
+                  {profile}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Postos de Trabalho */}
+          <FormControl fullWidth margin="dense" variant="outlined">
+            <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
+            <Select
+              labelId="workStations-label"
+              name="workStations"
+              value={formData.workStations}
+              label="Postos de trabalho"
+            >
+              {workStations.map((station) => (
+                <MenuItem key={station} value={station}>
+                  {station}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">
@@ -141,7 +198,7 @@ export function UserView() {
       </Dialog>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Users
+          Usuários
         </Typography>
         <Button
           variant="contained"
