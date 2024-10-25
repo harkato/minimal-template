@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText, SelectChangeEvent } from '@mui/material';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -61,7 +61,7 @@ export function UserView() {
     password: '',
     badge: '',
     profile: '',
-    workStations: [],
+    workStations: [] as string[],
   };
   const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +74,7 @@ export function UserView() {
     setOpen(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string | string[]>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -161,6 +161,7 @@ export function UserView() {
               name="profile"
               value={formData.profile}
               label="Perfil"
+              onChange={handleChange}
             >
               {profiles.map((profile) => (
                 <MenuItem key={profile} value={profile}>
@@ -177,6 +178,7 @@ export function UserView() {
               labelId="workStations-label"
               name="workStations"
               value={formData.workStations}
+              onChange={handleChange}
               label="Postos de trabalho"
             >
               {workStations.map((station) => (
