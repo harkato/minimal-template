@@ -1,6 +1,7 @@
+import React, { useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-import { Card, CardContent, CardHeader } from '@mui/material';
+import { Button, Card, CardContent, CardHeader } from '@mui/material';
 
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
@@ -28,8 +29,10 @@ import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
-  const cardData = [
+  
+  const [cardData, setCardData] = useState([
     {
+      id: '1',
       title: 'FAHRWERK',
       color: '#22c57e',
       vehicles: 37,
@@ -45,6 +48,7 @@ export function OverviewAnalyticsView() {
       ],
     },
     {
+      id: '2',
       title: 'ZP6',
       color: '#f24f4f',
       vehicles: 37,
@@ -60,6 +64,7 @@ export function OverviewAnalyticsView() {
       ],
     },
     {
+      id: '3',
       title: 'BANCOS',
       color: '#f24f4f',
       vehicles: 28,
@@ -75,6 +80,7 @@ export function OverviewAnalyticsView() {
       ],
     },
     {
+      id: '4',
       title: 'BANCOS',
       color: '#f24f4f',
       vehicles: 28,
@@ -90,6 +96,7 @@ export function OverviewAnalyticsView() {
       ],
     },
     {
+      id: '5',
       title: 'ZP6',
       color: '#22c57e',
       vehicles: 37,
@@ -105,6 +112,7 @@ export function OverviewAnalyticsView() {
       ],
     },
     {
+      id: '6',
       title: 'ZP6',
       color: '#22c57e',
       vehicles: 37,
@@ -119,26 +127,53 @@ export function OverviewAnalyticsView() {
         { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
       ],
     },
-  ];
+  ]);
+
+  const handleDeleteCard = (id: string) => {
+    setCardData((prevData) => prevData.filter((card) => card.id !== id));
+  };
+
+  const handleAddCard = () => {
+    const newCard = {
+      id: `${Date.now()}`, // Gera um ID único baseado no timestamp
+      title: 'Processo',
+      color: '#22c57e', // Cor padrão
+      vehicles: 0,
+      nok: 0,
+      nokVin: 0.0,
+      target: 1.0,
+      topIssues: [
+        { code: '0001', description: 'Exemplo de problema', occurrences: 1 },
+      ],
+    };
+    setCardData((prevData) => [...prevData, newCard]);
+  };
 
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        {t('dashboard.process')}
-      </Typography>
+      <Grid container sx={{ justifyContent: "space-between" }}>
+        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+          {t('dashboard.process')}
+        </Typography>
 
-
-      <Grid container spacing={5}>
-          {cardData.map((data, index) => (
-            <Grid xs={12} sm={6} md={6} key={index}>
-              <AnalyticsDashboardCard {...data} />
-            </Grid>
-          ))}
-        
-        
+        <Button
+          variant="contained"
+          size='small'
+          color="primary"
+          onClick={handleAddCard}
+          sx={{ mb: 3 }}
+        >
+          Novo Processo
+        </Button>
+      </Grid>
       
 
-        
+      <Grid container spacing={5}>
+        {cardData.map((data) => (
+          <Grid xs={12} sm={6} md={6} key={data.id}>
+            <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
+          </Grid>
+        ))}
 
         {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
@@ -192,16 +227,12 @@ export function OverviewAnalyticsView() {
               <AreaChart/>
             </CardContent>
           </Card>
-          
         </Grid>
 
         <Grid xs={12} md={6} lg={12}>
           <LineChart/>
         </Grid>
-        {/* <Grid xs={12} sm={6} md={3}>
-          <LineChart/>
-        </Grid>  */}
-       
+        
         <Grid xs={12} md={6} lg={4}>
           <AnalyticsCurrentVisits
             title="Current visits"

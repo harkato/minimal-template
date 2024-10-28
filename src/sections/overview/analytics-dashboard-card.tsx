@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Typography, IconButton, Collapse, Box, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CardHeader, Grid } from '@mui/material';
-import { useTheme } from '@emotion/react';
 import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DeleteIcon from '@mui/icons-material/Delete'
 
-type Props = CardProps & {
+export type Props = CardProps & {
+  id: string;
   title: string;
   color: string;
   vehicles: number;
@@ -13,9 +14,11 @@ type Props = CardProps & {
   nokVin: number;
   target: number;
   topIssues: { code: string; description: string; occurrences: number }[];
+  onDelete?: (id: string) => void;
 }
 
 export function AnalyticsDashboardCard({
+  id,
   title,
   color,
   vehicles,
@@ -23,43 +26,48 @@ export function AnalyticsDashboardCard({
   nokVin,
   target,
   topIssues,
+  onDelete,
   ...other
 }: Props) {
-  
   const [expanded, setExpanded] = useState(false);
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
+  
+  const handleExpandClick = () => setExpanded(!expanded);
 
   return (
-    <Card
-    sx={{
-      bgcolor: 'common.white',
-    }}
-    >
-      <CardHeader
-        title={title}
-        sx={{
-          bgcolor: color,
-          color: '#FFFFFF',
-          padding: '20px',
-          cursor: 'pointer',
-        }}
-        onClick={handleExpandClick}
-        action={
-          <IconButton sx={{ color: 'white' }}
+    <Card sx={{ bgcolor: 'common.white' }}>
+      <Box>
+        <CardHeader
+          title={title}
+          sx={{
+            bgcolor: color,
+            color: '#FFFFFF',
+            padding: '20px',
+            cursor: 'pointer',
+          }}
           onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more">
-            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        }/>
+          action={
+            <>
+              <IconButton
+              sx={{ color: 'white' }}
+              onClick={handleExpandClick}
+              aria-expanded={expanded}
+              aria-label="show more"
+            >
+              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+            <IconButton aria-label="delete" onClick={() => onDelete && onDelete(id)} sx={{ ml: 'auto' }}>
+            <DeleteIcon htmlColor="white" />
+            </IconButton>
+            </>
+          }
+          
+        />
+        
+      </Box>
+      
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          {/* Título */}
-          {/* Informações sobre os veículos */}
-          <Grid container sx={{
-            justifyContent: "space-between"}}>
+          <Grid container sx={{ justifyContent: "space-between" }}>
             <Grid>
               <Typography variant="body2">Veículos: {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
@@ -67,17 +75,13 @@ export function AnalyticsDashboardCard({
             </Grid>
             <Grid>
               <Typography variant="h3">Taxa: {nokVin.toFixed(3)}</Typography>
-              
             </Grid>
           </Grid>
-          
 
-          {/* Título dos Top 5 Quitações */}
-          <Typography variant="h6" component="div" style={{ marginTop: '10px', marginBottom: '10px'}}>
-          Top 5 Quitações:
+          <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
+            Top 5 Quitações:
           </Typography>
 
-          {/* Listagem das questões principais */}
           <TableContainer component={Paper} style={{ backgroundColor: 'white', borderRadius: '5px' }}>
             <Table>
               <TableBody>
@@ -91,10 +95,10 @@ export function AnalyticsDashboardCard({
               </TableBody>
             </Table>
           </TableContainer>
-
         </CardContent>
       </Collapse>
+
       
     </Card>
-  )
+  );
 }
