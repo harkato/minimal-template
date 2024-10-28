@@ -3,6 +3,8 @@ import { Suspense, StrictMode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
+import './i18n';
+
 import App from './app';
 
 // ----------------------------------------------------------------------

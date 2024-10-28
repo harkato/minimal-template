@@ -43,9 +43,14 @@ export function AnalyticsDashboardCard({
           bgcolor: color,
           color: '#FFFFFF',
           padding: '20px',
+          cursor: 'pointer',
         }}
+        onClick={handleExpandClick}
         action={
-          <IconButton onClick={handleExpandClick}>
+          <IconButton sx={{ color: 'white' }}
+          onClick={handleExpandClick}
+          aria-expanded={expanded}
+          aria-label="show more">
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         }/>

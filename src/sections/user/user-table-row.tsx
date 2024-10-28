@@ -72,7 +72,7 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           {row.isVerified ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
-            '-'
+            <Iconify width={22} icon="mi:circle-error" sx={{ color: 'error.main' }} />
           )}
         </TableCell>
 

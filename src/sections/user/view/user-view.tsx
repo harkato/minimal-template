@@ -103,46 +103,55 @@ export function UserView() {
 
   return (
     <DashboardContent>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Criar Novo Usuário</DialogTitle>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>Novo Usuário</DialogTitle>
         <DialogContent>
           {/* Nome */}
-          <TextField
-            margin="dense"
-            name="name"
-            label="Nome"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          
-          {/* userID */}
-          <TextField
-            margin="dense"
-            name="userID"
-            label="User ID"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.userID}
-            onChange={handleChange}
-          />
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={12}>
+              <TextField
+              margin="dense"
+              name="name"
+              label="Nome"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.name}
+              onChange={handleChange}
+              />
+            </Grid>
           
           {/* Senha */}
-          <TextField
-            margin="dense"
-            name="password"
-            label="Senha"
-            type="password"
-            fullWidth
-            variant="outlined"
-            value={formData.password}
-            onChange={handleChange}
-          />
+          <Grid item xs={12} sm={12}>
+            <TextField
+              margin="dense"
+              name="password"
+              label="Senha"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </Grid>
+          
+          {/* userID */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              margin="dense"
+              name="userID"
+              label="User ID"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.userID}
+              onChange={handleChange}
+            />
+          </Grid>
+          
           
           {/* Crachá */}
+          <Grid item xs={12} sm={6}>
           <TextField
             margin="dense"
             name="badge"
@@ -153,8 +162,10 @@ export function UserView() {
             value={formData.badge}
             onChange={handleChange}
           />
+          </Grid>
 
           {/* Perfil */}
+          <Grid item xs={12} sm={6}>
           <FormControl fullWidth margin="dense" variant="outlined">
             <InputLabel id="profile-label">Perfil</InputLabel>
             <Select
@@ -171,8 +182,10 @@ export function UserView() {
               ))}
             </Select>
           </FormControl>
+          </Grid>
 
           {/* Postos de Trabalho */}
+          <Grid item xs={12} sm={6} display="flex" alignItems="center">
           <FormControl fullWidth margin="dense" variant="outlined">
             <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
             <Select
@@ -189,6 +202,8 @@ export function UserView() {
               ))}
             </Select>
           </FormControl>
+          </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">
@@ -249,7 +264,7 @@ export function UserView() {
                   // { id: 'company', label: 'Companhia' },
                   { id: 'cracha', label: 'Crachá' },
                   { id: 'role', label: 'Cargo' },
-                  { id: 'isVerified', label: 'Verificado', align: 'center' },
+                  { id: 'isVerified', label: 'Fingerprint', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: '' },
                 ]}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
 import Pagination from '@mui/material/Pagination';
@@ -16,6 +16,7 @@ import { ProductFilters } from '../product-filters';
 import type { FiltersProps } from '../product-filters';
 
 // ----------------------------------------------------------------------
+
 
 const GENDER_OPTIONS = [
   { value: 'men', label: 'Men' },
@@ -58,6 +59,11 @@ const defaultFilters = {
 };
 
 export function ProductsView() {
+  const { t, i18n } = useTranslation();
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  }
+
   const [sortBy, setSortBy] = useState('featured');
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -86,8 +92,22 @@ export function ProductsView() {
 
   return (
     <DashboardContent>
+        <div>
+          <header className="app-header">
+          <h1>{t('app.title')}</h1>
+          <p>{t('app.subtitle')}</p>
+        </header>
+    
+        <p className="select-language">{t('app.select_language')}</p>
+        <button type="button" onClick={() => changeLanguage('pt-BR')}>
+          {t('app.portuguese')}
+        </button>
+        <button type="button" onClick={() => changeLanguage('en-US')}>
+          {t('app.english')}
+        </button>
+      </div>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
+        {t('app.products')}
       </Typography>
 
       <CartIcon totalItems={8} />

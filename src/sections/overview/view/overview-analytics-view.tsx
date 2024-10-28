@@ -7,7 +7,7 @@ import LineChart from 'src/components/chart/linechart';
 import { DashboardContent } from 'src/layouts/dashboard';
 import TorqueChart from 'src/components/chart/torquechart';
 import AreaChart from 'src/components/chart/areachart';
-
+import { useTranslation } from 'react-i18next';
 
 import { AnalyticsNews } from '../analytics-news';
 import { AnalyticsTasks } from '../analytics-tasks';
@@ -23,9 +23,11 @@ import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 
 
 
+
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
+  const { t, i18n } = useTranslation();
   const cardData = [
     {
       title: 'FAHRWERK',
@@ -122,7 +124,7 @@ export function OverviewAnalyticsView() {
   return (
     <DashboardContent maxWidth="xl">
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Principais Processos
+        {t('dashboard.process')}
       </Typography>
 
 
