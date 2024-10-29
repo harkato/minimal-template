@@ -4,11 +4,13 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText, SelectChangeEvent } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText, SelectChangeEvent, IconButton, InputAdornment } from '@mui/material';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -25,8 +27,6 @@ import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
-import UserModal from '../dialog';
-import CrudTable from '../crud-table';
 
 // ----------------------------------------------------------------------
 interface User {
@@ -59,12 +59,18 @@ export function UserView() {
     name: '',
     userID: '',
     password: '',
+    confirmPassword: '',
     badge: '',
     profile: '',
     workStations: [] as string[],
   };
   const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -121,22 +127,8 @@ export function UserView() {
               />
             </Grid>
           
-          {/* Senha */}
-          <Grid item xs={12} sm={12}>
-            <TextField
-              margin="dense"
-              name="password"
-              label="Senha"
-              type="password"
-              fullWidth
-              variant="outlined"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </Grid>
-          
           {/* userID */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={12}>
             <TextField
               margin="dense"
               name="userID"
@@ -148,6 +140,62 @@ export function UserView() {
               onChange={handleChange}
             />
           </Grid>
+
+          {/* Senha */}
+          <Grid item xs={12} sm={12}>
+            <TextField
+              margin="dense"
+              name="password"
+              label="Senha"
+              type={showPassword ? 'text' : 'password'}
+              fullWidth
+              variant="outlined"
+              value={formData.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      aria-label="toggle password visibility"
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              onChange={handleChange}
+            />
+          </Grid>
+
+          {/* Confirmar Senha */}
+          <Grid item xs={12} sm={12}>
+            <TextField
+              margin="dense"
+              name="confirmPassword"
+              label="Confirmar Senha"
+              type={showPassword ? 'text' : 'password'}
+              fullWidth
+              variant="outlined"
+              value={formData.confirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      aria-label="toggle password visibility"
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              onChange={handleChange}
+            />
+          </Grid>
+          
+          
           
           
           {/* Crachá */}
@@ -185,7 +233,7 @@ export function UserView() {
           </Grid>
 
           {/* Postos de Trabalho */}
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
+          {/* <Grid item xs={12} sm={6} display="flex" alignItems="center">
           <FormControl fullWidth margin="dense" variant="outlined">
             <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
             <Select
@@ -202,7 +250,7 @@ export function UserView() {
               ))}
             </Select>
           </FormControl>
-          </Grid>
+          </Grid> */}
           </Grid>
         </DialogContent>
         <DialogActions>

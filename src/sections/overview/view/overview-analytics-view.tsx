@@ -83,6 +83,7 @@ export function OverviewAnalyticsView() {
       id: '4',
       title: 'BANCOS',
       color: '#f24f4f',
+      // color: '#f52f2f',
       vehicles: 28,
       nok: 47,
       nokVin: 1.679,
@@ -232,7 +233,7 @@ export function OverviewAnalyticsView() {
         <Grid xs={12} md={6} lg={12}>
           <LineChart/>
         </Grid>
-        
+
         <Grid xs={12} md={6} lg={4}>
           <AnalyticsCurrentVisits
             title="Current visits"

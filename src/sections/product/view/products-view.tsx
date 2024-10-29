@@ -106,7 +106,7 @@ export function ProductsView() {
           {t('app.english')}
         </button>
       </div>
-      <Typography variant="h4" sx={{ mb: 5 }}>
+      {/* <Typography variant="h4" sx={{ mb: 5 }}>
         {t('app.products')}
       </Typography>
 
@@ -158,7 +158,7 @@ export function ProductsView() {
         ))}
       </Grid>
 
-      <Pagination count={10} color="primary" sx={{ mt: 8, mx: 'auto' }} />
+      <Pagination count={10} color="primary" sx={{ mt: 8, mx: 'auto' }} /> */}
     </DashboardContent>
   );
 }

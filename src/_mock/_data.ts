@@ -97,14 +97,14 @@ export const _products = [...Array(24)].map((_, index) => {
 
 export const _langs = [
   {
-    value: 'en',
+    value: 'en-US',
     label: 'English',
     icon: '/assets/icons/flags/ic-flag-en.svg',
   },
   {
-    value: 'de',
-    label: 'German',
-    icon: '/assets/icons/flags/ic-flag-de.svg',
+    value: 'pt-BR',
+    label: 'Português',
+    icon: '/assets/icons/flags/ic-flag-br.svg',
   },
   {
     value: 'fr',
@@ -140,8 +140,8 @@ export const _tasks = [...Array(5)].map((_, index) => ({
 export const _notifications = [
   {
     id: _id(1),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
+    title: 'Manutenção programada',
+    description: 'a ferramenta #253 possui uma manutenção agendada para 11:00',
     avatarUrl: null,
     type: 'order-placed',
     postedAt: _times(1),

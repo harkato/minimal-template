@@ -7,6 +7,7 @@ import Popover from '@mui/material/Popover';
 import MenuList from '@mui/material/MenuList';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
 
@@ -19,8 +20,11 @@ export type LanguagePopoverProps = IconButtonProps & {
 };
 
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
+  const { t, i18n } = useTranslation();
   const [locale, setLocale] = useState<string>(data[0].value);
-
+  const changeLanguage = useCallback((lng: string) => {
+    i18n.changeLanguage(lng);
+  }, [i18n])
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -33,10 +37,11 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
 
   const handleChangeLang = useCallback(
     (newLang: string) => {
+      changeLanguage(newLang);
       setLocale(newLang);
       handleClosePopover();
     },
-    [handleClosePopover]
+    [changeLanguage, handleClosePopover]
   );
 
   const currentLang = data.find((lang) => lang.value === locale);
