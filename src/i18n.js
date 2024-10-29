@@ -8,7 +8,7 @@ i18n
  .use(LanguageDetector) /** detecta idioma do navegador */
  .use(initReactI18next) /** inicializa a biblioteca */
  .init({ /** opções de configuração da biblioteca */
-   fallbackLng: 'pt-BR' /** idioma utilizado caso o idioma detectado não seja suportado */,
+   fallbackLng: 'en-US' /** idioma utilizado caso o idioma detectado não seja suportado */,
    supportedLngs: ['pt-BR', 'en-US'] /** idiomas suportados */,
  });
  

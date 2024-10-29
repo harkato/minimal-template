@@ -1,6 +1,6 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
@@ -21,7 +21,7 @@ export type LanguagePopoverProps = IconButtonProps & {
 
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
   const { t, i18n } = useTranslation();
-  const [locale, setLocale] = useState<string>(data[0].value);
+  const [locale, setLocale] = useState<string>('en-us');
   const changeLanguage = useCallback((lng: string) => {
     i18n.changeLanguage(lng);
   }, [i18n])
@@ -43,6 +43,10 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
     },
     [changeLanguage, handleClosePopover]
   );
+
+  useEffect(() => {
+    i18n.changeLanguage(locale);
+  }, [i18n, locale]);
 
   const currentLang = data.find((lang) => lang.value === locale);
 
