@@ -9,6 +9,18 @@
     },
 
     "dashboard": {
-        "process": "Main processes"
+        "process": "Main processes",
+        "newProcess": "New Process"
+    },
+
+    "users": {
+      "title": "Users",
+      "create": "Create new user"
+    },
+
+    "charts": {
+      "title": "Seats - Failure Rate",
+      "time": "Time",
+      "rate": "Rate"
     }
    }

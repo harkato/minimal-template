@@ -11,19 +11,19 @@ export const navData = [
   {
     title: 'Dashboard',
     path: '/',
-    icon: icon('ic-analytics'),
+    icon: icon('ic-dashboard'),
   },
   {
     title: 'Reports',
     path: '/user',
-    icon: icon('ic-user'),
+    icon: icon('ic-reports'),
   },
   {
     title: 'Statistics',
     path: '/products',
-    icon: icon('ic-cart'),
+    icon: icon('ic-statistics'),
     info: (
-      <Label color="error" variant="inverted">
+      <Label color="primary">
         +3
       </Label>
     ),
@@ -31,26 +31,26 @@ export const navData = [
   {
     title: 'Trace Analysis',
     path: '/blog',
-    icon: icon('ic-blog'),
+    icon: icon('ic-trace'),
   },
   {
     title: 'Notifications',
     path: '/sign-in',
-    icon: icon('ic-lock'),
+    icon: icon('ic-notifications'),
   },
   {
     title: 'Tool Center',
     path: '/404',
-    icon: icon('ic-disabled'),
+    icon: icon('ic-tool'),
   },
   {
     title: 'Command Center',
-    path: '/',
-    icon: icon('ic-analytics'),
+    path: '/command',
+    icon: icon('ic-command'),
   },
   {
     title: 'Administration',
-    path: '/user',
-    icon: icon('ic-user'),
+    path: '/admin',
+    icon: icon('ic-admin'),
   },
 ];

@@ -9,6 +9,18 @@
     },
 
     "dashboard": {
-        "process": "Principais processos"
+        "process": "Principais processos",
+        "newProcess": "Novo Processo"
+    },
+
+    "users": {
+      "title": "Usuários",
+      "create": "Criar novo usuário"
+    },
+
+    "charts": {
+      "seatsFailureRate": "Bancos - Taxa de Falha",
+      "time": "Horário",
+      "rate": "Taxa"
     }
    }

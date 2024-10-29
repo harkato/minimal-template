@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -28,6 +28,8 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
+
+
 // ----------------------------------------------------------------------
 interface User {
   name: string;
@@ -42,6 +44,7 @@ const userNameSchema = z.string()
   .regex(/^[a-zA-Z\s]+$/, { message: 'O nome deve conter apenas letras e espaços.' });
 
 export function UserView() {
+  const { t } = useTranslation();
   const table = useTable();
 
   const [filterName, setFilterName] = useState('');
@@ -254,7 +257,7 @@ export function UserView() {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">
+          <Button onClick={handleClose} sx={{color: "grey"}}>
             Cancelar
           </Button>
           <Button onClick={handleSubmit} color="primary">
@@ -264,15 +267,15 @@ export function UserView() {
       </Dialog>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Usuários
+          {t('users.title')}
         </Typography>
         <Button
           variant="contained"
-          color="inherit"
+          color="primary"
           onClick={handleOpen}
           startIcon={<Iconify icon="mingcute:add-line" />}
         >
-          Criar novo usuário
+           {t('users.create')}
         </Button>
       </Box>
       {/* <Grid container spacing={3}>

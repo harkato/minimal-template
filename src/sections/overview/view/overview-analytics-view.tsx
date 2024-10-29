@@ -164,7 +164,7 @@ export function OverviewAnalyticsView() {
           onClick={handleAddCard}
           sx={{ mb: 3 }}
         >
-          Novo Processo
+          {t('dashboard.newProcess')}
         </Button>
       </Grid>
       
