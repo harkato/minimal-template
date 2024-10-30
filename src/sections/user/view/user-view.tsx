@@ -27,6 +27,7 @@ import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
+import ResultPage from '../../results/view/reports-view';
 
 
 
@@ -236,7 +237,7 @@ export function UserView() {
           </Grid>
 
           {/* Postos de Trabalho */}
-          {/* <Grid item xs={12} sm={6} display="flex" alignItems="center">
+          <Grid item xs={12} sm={6} display="flex" alignItems="center">
           <FormControl fullWidth margin="dense" variant="outlined">
             <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
             <Select
@@ -253,7 +254,7 @@ export function UserView() {
               ))}
             </Select>
           </FormControl>
-          </Grid> */}
+          </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>

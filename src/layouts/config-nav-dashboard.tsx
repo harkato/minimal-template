@@ -15,7 +15,7 @@ export const navData = [
   },
   {
     title: 'Reports',
-    path: '/user',
+    path: '/menu',
     icon: icon('ic-reports'),
   },
   {
