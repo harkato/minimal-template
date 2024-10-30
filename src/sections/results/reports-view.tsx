@@ -60,14 +60,38 @@ export default function ResultPage() {
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>Results</Typography>
       
       {/* Menu de Filtros */}
-      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2, flexWrap: 'wrap' }}>
         <TextField
           label="Nome do Programa"
           name="programName"
           variant="outlined"
           value={filters.programName}
           onChange={handleFilterChange}
-          sx={{ minWidth: 200 }}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
+        />
+        <TextField
+          label="Data"
+          name="programName"
+          variant="outlined"
+          value={filters.programName}
+          onChange={handleFilterChange}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
+        />
+        <TextField
+          label="Corrente"
+          name="programName"
+          variant="outlined"
+          value={filters.programName}
+          onChange={handleFilterChange}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
+        />
+        <TextField
+          label="Corrente"
+          name="programName"
+          variant="outlined"
+          value={filters.programName}
+          onChange={handleFilterChange}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
         />
         <TextField
           select
@@ -76,7 +100,7 @@ export default function ResultPage() {
           variant="outlined"
           value={filters.status}
           onChange={handleFilterChange}
-          sx={{ minWidth: 200 }}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
         >
           <MenuItem value="">Todos</MenuItem>
           <MenuItem value="OK">OK</MenuItem>

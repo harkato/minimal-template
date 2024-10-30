@@ -27,7 +27,7 @@ import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
-import ResultPage from '../../results/view/reports-view';
+import ResultPage from '../../results/reports-view';
 
 
 
