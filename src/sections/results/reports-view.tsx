@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Box, Button, TextField, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material';
 
 type Order = 'asc' | 'desc';
@@ -60,33 +63,54 @@ export default function ResultPage() {
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>Results</Typography>
       
       {/* Menu de Filtros */}
-      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2, flexWrap: 'wrap'}}>
+        {/* Data */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker label="Date range" sx={{ flexBasis: '30%', minWidth: 200 }}/>
+        </LocalizationProvider>
+        {/* Ferramentas */}
         <TextField
-          label="Nome do Programa"
+          select
+          label="Tool Structure"
+          name="status"
+          variant="outlined"
+          value={filters.status}
+          onChange={handleFilterChange}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
+        >
+          <MenuItem value="">Todos</MenuItem>
+          <MenuItem value="OK">Apertadeira 1</MenuItem>
+          <MenuItem value="NOK">Apertadeira 2</MenuItem>
+        </TextField>
+        {/* Resultados */}
+        <TextField
+          select
+          label="Max results"
+          name="status"
+          variant="outlined"
+          value={filters.status}
+          onChange={handleFilterChange}
+          sx={{ flexBasis: '30%', minWidth: 200 }}
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="NOK">50</MenuItem>
+          <MenuItem value="OK">100</MenuItem>
+          <MenuItem value="OK">300</MenuItem>
+          <MenuItem value="OK">500</MenuItem>
+          <MenuItem value="NOK">1000</MenuItem>
+        </TextField>
+        {/* Program name */}
+        <TextField
+          label="Program name"
           name="programName"
           variant="outlined"
           value={filters.programName}
           onChange={handleFilterChange}
           sx={{ flexBasis: '30%', minWidth: 200 }}
         />
+        {/* Bolt */}
         <TextField
-          label="Data"
-          name="programName"
-          variant="outlined"
-          value={filters.programName}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        />
-        <TextField
-          label="Corrente"
-          name="programName"
-          variant="outlined"
-          value={filters.programName}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        />
-        <TextField
-          label="Corrente"
+          label="Bolt"
           name="programName"
           variant="outlined"
           value={filters.programName}
@@ -108,6 +132,9 @@ export default function ResultPage() {
         </TextField>
         <Button variant="contained" onClick={() => setData(initialData)}>
           Limpar Filtros
+        </Button>
+        <Button variant="contained" onClick={() => setData(initialData)}>
+          Run report
         </Button>
       </Box>
 
