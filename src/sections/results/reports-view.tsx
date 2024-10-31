@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Box, Button, TextField, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material';
+import { Box, Button, TextField, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography, Grid, TablePagination } from '@mui/material';
+import { DashboardContent } from 'src/layouts/dashboard';
+
 
 type Order = 'asc' | 'desc';
 
@@ -16,12 +18,15 @@ interface DataRow {
   torqueStatus: string;
 }
 
-const initialData: DataRow[] = [
-  { id: 1, status: 'OK', identifier: '123', programName: 'PVT1', resultTime: '2022-01-01 08:00', finalTorque: 20.5, torqueStatus: 'High' },
-  { id: 2, status: 'NOK', identifier: '124', programName: 'PVT2', resultTime: '2022-01-02 08:00', finalTorque: 15.3, torqueStatus: 'Low' },
-  { id: 3, status: 'OK', identifier: '125', programName: 'PVT3', resultTime: '2022-01-03 08:00', finalTorque: 10.7, torqueStatus: 'Medium' },
-  // Adicione mais dados conforme necessário
-];
+const initialData = Array.from({ length: 200 }, (_, i) => ({
+  id: i + 1,
+  status: i % 2 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
+  identifier: `${123 + i}`, // Identificador único
+  programName: `PVT${(i % 5) + 1}`, // Cicla entre PVT1 a PVT5
+  resultTime: `2022-01-${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
+  finalTorque: (Math.random() * 25).toFixed(1), // Torque aleatório entre 0 e 25 com uma casa decimal
+  torqueStatus: ['Low', 'Medium', 'High'][i % 3] // Cicla entre 'Low', 'Medium', 'High'
+}));
 
 export default function ResultPage() {
   const [data, setData] = useState(initialData);
@@ -57,93 +62,118 @@ export default function ResultPage() {
     );
     setData(filteredData);
   };
-
+  
+  const table = useTable();
+  const paginatedData = data.slice(table.page * table.rowsPerPage , table.page * table.rowsPerPage + table.rowsPerPage);
+  
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>Results</Typography>
+    <DashboardContent maxWidth="xl">
       
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>Results</Typography>
       {/* Menu de Filtros */}
-      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2, flexWrap: 'wrap'}}>
+      <Grid container spacing={2} sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}>
         {/* Data */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker label="Date range" sx={{ flexBasis: '30%', minWidth: 200 }}/>
-        </LocalizationProvider>
+        <Grid item xs={12} sm={6} md={4}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Date Range"
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
+        </Grid>
+        
         {/* Ferramentas */}
-        <TextField
-          select
-          label="Tool Structure"
-          name="status"
-          variant="outlined"
-          value={filters.status}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        >
-          <MenuItem value="">Todos</MenuItem>
-          <MenuItem value="OK">Apertadeira 1</MenuItem>
-          <MenuItem value="NOK">Apertadeira 2</MenuItem>
-        </TextField>
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            select
+            label="Tool Structure"
+            name="status"
+            variant="outlined"
+            value={filters.status}
+            onChange={handleFilterChange}
+            fullWidth
+          >
+            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="OK">Apertadeira 1</MenuItem>
+            <MenuItem value="NOK">Apertadeira 2</MenuItem>
+          </TextField>
+        </Grid>
+        
         {/* Resultados */}
-        <TextField
-          select
-          label="Max results"
-          name="status"
-          variant="outlined"
-          value={filters.status}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="NOK">50</MenuItem>
-          <MenuItem value="OK">100</MenuItem>
-          <MenuItem value="OK">300</MenuItem>
-          <MenuItem value="OK">500</MenuItem>
-          <MenuItem value="NOK">1000</MenuItem>
-        </TextField>
+        
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            select
+            label="Max results"
+            name="status"
+            variant="outlined"
+            value={filters.status}
+            onChange={handleFilterChange}
+            fullWidth
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="NOK">50</MenuItem>
+            <MenuItem value="OK">100</MenuItem>
+            <MenuItem value="OK">300</MenuItem>
+            <MenuItem value="OK">500</MenuItem>
+            <MenuItem value="NOK">1000</MenuItem>
+          </TextField>
+        </Grid>
         {/* Program name */}
-        <TextField
-          label="Program name"
-          name="programName"
-          variant="outlined"
-          value={filters.programName}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        />
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            label="Program name"
+            name="programName"
+            variant="outlined"
+            value={filters.programName}
+            onChange={handleFilterChange}
+            fullWidth
+          />
+        </Grid>
+        
         {/* Bolt */}
-        <TextField
-          label="Bolt"
-          name="programName"
-          variant="outlined"
-          value={filters.programName}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        />
-        <TextField
-          select
-          label="Status"
-          name="status"
-          variant="outlined"
-          value={filters.status}
-          onChange={handleFilterChange}
-          sx={{ flexBasis: '30%', minWidth: 200 }}
-        >
-          <MenuItem value="">Todos</MenuItem>
-          <MenuItem value="OK">OK</MenuItem>
-          <MenuItem value="NOK">NOK</MenuItem>
-        </TextField>
-        <Button variant="contained" onClick={() => setData(initialData)}>
-          Limpar Filtros
-        </Button>
-        <Button variant="contained" onClick={() => setData(initialData)}>
-          Run report
-        </Button>
-      </Box>
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            label="Bolt"
+            name="programName"
+            variant="outlined"
+            value={filters.programName}
+            onChange={handleFilterChange}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            select
+            label="Status"
+            name="status"
+            variant="outlined"
+            value={filters.status}
+            onChange={handleFilterChange}
+            fullWidth
+          >
+            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="OK">OK</MenuItem>
+            <MenuItem value="NOK">NOK</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
+          <Button variant="contained" onClick={() => setData(initialData)}>
+            Limpar Filtros
+          </Button>
+          <Button variant="contained" onClick={() => setData(initialData)}>
+            Run report
+          </Button>
+        </Grid>
+      </Grid>
 
       {/* Tabela de Dados */}
+      <Grid item xs={12} sm={12} md={12}>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'status'}
                   direction={orderBy === 'status' ? order : 'asc'}
@@ -152,7 +182,7 @@ export default function ResultPage() {
                   Status
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'identifier'}
                   direction={orderBy === 'identifier' ? order : 'asc'}
@@ -161,7 +191,7 @@ export default function ResultPage() {
                   Identificador
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'programName'}
                   direction={orderBy === 'programName' ? order : 'asc'}
@@ -170,7 +200,7 @@ export default function ResultPage() {
                   Nome do Programa
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'resultTime'}
                   direction={orderBy === 'resultTime' ? order : 'asc'}
@@ -179,7 +209,7 @@ export default function ResultPage() {
                   Data do Resultado
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'finalTorque'}
                   direction={orderBy === 'finalTorque' ? order : 'asc'}
@@ -188,7 +218,7 @@ export default function ResultPage() {
                   Torque Final
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell size='small'>
                 <TableSortLabel
                   active={orderBy === 'torqueStatus'}
                   direction={orderBy === 'torqueStatus' ? order : 'asc'}
@@ -200,19 +230,96 @@ export default function ResultPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.status}</TableCell>
-                <TableCell>{row.identifier}</TableCell>
-                <TableCell>{row.programName}</TableCell>
-                <TableCell>{row.resultTime}</TableCell>
-                <TableCell>{row.finalTorque}</TableCell>
-                <TableCell>{row.torqueStatus}</TableCell>
+            {paginatedData.map((row, index) => (
+              <TableRow key={row.id} sx={{backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff'}}>
+                <TableCell size='small' sx={{backgroundColor: row.status  === "OK" ? 'inherit' : '#f24f4f'}}>{row.status}</TableCell>
+                <TableCell size='small'>{row.identifier}</TableCell>
+                <TableCell size='small'>{row.programName}</TableCell>
+                <TableCell size='small'>{row.resultTime}</TableCell>
+                <TableCell size='small'>{row.finalTorque}</TableCell>
+                <TableCell size='small'>{row.torqueStatus}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          page={table.page}
+          count={data.length}
+          rowsPerPage={table.rowsPerPage}
+          onPageChange={table.onChangePage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          onRowsPerPageChange={table.onChangeRowsPerPage}
+        />
       </TableContainer>
-    </Box>
+      </Grid>
+    </DashboardContent>
   );
 }
+
+export function useTable() {
+  const [page, setPage] = useState(0);
+  const [orderBy, setOrderBy] = useState('name');
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
+  const onSort = useCallback(
+    (id: string) => {
+      const isAsc = orderBy === id && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(id);
+    },
+    [order, orderBy]
+  );
+
+  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
+    if (checked) {
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  }, []);
+
+  const onSelectRow = useCallback(
+    (inputValue: string) => {
+      const newSelected = selected.includes(inputValue)
+        ? selected.filter((value) => value !== inputValue)
+        : [...selected, inputValue];
+
+      setSelected(newSelected);
+    },
+    [selected]
+  );
+
+  const onResetPage = useCallback(() => {
+    setPage(0);
+  }, []);
+
+  const onChangePage = useCallback((event: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const onChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      onResetPage();
+    },
+    [onResetPage]
+  );
+
+  return {
+    page,
+    order,
+    onSort,
+    orderBy,
+    selected,
+    rowsPerPage,
+    onSelectRow,
+    onResetPage,
+    onChangePage,
+    onSelectAllRows,
+    onChangeRowsPerPage,
+  };
+}
+
