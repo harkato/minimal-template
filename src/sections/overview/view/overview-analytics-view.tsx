@@ -30,7 +30,7 @@ export function OverviewAnalyticsView() {
     {
       id: '1',
       title: 'FAHRWERK',
-      color: '#22c57e',
+      color: '#20878b',
       vehicles: 37,
       nok: 28,
       nokVin: 0.757,
@@ -95,7 +95,7 @@ export function OverviewAnalyticsView() {
     {
       id: '5',
       title: 'ZP6',
-      color: '#22c57e',
+      color: '#20878b',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -111,7 +111,7 @@ export function OverviewAnalyticsView() {
     {
       id: '6',
       title: 'ZP6',
-      color: '#22c57e',
+      color: '#20878b', // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c, 
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,

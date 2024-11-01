@@ -50,7 +50,7 @@ export function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        { path: 'menu', element: <Menu />}
+        { path: 'menu', element: <Menu />},
       ],
     },
     {
