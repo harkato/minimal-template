@@ -21,15 +21,11 @@ import { AnalyticsCurrentSubject } from '../analytics-current-subject';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 
-
-
-
-
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
-  
+
   const [cardData, setCardData] = useState([
     {
       id: '1',
@@ -40,7 +36,7 @@ export function OverviewAnalyticsView() {
       nokVin: 0.757,
       target: 0.8,
       topIssues: [
-        { code: '2490 01', description: 'Bomba d\'água', occurrences: 8 },
+        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
         { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
         { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
         { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
@@ -72,7 +68,7 @@ export function OverviewAnalyticsView() {
       nokVin: 1.679,
       target: 0.8,
       topIssues: [
-        { code: '2490 01', description: 'Bomba d\'água', occurrences: 8 },
+        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
         { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
         { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
         { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
@@ -89,7 +85,7 @@ export function OverviewAnalyticsView() {
       nokVin: 1.679,
       target: 0.8,
       topIssues: [
-        { code: '2490 01', description: 'Bomba d\'água', occurrences: 8 },
+        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
         { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
         { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
         { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
@@ -143,23 +139,21 @@ export function OverviewAnalyticsView() {
       nok: 0,
       nokVin: 0.0,
       target: 1.0,
-      topIssues: [
-        { code: '0001', description: 'Exemplo de problema', occurrences: 1 },
-      ],
+      topIssues: [{ code: '0001', description: 'Exemplo de problema', occurrences: 1 }],
     };
     setCardData((prevData) => [...prevData, newCard]);
   };
 
   return (
     <DashboardContent maxWidth="xl">
-      <Grid container sx={{ justifyContent: "space-between" }}>
+      <Grid container sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
           {t('dashboard.process')}
         </Typography>
 
         <Button
           variant="contained"
-          size='small'
+          size="small"
           color="primary"
           onClick={handleAddCard}
           sx={{ mb: 3 }}
@@ -167,7 +161,6 @@ export function OverviewAnalyticsView() {
           {t('dashboard.newProcess')}
         </Button>
       </Grid>
-      
 
       <Grid container spacing={5}>
         {cardData.map((data) => (
@@ -218,20 +211,20 @@ export function OverviewAnalyticsView() {
           />
         </Grid> */}
         <Grid xs={12} md={6} lg={12}>
-          <TorqueChart/>
+          <TorqueChart />
         </Grid>
 
         <Grid xs={12} md={6} lg={12}>
           <Card>
-            <CardHeader title='Gráfico de Área'/>
+            <CardHeader title="Gráfico de Área" />
             <CardContent>
-              <AreaChart/>
+              <AreaChart />
             </CardContent>
           </Card>
         </Grid>
 
         <Grid xs={12} md={6} lg={12}>
-          <LineChart/>
+          <LineChart />
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
@@ -261,8 +254,6 @@ export function OverviewAnalyticsView() {
             }}
           />
         </Grid>
-        
-
 
         <Grid xs={12} md={6} lg={8}>
           <AnalyticsConversionRates

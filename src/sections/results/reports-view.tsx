@@ -2,9 +2,24 @@ import React, { useCallback, useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Box, Button, TextField, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Typography, Grid, TablePagination } from '@mui/material';
+import {
+  Box,
+  Button,
+  TextField,
+  MenuItem,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Typography,
+  Grid,
+  TablePagination,
+} from '@mui/material';
 import { DashboardContent } from 'src/layouts/dashboard';
-
 
 type Order = 'asc' | 'desc';
 
@@ -25,7 +40,7 @@ const initialData = Array.from({ length: 200 }, (_, i) => ({
   programName: `PVT${(i % 5) + 1}`, // Cicla entre PVT1 a PVT5
   resultTime: `2022-01-${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
   finalTorque: (Math.random() * 25).toFixed(1), // Torque aleatório entre 0 e 25 com uma casa decimal
-  torqueStatus: ['Low', 'Medium', 'High'][i % 3] // Cicla entre 'Low', 'Medium', 'High'
+  torqueStatus: ['Low', 'Medium', 'High'][i % 3], // Cicla entre 'Low', 'Medium', 'High'
 }));
 
 export default function ResultPage() {
@@ -56,32 +71,38 @@ export default function ResultPage() {
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters({ ...filters, [name]: value });
-    const filteredData = initialData.filter(row => 
+    const filteredData = initialData.filter(
+      (row) =>
         (filters.programName ? row.programName.includes(filters.programName) : true) &&
         (filters.status ? row.status === filters.status : true)
     );
     setData(filteredData);
   };
-  
+
   const table = useTable();
-  const paginatedData = data.slice(table.page * table.rowsPerPage , table.page * table.rowsPerPage + table.rowsPerPage);
-  
+  const paginatedData = data.slice(
+    table.page * table.rowsPerPage,
+    table.page * table.rowsPerPage + table.rowsPerPage
+  );
+
   return (
     <DashboardContent maxWidth="xl">
-      
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>Results</Typography>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+        Results
+      </Typography>
       {/* Menu de Filtros */}
-      <Grid container spacing={2} sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}>
+      <Grid
+        container
+        spacing={2}
+        sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
+      >
         {/* Data */}
         <Grid item xs={12} sm={6} md={4}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Date Range"
-              sx={{ width: '100%' }}
-            />
+            <DatePicker label="Date Range" sx={{ width: '100%' }} />
           </LocalizationProvider>
         </Grid>
-        
+
         {/* Ferramentas */}
         <Grid item xs={12} sm={6} md={4}>
           <TextField
@@ -98,9 +119,9 @@ export default function ResultPage() {
             <MenuItem value="NOK">Apertadeira 2</MenuItem>
           </TextField>
         </Grid>
-        
+
         {/* Resultados */}
-        
+
         <Grid item xs={12} sm={6} md={4}>
           <TextField
             select
@@ -130,7 +151,7 @@ export default function ResultPage() {
             fullWidth
           />
         </Grid>
-        
+
         {/* Bolt */}
         <Grid item xs={12} sm={6} md={4}>
           <TextField
@@ -169,89 +190,97 @@ export default function ResultPage() {
 
       {/* Tabela de Dados */}
       <Grid item xs={12} sm={12} md={12}>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'status'}
-                  direction={orderBy === 'status' ? order : 'asc'}
-                  onClick={() => handleRequestSort('status')}
-                >
-                  Status
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'identifier'}
-                  direction={orderBy === 'identifier' ? order : 'asc'}
-                  onClick={() => handleRequestSort('identifier')}
-                >
-                  Identificador
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'programName'}
-                  direction={orderBy === 'programName' ? order : 'asc'}
-                  onClick={() => handleRequestSort('programName')}
-                >
-                  Nome do Programa
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'resultTime'}
-                  direction={orderBy === 'resultTime' ? order : 'asc'}
-                  onClick={() => handleRequestSort('resultTime')}
-                >
-                  Data do Resultado
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'finalTorque'}
-                  direction={orderBy === 'finalTorque' ? order : 'asc'}
-                  onClick={() => handleRequestSort('finalTorque')}
-                >
-                  Torque Final
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size='small'>
-                <TableSortLabel
-                  active={orderBy === 'torqueStatus'}
-                  direction={orderBy === 'torqueStatus' ? order : 'asc'}
-                  onClick={() => handleRequestSort('torqueStatus')}
-                >
-                  Status do Torque
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((row, index) => (
-              <TableRow key={row.id} sx={{backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff'}}>
-                <TableCell size='small' sx={{backgroundColor: row.status  === "OK" ? 'inherit' : '#f24f4f'}}>{row.status}</TableCell>
-                <TableCell size='small'>{row.identifier}</TableCell>
-                <TableCell size='small'>{row.programName}</TableCell>
-                <TableCell size='small'>{row.resultTime}</TableCell>
-                <TableCell size='small'>{row.finalTorque}</TableCell>
-                <TableCell size='small'>{row.torqueStatus}</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'status'}
+                    direction={orderBy === 'status' ? order : 'asc'}
+                    onClick={() => handleRequestSort('status')}
+                  >
+                    Status
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'identifier'}
+                    direction={orderBy === 'identifier' ? order : 'asc'}
+                    onClick={() => handleRequestSort('identifier')}
+                  >
+                    Identificador
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'programName'}
+                    direction={orderBy === 'programName' ? order : 'asc'}
+                    onClick={() => handleRequestSort('programName')}
+                  >
+                    Nome do Programa
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'resultTime'}
+                    direction={orderBy === 'resultTime' ? order : 'asc'}
+                    onClick={() => handleRequestSort('resultTime')}
+                  >
+                    Data do Resultado
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'finalTorque'}
+                    direction={orderBy === 'finalTorque' ? order : 'asc'}
+                    onClick={() => handleRequestSort('finalTorque')}
+                  >
+                    Torque Final
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'torqueStatus'}
+                    direction={orderBy === 'torqueStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('torqueStatus')}
+                  >
+                    Status do Torque
+                  </TableSortLabel>
+                </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          page={table.page}
-          count={data.length}
-          rowsPerPage={table.rowsPerPage}
-          onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
-        />
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {paginatedData.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff' }}
+                >
+                  <TableCell
+                    size="small"
+                    sx={{ backgroundColor: row.status === 'OK' ? 'inherit' : '#f24f4f' }}
+                  >
+                    {row.status}
+                  </TableCell>
+                  <TableCell size="small">{row.identifier}</TableCell>
+                  <TableCell size="small">{row.programName}</TableCell>
+                  <TableCell size="small">{row.resultTime}</TableCell>
+                  <TableCell size="small">{row.finalTorque}</TableCell>
+                  <TableCell size="small">{row.torqueStatus}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            page={table.page}
+            count={data.length}
+            rowsPerPage={table.rowsPerPage}
+            onPageChange={table.onChangePage}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            onRowsPerPageChange={table.onChangeRowsPerPage}
+          />
+        </TableContainer>
       </Grid>
     </DashboardContent>
   );
@@ -322,4 +351,3 @@ export function useTable() {
     onChangeRowsPerPage,
   };
 }
-

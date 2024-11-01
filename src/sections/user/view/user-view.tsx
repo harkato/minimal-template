@@ -10,7 +10,28 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, TableCell, TableHead, TableRow, Paper, Grid, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Checkbox, ListItemText, SelectChangeEvent, IconButton, InputAdornment } from '@mui/material';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
+  Checkbox,
+  ListItemText,
+  SelectChangeEvent,
+  IconButton,
+  InputAdornment,
+} from '@mui/material';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -29,8 +50,6 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 import type { UserProps } from '../user-table-row';
 import ResultPage from '../../results/reports-view';
 
-
-
 // ----------------------------------------------------------------------
 interface User {
   name: string;
@@ -39,7 +58,8 @@ interface User {
 }
 
 // Esquema de validação para o nome do usuário
-const userNameSchema = z.string()
+const userNameSchema = z
+  .string()
   .min(2, { message: 'O nome deve ter no mínimo 2 caracteres.' })
   .max(50, { message: 'O nome deve ter no máximo 50 caracteres.' })
   .regex(/^[a-zA-Z\s]+$/, { message: 'O nome deve conter apenas letras e espaços.' });
@@ -85,7 +105,11 @@ export function UserView() {
     setFormData(initialFormData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string | string[]>) => {
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string | string[]>
+  ) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -101,15 +125,20 @@ export function UserView() {
       console.log('Nome válido:', formData.name);
       // Aqui você pode processar o envio do formulário
     } catch (e) {
-      alert('Erro ao criar usuário: nome inválido')
+      alert('Erro ao criar usuário: nome inválido');
     } finally {
       setFormData(initialFormData);
       handleClose(); // Fecha o diálogo após a submissão
     }
   };
-  const profiles = ['Operador', 'Lider', 'Engenheiro de processo', 'Administrador do sistema', 'Usuário'];
+  const profiles = [
+    'Operador',
+    'Lider',
+    'Engenheiro de processo',
+    'Administrador do sistema',
+    'Usuário',
+  ];
   const workStations = ['ABS1', 'ABS2', 'Tacto 1', 'Tacto 13', 'R2 Chicote TC58', 'ZP6'];
-
 
   return (
     <DashboardContent>
@@ -120,145 +149,142 @@ export function UserView() {
           <Grid container spacing={4}>
             <Grid item xs={12} sm={12}>
               <TextField
-              margin="dense"
-              name="name"
-              label="Nome"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.name}
-              onChange={handleChange}
+                margin="dense"
+                name="name"
+                label="Nome"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.name}
+                onChange={handleChange}
               />
             </Grid>
-          
-          {/* userID */}
-          <Grid item xs={12} sm={12}>
-            <TextField
-              margin="dense"
-              name="userID"
-              label="User ID"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.userID}
-              onChange={handleChange}
-            />
-          </Grid>
 
-          {/* Senha */}
-          <Grid item xs={12} sm={12}>
-            <TextField
-              margin="dense"
-              name="password"
-              label="Senha"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              variant="outlined"
-              value={formData.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleTogglePasswordVisibility}
-                      aria-label="toggle password visibility"
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              onChange={handleChange}
-            />
-          </Grid>
+            {/* userID */}
+            <Grid item xs={12} sm={12}>
+              <TextField
+                margin="dense"
+                name="userID"
+                label="User ID"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.userID}
+                onChange={handleChange}
+              />
+            </Grid>
 
-          {/* Confirmar Senha */}
-          <Grid item xs={12} sm={12}>
-            <TextField
-              margin="dense"
-              name="confirmPassword"
-              label="Confirmar Senha"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              variant="outlined"
-              value={formData.confirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleTogglePasswordVisibility}
-                      aria-label="toggle password visibility"
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              onChange={handleChange}
-            />
-          </Grid>
-          
-          
-          
-          
-          {/* Crachá */}
-          <Grid item xs={12} sm={6}>
-          <TextField
-            margin="dense"
-            name="badge"
-            label="Crachá"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.badge}
-            onChange={handleChange}
-          />
-          </Grid>
+            {/* Senha */}
+            <Grid item xs={12} sm={12}>
+              <TextField
+                margin="dense"
+                name="password"
+                label="Senha"
+                type={showPassword ? 'text' : 'password'}
+                fullWidth
+                variant="outlined"
+                value={formData.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePasswordVisibility}
+                        aria-label="toggle password visibility"
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleChange}
+              />
+            </Grid>
 
-          {/* Perfil */}
-          <Grid item xs={12} sm={6}>
-          <FormControl fullWidth margin="dense" variant="outlined">
-            <InputLabel id="profile-label">Perfil</InputLabel>
-            <Select
-              labelId="profile-label"
-              name="profile"
-              value={formData.profile}
-              label="Perfil"
-              onChange={handleChange}
-            >
-              {profiles.map((profile) => (
-                <MenuItem key={profile} value={profile}>
-                  {profile}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          </Grid>
+            {/* Confirmar Senha */}
+            <Grid item xs={12} sm={12}>
+              <TextField
+                margin="dense"
+                name="confirmPassword"
+                label="Confirmar Senha"
+                type={showPassword ? 'text' : 'password'}
+                fullWidth
+                variant="outlined"
+                value={formData.confirmPassword}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePasswordVisibility}
+                        aria-label="toggle password visibility"
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleChange}
+              />
+            </Grid>
 
-          {/* Postos de Trabalho */}
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-          <FormControl fullWidth margin="dense" variant="outlined">
-            <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
-            <Select
-              labelId="workStations-label"
-              name="workStations"
-              value={formData.workStations}
-              onChange={handleChange}
-              label="Postos de trabalho"
-            >
-              {workStations.map((station) => (
-                <MenuItem key={station} value={station}>
-                  {station}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          </Grid>
+            {/* Crachá */}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                margin="dense"
+                name="badge"
+                label="Crachá"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formData.badge}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            {/* Perfil */}
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth margin="dense" variant="outlined">
+                <InputLabel id="profile-label">Perfil</InputLabel>
+                <Select
+                  labelId="profile-label"
+                  name="profile"
+                  value={formData.profile}
+                  label="Perfil"
+                  onChange={handleChange}
+                >
+                  {profiles.map((profile) => (
+                    <MenuItem key={profile} value={profile}>
+                      {profile}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Postos de Trabalho */}
+            <Grid item xs={12} sm={6} display="flex" alignItems="center">
+              <FormControl fullWidth margin="dense" variant="outlined">
+                <InputLabel id="workStations-label">Postos de Trabalho</InputLabel>
+                <Select
+                  labelId="workStations-label"
+                  name="workStations"
+                  value={formData.workStations}
+                  onChange={handleChange}
+                  label="Postos de trabalho"
+                >
+                  {workStations.map((station) => (
+                    <MenuItem key={station} value={station}>
+                      {station}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} sx={{color: "grey"}}>
+          <Button onClick={handleClose} sx={{ color: 'grey' }}>
             Cancelar
           </Button>
           <Button onClick={handleSubmit} color="primary">
@@ -276,15 +302,10 @@ export function UserView() {
           onClick={handleOpen}
           startIcon={<Iconify icon="mingcute:add-line" />}
         >
-           {t('users.create')}
+          {t('users.create')}
         </Button>
       </Box>
-      {/* <Grid container spacing={3}>
-        <CrudTable/>
-        <h1> texto</h1>
-      </Grid> */}
-      
-      
+
       <Card>
         <UserTableToolbar
           numSelected={table.selected.length}
@@ -294,7 +315,7 @@ export function UserView() {
             table.onResetPage();
           }}
         />
-        
+
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -357,43 +378,6 @@ export function UserView() {
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
-
-        {/* <div style={{ padding: '20px' }}>
-        <h1>Tabela de Usuários</h1>
-
-        <UserModal open={openModal} handleClose={closeUserModal} handleSubmit={addUser} />
-
-        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>Companhia</TableCell>
-                <TableCell>Cargo</TableCell>
-                <TableCell>Email</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.length > 0 ? (
-                users.map((user, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.company}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={2} align="center">
-                    Nenhum usuário cadastrado
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div> */}
     </DashboardContent>
   );
 }
