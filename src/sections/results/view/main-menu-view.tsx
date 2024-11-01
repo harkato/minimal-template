@@ -18,13 +18,13 @@ export function MainMenu() {
     <DashboardContent>
       {/* Categoria: General */}
       <Grid container spacing={1} mb={2}>
-        <Grid item xs={12} sm={12} md={12} lg={12}>
+        <Grid item xs={12}>
           <Typography variant="h4" mb="10px">
             General
           </Typography>
         </Grid>
 
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -38,7 +38,7 @@ export function MainMenu() {
           </Button>
         </Grid>
 
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -52,7 +52,7 @@ export function MainMenu() {
           </Button>
         </Grid>
 
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -66,7 +66,7 @@ export function MainMenu() {
           </Button>
         </Grid>
 
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -89,7 +89,7 @@ export function MainMenu() {
           </Typography>
         </Grid>
 
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -102,7 +102,7 @@ export function MainMenu() {
             </Stack>
           </Button>
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"
@@ -124,7 +124,7 @@ export function MainMenu() {
             Adhesive
           </Typography>
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             color="primary"

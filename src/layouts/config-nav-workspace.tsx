@@ -3,7 +3,7 @@
 export const _workspaces = [
   {
     id: 'team-1',
-    name: 'Vendedor',
+    name: 'Operador',
     logo: `/assets/icons/workspaces/logo-1.webp`,
     plan: 'Free',
   },
@@ -15,7 +15,7 @@ export const _workspaces = [
   },
   {
     id: 'team-3',
-    name: 'Operador',
+    name: 'Vendedor',
     logo: `/assets/icons/workspaces/logo-3.webp`,
     plan: 'Pro',
   },

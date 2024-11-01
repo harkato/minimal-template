@@ -18,8 +18,14 @@ import {
   Typography,
   Grid,
   TablePagination,
+  Toolbar,
+  OutlinedInput,
+  InputAdornment,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { Iconify } from 'src/components/iconify';
 
 type Order = 'asc' | 'desc';
 
@@ -191,7 +197,31 @@ export default function ResultPage() {
       {/* Tabela de Dados */}
       <Grid item xs={12} sm={12} md={12}>
         <TableContainer component={Paper}>
+        <Toolbar
+              sx={{
+                height: 50,
+                display: 'flex',
+                justifyContent: 'space-between',
+                p: (theme) => theme.spacing(0, 1, 0, 3)
+              }}
+            >
+            <div/>
+                <div>
+                <Tooltip title="Save or Export">
+                  <IconButton>
+                    <Iconify icon="material-symbols:save" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Refresh">
+                  <IconButton>
+                    <Iconify icon="material-symbols:refresh" />
+                  </IconButton>
+                </Tooltip>
+                </div>
+                
+            </Toolbar>
           <Table>
+            
             <TableHead>
               <TableRow>
                 <TableCell size="small">
@@ -254,7 +284,7 @@ export default function ResultPage() {
               {paginatedData.map((row, index) => (
                 <TableRow
                   key={row.id}
-                  sx={{ backgroundColor: index % 2 === 0 ? '#f5f5f5' : '#ffffff' }}
+                  sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
                   <TableCell
                     size="small"
