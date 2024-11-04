@@ -134,7 +134,8 @@ export function OverviewAnalyticsView() {
     const newCard = {
       id: `${Date.now()}`, // Gera um ID único baseado no timestamp
       title: 'Processo',
-      color: '#22c57e', // Cor padrão
+      // color: '#22c57e',
+      color: '#20878b',
       vehicles: 0,
       nok: 0,
       nokVin: 0.0,
