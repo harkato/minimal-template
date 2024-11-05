@@ -75,12 +75,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClose={() => setNavOpen(false)}
                   workspaces={_workspaces}
                 />
-                <NavDesktop
-                  data={navData}
-                  open={navOpen}
-                  onClose={() => setNavOpen(false)}
-                  workspaces={_workspaces}
-                />
+                <NavDesktop data={navData} open={navOpen}
+        onClose={() => setNavOpen(false)} workspaces={_workspaces} />
               </>
             ),
             rightArea: (
@@ -115,7 +111,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
       /** **************************************
        * Sidebar
        *************************************** */
-      sidebarSection={null}
+      sidebarSection={
+        null
+      }
       /** **************************************
        * Footer
        *************************************** */
