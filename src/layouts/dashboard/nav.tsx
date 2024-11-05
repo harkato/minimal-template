@@ -16,7 +16,6 @@ import { varAlpha } from 'src/theme/styles';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
-import { NavUpgrade } from '../components/nav-upgrade';
 import { WorkspacesPopover } from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
@@ -43,12 +42,22 @@ export function NavDesktop({
   data,
   slots,
   workspaces,
-  layoutQuery,
-}: NavContentProps & { layoutQuery: Breakpoint }) {
-  const theme = useTheme();
+  open,
+  onClose,
+}: NavContentProps & { open: boolean; onClose: () => void }) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (open) {
+      onClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
-    <Box
+    <Drawer
+      open={open}
+      onClose={onClose}
       sx={{
         pt: 2.5,
         px: 2.5,
@@ -61,15 +70,11 @@ export function NavDesktop({
         bgcolor: 'var(--layout-nav-bg)',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid var(--layout-nav-border-color, ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)})`,
-        [theme.breakpoints.up(layoutQuery)]: {
-          display: 'flex',
-        },
         ...sx,
       }}
     >
       <NavContent data={data} slots={slots} workspaces={workspaces} />
-    </Box>
+    </Drawer>
   );
 }
 

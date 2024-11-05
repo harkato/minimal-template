@@ -67,7 +67,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClick={() => setNavOpen(true)}
                   sx={{
                     ml: -1,
-                    [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
                   }}
                 />
                 <NavMobile
@@ -111,7 +110,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+        <NavDesktop data={navData} open={navOpen}
+        onClose={() => setNavOpen(false)} workspaces={_workspaces} />
       }
       /** **************************************
        * Footer
