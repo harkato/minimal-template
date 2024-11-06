@@ -56,6 +56,7 @@ export function NavDesktop({
 
   return (
     <Drawer
+    variant='permanent'
       open={open}
       onClose={onClose}
       sx={{
@@ -64,7 +65,6 @@ export function NavDesktop({
         top: 0,
         left: 0,
         height: 1,
-        display: 'none',
         position: 'fixed',
         flexDirection: 'column',
         bgcolor: 'var(--layout-nav-bg)',
@@ -73,7 +73,7 @@ export function NavDesktop({
         ...sx,
       }}
     >
-      <NavContent data={data} slots={slots} workspaces={workspaces} />
+      <NavContent open={open} data={data} slots={slots} workspaces={workspaces} />
     </Drawer>
   );
 }
@@ -112,23 +112,29 @@ export function NavMobile({
         },
       }}
     >
-      <NavContent data={data} slots={slots} workspaces={workspaces} />
+      <NavContent open={open} data={data} slots={slots} workspaces={workspaces} />
     </Drawer>
   );
 }
 
 // ----------------------------------------------------------------------
 
-export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
+export function NavContent({
+  data,
+  slots,
+  workspaces,
+  sx,
+  open,
+}: NavContentProps & { open: boolean }) {
   const pathname = usePathname();
 
   return (
     <>
-      <Logo />
+      {open && <Logo/>}
 
       {slots?.topArea}
 
-      <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />
+      {open && <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />}
 
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
@@ -143,10 +149,11 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                     component={RouterLink}
                     href={item.path}
                     sx={{
-                      pl: 2,
+                      pl: open ? 2 : 1,
                       py: 1,
-                      gap: 2,
-                      pr: 1.5,
+                      gap: open ? 2 : 0,
+                      justifyContent: open ? 'initial' : 'center',
+                      pr: open ? 1.5 : 1,
                       borderRadius: 0.75,
                       typography: 'body2',
                       fontWeight: 'fontWeightMedium',
@@ -166,9 +173,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                       {item.icon}
                     </Box>
 
-                    <Box component="span" flexGrow={1}>
-                      {item.title}
-                    </Box>
+                    {open && <Box component="span" flexGrow={1}>{item.title}</Box>}
 
                     {item.info && item.info}
                   </ListItemButton>

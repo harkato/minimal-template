@@ -66,7 +66,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 <MenuButton
                   onClick={() => setNavOpen(true)}
                   sx={{
-                    ml: -1,
+                    ml: 15,
                   }}
                 />
                 <NavMobile
@@ -75,8 +75,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClose={() => setNavOpen(false)}
                   workspaces={_workspaces}
                 />
-                <NavDesktop data={navData} open={navOpen}
-        onClose={() => setNavOpen(false)} workspaces={_workspaces} />
+                
               </>
             ),
             rightArea: (
@@ -112,7 +111,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        null
+        <NavDesktop data={navData} open={navOpen}
+        onClose={() => setNavOpen(false)} workspaces={_workspaces} />
       }
       /** **************************************
        * Footer
@@ -122,7 +122,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Style
        *************************************** */
       cssVars={{
-        '--layout-nav-vertical-width': navOpen ? '300px' : '0',
+        '--layout-nav-vertical-width': navOpen ? '300px' : '0px',
         '--layout-dashboard-content-pt': theme.spacing(1),
         '--layout-dashboard-content-pb': theme.spacing(8),
         '--layout-dashboard-content-px': theme.spacing(5),
