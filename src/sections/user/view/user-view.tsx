@@ -269,15 +269,27 @@ export function UserView() {
                 <Select
                   labelId="workStations-label"
                   name="workStations"
+                  multiple
                   value={formData.workStations}
                   onChange={handleChange}
-                  label="Postos de trabalho"
+                  renderValue={(selected) => selected.join(', ')}
+                  label="Postos de Trabalho"
                 >
                   {workStations.map((station) => (
                     <MenuItem key={station} value={station}>
-                      {station}
+                      <Checkbox checked={formData.workStations.includes(station)} />
+                      <ListItemText primary={station} />
                     </MenuItem>
                   ))}
+                  <TablePagination
+                    component="div"
+                    page={table.page}
+                    count={_users.length}
+                    rowsPerPage={table.rowsPerPage}
+                    onPageChange={table.onChangePage}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    onRowsPerPageChange={table.onChangeRowsPerPage}
+                  />
                 </Select>
               </FormControl>
             </Grid>
