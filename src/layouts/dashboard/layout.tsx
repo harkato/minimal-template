@@ -66,7 +66,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 <MenuButton
                   onClick={() => setNavOpen(true)}
                   sx={{
-                    ml: 15,
+                    ml: -1,
                   }}
                 />
                 <NavMobile
@@ -122,7 +122,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Style
        *************************************** */
       cssVars={{
-        '--layout-nav-vertical-width': navOpen ? '300px' : '0px',
+        '--layout-nav-vertical-width': navOpen ? '300px' : '150px',
         '--layout-dashboard-content-pt': theme.spacing(1),
         '--layout-dashboard-content-pb': theme.spacing(8),
         '--layout-dashboard-content-px': theme.spacing(5),
