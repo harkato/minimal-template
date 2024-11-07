@@ -15,6 +15,10 @@
 /* scrollbar */
 @import './components/scrollbar/styles.css';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* chart */
 @import './components/chart/styles.css';
 
