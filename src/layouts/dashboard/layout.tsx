@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -22,6 +22,7 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
+import MiniDrawer from './mini-drawer';
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +38,15 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const theme = useTheme();
 
   const [navOpen, setNavOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setNavOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setNavOpen(false);
+  };
 
   const layoutQuery: Breakpoint = 'lg';
 
@@ -67,7 +77,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClick={() => setNavOpen(true)}
                   sx={{
                     ml: -1,
+                    [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
                   }}
+                />
+                <MenuButton
+                  onClick={handleDrawerOpen}
+                  sx={[{ ml: -1 }, navOpen && { display: 'none' }]}
                 />
                 <NavMobile
                   data={navData}
@@ -75,8 +90,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClose={() => setNavOpen(false)}
                   workspaces={_workspaces}
                 />
-                <NavDesktop data={navData} open={navOpen}
-        onClose={() => setNavOpen(false)} workspaces={_workspaces} />
+                
               </>
             ),
             rightArea: (
@@ -112,8 +126,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        null
-      }
+      <NavDesktop
+        data={navData}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        workspaces={_workspaces}
+      />}
       /** **************************************
        * Footer
        *************************************** */
@@ -122,7 +140,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Style
        *************************************** */
       cssVars={{
-        '--layout-nav-vertical-width': navOpen ? '300px' : '0',
+        '--layout-nav-vertical-width': '240px',
         '--layout-dashboard-content-pt': theme.spacing(1),
         '--layout-dashboard-content-pb': theme.spacing(8),
         '--layout-dashboard-content-px': theme.spacing(5),
@@ -136,7 +154,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         ...sx,
       }}
     >
-      <Main>{children}</Main>
+      <Main>
+        {children}
+      </Main>
     </LayoutSection>
   );
 }
