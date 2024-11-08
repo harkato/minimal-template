@@ -5,6 +5,9 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
+import { IconButton } from '@mui/material';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 import { _langs, _notifications } from 'src/_mock';
 
@@ -37,8 +40,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const theme = useTheme();
 
   const [navOpen, setNavOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
+
+  const toggleExpand = () => setIsExpanded((prev) => !prev);
 
   return (
     <LayoutSection
@@ -70,6 +76,17 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
                   }}
                 />
+                <IconButton
+                  onClick={toggleExpand}
+                  sx={{
+                    ml: -1,
+                    [theme.breakpoints.down(layoutQuery)]: { display: 'none' },
+                    alignSelf: 'center',
+                    color: 'var(--layout-nav-item-color)',
+                  }}
+                >
+                  {isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
                 <NavMobile
                   data={navData}
                   open={navOpen}
@@ -111,7 +128,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+        <NavDesktop
+          isExpanded={isExpanded}
+          data={navData}
+          layoutQuery={layoutQuery}
+          workspaces={_workspaces}
+        />
       }
       /** **************************************
        * Footer
@@ -121,7 +143,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Style
        *************************************** */
       cssVars={{
-        '--layout-nav-vertical-width': '300px',
+        '--layout-nav-vertical-width': isExpanded? '300px' : '72px',
         '--layout-dashboard-content-pt': theme.spacing(1),
         '--layout-dashboard-content-pb': theme.spacing(8),
         '--layout-dashboard-content-px': theme.spacing(5),
