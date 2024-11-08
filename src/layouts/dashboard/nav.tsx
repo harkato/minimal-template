@@ -94,7 +94,7 @@ export function NavDesktop({
       {slots?.topArea}
 
       {/* Popover dos workspaces */}
-      {isExpanded && <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />}
+      {/* {isExpanded && <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />} */}
 
       {/* Scrollbar para a lista de navegação */}
       <Scrollbar fillContent>
