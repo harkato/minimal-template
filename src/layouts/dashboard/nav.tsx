@@ -8,13 +8,13 @@ import { useTheme } from '@mui/material/styles';
 import ListItemButton from '@mui/material/ListItemButton';
 import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
-
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { varAlpha } from 'src/theme/styles';
 
 import { Logo } from 'src/components/logo';
+import { MiniLogo } from 'src/components/logo/mini-logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import { NavUpgrade } from '../components/nav-upgrade';
@@ -55,7 +55,7 @@ export function NavDesktop({
     <Box
       sx={{
         pt: 2.5,
-        px: isExpanded? 2.5 : 1,
+        px: isExpanded ? 2.5 : 1,
         top: 0,
         left: 0,
         height: 1,
@@ -75,9 +75,21 @@ export function NavDesktop({
         ...sx,
       }}
     >
-      
       {/* Logo */}
-      {isExpanded && <Logo />}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isExpanded ? 'flex-start' : 'center',
+          mb: 2,
+          transition: theme.transitions.create(['justify-content', 'width'], {
+            duration: theme.transitions.duration.short,
+          }),
+        }}
+      >
+        {isExpanded ? <Logo /> : <MiniLogo />}
+      </Box>
+      
 
       {slots?.topArea}
 
@@ -98,21 +110,33 @@ export function NavDesktop({
                     component={RouterLink}
                     href={item.path}
                     sx={{
-                      pl: isExpanded ? 2 : 0,
+                      justifyContent:'center',
+                      pl: isExpanded ? 2 : 1.5,
                       py: 1,
                       gap: isExpanded ? 2 : 0,
                       pr: 1.5,
                       borderRadius: 0.75,
                       typography: isExpanded ? 'body2' : 'caption',
                       fontWeight: isActived ? 'fontWeightSemiBold' : 'fontWeightMedium',
-                      color: isActived ? 'var(--layout-nav-item-active-color)' : 'var(--layout-nav-item-color)',
+                      color: isActived
+                        ? 'var(--layout-nav-item-active-color)'
+                        : 'var(--layout-nav-item-color)',
                       bgcolor: isActived ? 'var(--layout-nav-item-active-bg)' : 'transparent',
                       '&:hover': {
                         bgcolor: 'var(--layout-nav-item-hover-bg)',
                       },
                     }}
                   >
-                    <Box component="span" sx={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
                       {item.icon}
                     </Box>
 
