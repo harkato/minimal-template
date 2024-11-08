@@ -83,7 +83,7 @@ export function NavDesktop({
           justifyContent: isExpanded ? 'flex-start' : 'center',
           mb: 2,
           transition: theme.transitions.create(['justify-content', 'width'], {
-            duration: theme.transitions.duration.short,
+            duration: theme.transitions.duration.standard,
           }),
         }}
       >
@@ -125,6 +125,9 @@ export function NavDesktop({
                       '&:hover': {
                         bgcolor: 'var(--layout-nav-item-hover-bg)',
                       },
+                      transition: theme.transitions.create('width', {
+                        duration: theme.transitions.duration.standard,
+                      }),
                     }}
                   >
                     <Box
@@ -141,7 +144,9 @@ export function NavDesktop({
                     </Box>
 
                     {isExpanded && (
-                      <Box component="span" flexGrow={1}>
+                      <Box component="span" flexGrow={1} sx={{transition: theme.transitions.create('width', {
+                        duration: theme.transitions.duration.standard,
+                      })}}>
                         {item.title}
                       </Box>
                     )}

@@ -170,7 +170,7 @@ export function OverviewAnalyticsView() {
             <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
           </Grid>
         ))}
-        <Grid xs={12}> 
+        <Grid xs={6}> 
         <AnalyticsChartCard id='12'/>
         </Grid>
         
