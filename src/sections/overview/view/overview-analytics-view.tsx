@@ -20,6 +20,7 @@ import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
+import { AnalyticsChartCard } from '../analytics-chart-card';
 
 // ----------------------------------------------------------------------
 
@@ -111,7 +112,7 @@ export function OverviewAnalyticsView() {
     {
       id: '6',
       title: 'ZP6',
-      color: '#20878b', // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c, 
+      color: '#20878b', // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c,
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -169,6 +170,10 @@ export function OverviewAnalyticsView() {
             <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
           </Grid>
         ))}
+        <Grid xs={12}> 
+        <AnalyticsChartCard id='12'/>
+        </Grid>
+        
 
         {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
