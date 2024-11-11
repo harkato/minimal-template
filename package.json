@@ -40,6 +40,8 @@
     "@mui/x-data-grid": "7.20.0",
     "@mui/x-date-pickers": "^7.22.0",
     "apexcharts": "3.52.0",
+    "datatables.net-dt": "^2.1.8",
+    "datatables.net-react": "^1.0.0",
     "dayjs": "^1.11.13",
     "highcharts": "11.4.8",
     "highcharts-react-official": "3.2.1",

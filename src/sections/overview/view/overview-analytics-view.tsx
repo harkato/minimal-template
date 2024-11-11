@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-import { Button, Card, CardContent, CardHeader } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  FormControlLabel,
+  Menu,
+  MenuItem,
+} from '@mui/material';
 
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
@@ -127,23 +136,31 @@ export function OverviewAnalyticsView() {
     },
   ]);
 
-  const handleDeleteCard = (id: string) => {
-    setCardData((prevData) => prevData.filter((card) => card.id !== id));
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
   };
 
-  const handleAddCard = () => {
-    const newCard = {
-      id: `${Date.now()}`, // Gera um ID único baseado no timestamp
-      title: 'Processo',
-      // color: '#22c57e',
-      color: '#20878b',
-      vehicles: 0,
-      nok: 0,
-      nokVin: 0.0,
-      target: 1.0,
-      topIssues: [{ code: '0001', description: 'Exemplo de problema', occurrences: 1 }],
-    };
-    setCardData((prevData) => [...prevData, newCard]);
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleToggleCard = (id: string) => {
+    setSelectedCards((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((cardId) => cardId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleApplySelection = () => {
+    handleMenuClose();
+  };
+
+  const handleDeleteCard = (id: string) => {
+    setCardData((prevData) => prevData.filter((card) => card.id !== id));
   };
 
   return (
@@ -157,23 +174,42 @@ export function OverviewAnalyticsView() {
           variant="contained"
           size="small"
           color="primary"
-          onClick={handleAddCard}
+          onClick={handleMenuOpen}
           sx={{ mb: 3 }}
         >
           {t('dashboard.newProcess')}
         </Button>
+        <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+          {cardData.map((card) => (
+            <MenuItem key={card.id}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedCards.includes(card.id)}
+                    onChange={() => handleToggleCard(card.id)}
+                  />
+                }
+                label={card.title}
+              />
+            </MenuItem>
+          ))}
+          <Button onClick={handleApplySelection} color="primary">
+            {t('dashboard.applySelection')}
+          </Button>
+        </Menu>
       </Grid>
 
       <Grid container spacing={5}>
-        {cardData.map((data) => (
-          <Grid xs={12} sm={6} md={6} key={data.id}>
-            <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
-          </Grid>
-        ))}
-        <Grid xs={6}> 
-        <AnalyticsChartCard id='12'/>
+        {cardData
+          .filter((data) => selectedCards.includes(data.id))
+          .map((data) => (
+            <Grid xs={12} sm={6} md={6} key={data.id}>
+              <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
+            </Grid>
+          ))}
+        <Grid xs={6}>
+          <AnalyticsChartCard id="12" />
         </Grid>
-        
 
         {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary

@@ -5,6 +5,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
 
+import DataTable from 'datatables.net-react';
+import DT from 'datatables.net-dt';
+
 import { _products } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -17,7 +20,7 @@ import type { FiltersProps } from '../product-filters';
 
 // ----------------------------------------------------------------------
 
-
+DataTable.use(DT);
 const GENDER_OPTIONS = [
   { value: 'men', label: 'Men' },
   { value: 'women', label: 'Women' },
@@ -62,7 +65,7 @@ export function ProductsView() {
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
-  }
+  };
 
   const [sortBy, setSortBy] = useState('featured');
 
@@ -90,14 +93,20 @@ export function ProductsView() {
     (key) => filters[key as keyof FiltersProps] !== defaultFilters[key as keyof FiltersProps]
   );
 
+  const [tableData, setTableData] = useState([
+    [ 'Tiger Nixon', 'System Architect' ],
+    [ 'Garrett Winters', 'Accountant' ],
+    // ...
+  ]);
+
   return (
     <DashboardContent>
-        <div>
-          <header className="app-header">
+      <div>
+        <header className="app-header">
           <h1>{t('app.title')}</h1>
           <p>{t('app.subtitle')}</p>
         </header>
-    
+
         <p className="select-language">{t('app.select_language')}</p>
         <button type="button" onClick={() => changeLanguage('pt-BR')}>
           {t('app.portuguese')}
@@ -105,6 +114,15 @@ export function ProductsView() {
         <button type="button" onClick={() => changeLanguage('en-US')}>
           {t('app.english')}
         </button>
+        
+        <DataTable data={tableData} className="display">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+        </DataTable>
       </div>
       {/* <Typography variant="h4" sx={{ mb: 5 }}>
         {t('app.products')}

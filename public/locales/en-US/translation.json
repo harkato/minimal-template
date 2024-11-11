@@ -10,7 +10,8 @@
 
     "dashboard": {
         "process": "Main processes",
-        "newProcess": "New Process"
+        "newProcess": "New Process",
+        "applySelection": "Apply selection"
     },
 
     "users": {
