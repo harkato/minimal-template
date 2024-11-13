@@ -50,7 +50,12 @@ export function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
-        { path: 'menu', element: <Menu />},
+        { path: 'menu', element: <Menu />, 
+          children: [ // Subpáginas aninhadas
+            { path: 'result', element: <ResultsPage /> },
+            { path: 'users', element: <UserPage /> },
+          ]
+        },
       ],
     },
     {

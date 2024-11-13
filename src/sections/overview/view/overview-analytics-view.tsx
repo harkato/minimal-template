@@ -19,123 +19,20 @@ import TorqueChart from 'src/components/chart/torquechart';
 import AreaChart from 'src/components/chart/areachart';
 import { useTranslation } from 'react-i18next';
 
-import { AnalyticsNews } from '../analytics-news';
-import { AnalyticsTasks } from '../analytics-tasks';
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
-import { AnalyticsOrderTimeline } from '../analytics-order-timeline';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
-import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsChartCard } from '../analytics-chart-card';
+import { initialData } from './initial-data';
 
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
 
-  const [cardData, setCardData] = useState([
-    {
-      id: '1',
-      title: 'FAHRWERK',
-      color: '#20878b',
-      vehicles: 37,
-      nok: 28,
-      nokVin: 0.757,
-      target: 0.8,
-      topIssues: [
-        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
-        { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
-        { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
-        { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
-        { code: '4107 01', description: 'Suporte bomba de vácuo', occurrences: 3 },
-      ],
-    },
-    {
-      id: '2',
-      title: 'ZP6',
-      color: '#f24f4f',
-      vehicles: 37,
-      nok: 21,
-      nokVin: 0.568,
-      target: 0.8,
-      topIssues: [
-        { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
-        { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
-        { code: '4237 01', description: 'Dobradiças porta traseira LE', occurrences: 2 },
-        { code: '2640 01', description: 'Duto freio agregado hidráulico 740', occurrences: 2 },
-        { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
-      ],
-    },
-    {
-      id: '3',
-      title: 'BANCOS',
-      color: '#f24f4f',
-      vehicles: 28,
-      nok: 47,
-      nokVin: 1.679,
-      target: 0.8,
-      topIssues: [
-        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
-        { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
-        { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
-        { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
-        { code: '4107 01', description: 'Suporte bomba de vácuo', occurrences: 3 },
-      ],
-    },
-    {
-      id: '4',
-      title: 'BANCOS',
-      color: '#f24f4f',
-      // color: '#f52f2f',
-      vehicles: 28,
-      nok: 47,
-      nokVin: 1.679,
-      target: 0.8,
-      topIssues: [
-        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
-        { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
-        { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
-        { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
-        { code: '4107 01', description: 'Suporte bomba de vácuo', occurrences: 3 },
-      ],
-    },
-    {
-      id: '5',
-      title: 'ZP6',
-      color: '#20878b',
-      vehicles: 37,
-      nok: 21,
-      nokVin: 0.568,
-      target: 0.8,
-      topIssues: [
-        { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
-        { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
-        { code: '4237 01', description: 'Dobradiças porta traseira LE', occurrences: 2 },
-        { code: '2640 01', description: 'Duto freio agregado hidráulico 740', occurrences: 2 },
-        { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
-      ],
-    },
-    {
-      id: '6',
-      title: 'ZP6',
-      color: '#20878b', // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c,
-      vehicles: 37,
-      nok: 21,
-      nokVin: 0.568,
-      target: 0.8,
-      topIssues: [
-        { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
-        { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
-        { code: '4237 01', description: 'Dobradiças porta traseira LE', occurrences: 2 },
-        { code: '2640 01', description: 'Duto freio agregado hidráulico 740', occurrences: 2 },
-        { code: '4208 01', description: 'Batente da tampa dianteira LD', occurrences: 2 },
-      ],
-    },
-  ]);
-
+  const [cardData, setCardData] = useState(initialData);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
 
@@ -211,47 +108,6 @@ export function OverviewAnalyticsView() {
           <AnalyticsChartCard id="12" />
         </Grid>
 
-        {/* <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="New users"
-            percent={-0.1}
-            total={1352831}
-            color="secondary"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-users.svg" />}
-            chart={{
-              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              series: [56, 47, 40, 62, 73, 30, 23, 54],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="Purchase orders"
-            percent={2.8}
-            total={1723315}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-buy.svg" />}
-            chart={{
-              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              series: [40, 70, 50, 28, 70, 75, 7, 64],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="Messages"
-            percent={3.6}
-            total={234}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic-glass-message.svg" />}
-            chart={{
-              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              series: [56, 30, 23, 54, 47, 40, 62, 73],
-            }}
-          />
-        </Grid> */}
         <Grid xs={12} md={6} lg={12}>
           <TorqueChart />
         </Grid>
@@ -324,30 +180,6 @@ export function OverviewAnalyticsView() {
             }}
           />
         </Grid>
-
-        {/* <Grid xs={12} md={6} lg={8}>
-          <AnalyticsNews title="News" list={_posts.slice(0, 5)} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsOrderTimeline title="Order timeline" list={_timeline} />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsTrafficBySite
-            title="Traffic by site"
-            list={[
-              { value: 'facebook', label: 'Facebook', total: 323234 },
-              { value: 'google', label: 'Google', total: 341212 },
-              { value: 'linkedin', label: 'Linkedin', total: 411213 },
-              { value: 'twitter', label: 'Twitter', total: 443232 },
-            ]}
-          />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={8}>
-          <AnalyticsTasks title="Tasks" list={_tasks} />
-        </Grid> */}
       </Grid>
     </DashboardContent>
   );
