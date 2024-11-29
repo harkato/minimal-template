@@ -96,6 +96,7 @@ export default function ResultPage() {
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
         Results
       </Typography>
+
       {/* Menu de Filtros */}
       <Grid
         container
@@ -103,9 +104,15 @@ export default function ResultPage() {
         sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
       >
         {/* Data */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={6} sm={3} md={2}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="Date Range" sx={{ width: '100%' }} />
+            <DatePicker label="Início" sx={{ width: '100%' }} />
+          </LocalizationProvider>
+        </Grid>
+
+        <Grid item xs={6} sm={3} md={2}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="Fim" sx={{ width: '100%' }} />
           </LocalizationProvider>
         </Grid>
 
@@ -197,31 +204,29 @@ export default function ResultPage() {
       {/* Tabela de Dados */}
       <Grid item xs={12} sm={12} md={12}>
         <TableContainer component={Paper}>
-        <Toolbar
-              sx={{
-                height: 50,
-                display: 'flex',
-                justifyContent: 'space-between',
-                p: (theme) => theme.spacing(0, 1, 0, 3)
-              }}
-            >
-            <div/>
-                <div>
-                <Tooltip title="Save or Export">
-                  <IconButton>
-                    <Iconify icon="material-symbols:save" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Refresh">
-                  <IconButton>
-                    <Iconify icon="material-symbols:refresh" />
-                  </IconButton>
-                </Tooltip>
-                </div>
-                
-            </Toolbar>
+          <Toolbar
+            sx={{
+              height: 50,
+              display: 'flex',
+              justifyContent: 'space-between',
+              p: (theme) => theme.spacing(0, 1, 0, 3),
+            }}
+          >
+            <div />
+            <div>
+              <Tooltip title="Save or Export">
+                <IconButton>
+                  <Iconify icon="material-symbols:save" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Print">
+                <IconButton>
+                  <Iconify icon="material-symbols:print" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </Toolbar>
           <Table>
-            
             <TableHead>
               <TableRow>
                 <TableCell size="small">
@@ -231,6 +236,15 @@ export default function ResultPage() {
                     onClick={() => handleRequestSort('status')}
                   >
                     Status
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'resultTime'}
+                    direction={orderBy === 'resultTime' ? order : 'asc'}
+                    onClick={() => handleRequestSort('resultTime')}
+                  >
+                    Data do Resultado
                   </TableSortLabel>
                 </TableCell>
                 <TableCell size="small">
@@ -251,15 +265,7 @@ export default function ResultPage() {
                     Nome do Programa
                   </TableSortLabel>
                 </TableCell>
-                <TableCell size="small">
-                  <TableSortLabel
-                    active={orderBy === 'resultTime'}
-                    direction={orderBy === 'resultTime' ? order : 'asc'}
-                    onClick={() => handleRequestSort('resultTime')}
-                  >
-                    Data do Resultado
-                  </TableSortLabel>
-                </TableCell>
+                
                 <TableCell size="small">
                   <TableSortLabel
                     active={orderBy === 'finalTorque'}
@@ -288,13 +294,25 @@ export default function ResultPage() {
                 >
                   <TableCell
                     size="small"
-                    sx={{ backgroundColor: row.status === 'OK' ? 'inherit' : '#f24f4f' }}
+                    // sx={{ backgroundColor: row.status === 'OK' ? 'inherit' : '#f24f4f' }}
                   >
-                    {row.status}
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.status === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.status}
+                    </Box>
                   </TableCell>
+                  <TableCell size="small">{row.resultTime}</TableCell>
                   <TableCell size="small">{row.identifier}</TableCell>
                   <TableCell size="small">{row.programName}</TableCell>
-                  <TableCell size="small">{row.resultTime}</TableCell>
                   <TableCell size="small">{row.finalTorque}</TableCell>
                   <TableCell size="small">{row.torqueStatus}</TableCell>
                 </TableRow>

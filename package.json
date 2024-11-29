@@ -20,7 +20,7 @@
     "dev:host": "vite --host"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "packageManager": "yarn@1.22.22",
   "dependencies": {
@@ -39,6 +39,7 @@
     "@mui/material": "5.16.7",
     "@mui/x-data-grid": "7.20.0",
     "@mui/x-date-pickers": "^7.22.0",
+    "@mui/x-date-pickers-pro": "^7.23.0",
     "apexcharts": "3.52.0",
     "datatables.net-dt": "^2.1.8",
     "datatables.net-react": "^1.0.0",
