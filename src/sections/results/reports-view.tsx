@@ -30,29 +30,37 @@ import { Iconify } from 'src/components/iconify';
 type Order = 'asc' | 'desc';
 
 interface DataRow {
-  id: number;
-  status: string;
-  identifier: string;
-  programName: string;
   resultTime: string;
-  finalTorque: number;
+  id: number;
+  tool: string;
+  job: number;
+  programName: string;
+  fuso: number;
+  torque: number;
   torqueStatus: string;
+  angle: string;
+  angleStatus: string;
+  generalStatus: string;
 }
 
 const initialData = Array.from({ length: 200 }, (_, i) => ({
+  resultTime: `2024/01/${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
   id: i + 1,
-  status: i % 2 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-  identifier: `${123 + i}`, // Identificador único
-  programName: `PVT${(i % 5) + 1}`, // Cicla entre PVT1 a PVT5
-  resultTime: `2022-01-${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-  finalTorque: (Math.random() * 25).toFixed(1), // Torque aleatório entre 0 e 25 com uma casa decimal
-  torqueStatus: ['Low', 'Medium', 'High'][i % 3], // Cicla entre 'Low', 'Medium', 'High'
+  tool: 'MAKITA',
+  job: 1,
+  programName: `PVT${(i % 5) + 1}`,
+  fuso: Math.round((Math.random() * 4 + 1)), // Fuso aleatório entre 1 e 5
+  torque: (Math.random() * 25).toFixed(1), // Torque aleatório entre 0 e 25 com uma casa decimal
+  torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
+  angle: (Math.random() * 90).toFixed(1),
+  angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
+  generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
 }));
 
 export default function ResultPage() {
   const [data, setData] = useState(initialData);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof DataRow>('programName');
+  const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
   const [filters, setFilters] = useState({
     programName: '',
     status: '',
@@ -80,7 +88,7 @@ export default function ResultPage() {
     const filteredData = initialData.filter(
       (row) =>
         (filters.programName ? row.programName.includes(filters.programName) : true) &&
-        (filters.status ? row.status === filters.status : true)
+        (filters.status ? row.generalStatus === filters.status : true)
     );
     setData(filteredData);
   };
@@ -231,15 +239,6 @@ export default function ResultPage() {
               <TableRow>
                 <TableCell size="small">
                   <TableSortLabel
-                    active={orderBy === 'status'}
-                    direction={orderBy === 'status' ? order : 'asc'}
-                    onClick={() => handleRequestSort('status')}
-                  >
-                    Status
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell size="small">
-                  <TableSortLabel
                     active={orderBy === 'resultTime'}
                     direction={orderBy === 'resultTime' ? order : 'asc'}
                     onClick={() => handleRequestSort('resultTime')}
@@ -249,13 +248,34 @@ export default function ResultPage() {
                 </TableCell>
                 <TableCell size="small">
                   <TableSortLabel
-                    active={orderBy === 'identifier'}
-                    direction={orderBy === 'identifier' ? order : 'asc'}
-                    onClick={() => handleRequestSort('identifier')}
+                    active={orderBy === 'id'}
+                    direction={orderBy === 'id' ? order : 'asc'}
+                    onClick={() => handleRequestSort('id')}
                   >
-                    Identificador
+                    Id
                   </TableSortLabel>
                 </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'tool'}
+                    direction={orderBy === 'tool' ? order : 'asc'}
+                    onClick={() => handleRequestSort('tool')}
+                  >
+                    Nome da Ferramenta
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'job'}
+                    direction={orderBy === 'job' ? order : 'asc'}
+                    onClick={() => handleRequestSort('job')}
+                  >
+                    Job
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell size="small">
                   <TableSortLabel
                     active={orderBy === 'programName'}
@@ -265,14 +285,24 @@ export default function ResultPage() {
                     Nome do Programa
                   </TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell size="small">
                   <TableSortLabel
-                    active={orderBy === 'finalTorque'}
-                    direction={orderBy === 'finalTorque' ? order : 'asc'}
-                    onClick={() => handleRequestSort('finalTorque')}
+                    active={orderBy === 'fuso'}
+                    direction={orderBy === 'fuso' ? order : 'asc'}
+                    onClick={() => handleRequestSort('fuso')}
                   >
-                    Torque Final
+                    Fuso
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'torque'}
+                    direction={orderBy === 'torque' ? order : 'asc'}
+                    onClick={() => handleRequestSort('torque')}
+                  >
+                    Torque
                   </TableSortLabel>
                 </TableCell>
                 <TableCell size="small">
@@ -281,7 +311,36 @@ export default function ResultPage() {
                     direction={orderBy === 'torqueStatus' ? order : 'asc'}
                     onClick={() => handleRequestSort('torqueStatus')}
                   >
-                    Status do Torque
+                    Status Torque
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'angle'}
+                    direction={orderBy === 'angle' ? order : 'asc'}
+                    onClick={() => handleRequestSort('angle')}
+                  >
+                    Ângulo
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'angleStatus'}
+                    direction={orderBy === 'angleStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('angleStatus')}
+                  >
+                    Status Ângulo
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'generalStatus'}
+                    direction={orderBy === 'generalStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('generalStatus')}
+                  >
+                    Status Geral
                   </TableSortLabel>
                 </TableCell>
               </TableRow>
@@ -292,29 +351,61 @@ export default function ResultPage() {
                   key={row.id}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell
-                    size="small"
-                    // sx={{ backgroundColor: row.status === 'OK' ? 'inherit' : '#f24f4f' }}
-                  >
+                  <TableCell size="small">{row.resultTime}</TableCell>
+                  <TableCell size="small">{row.id}</TableCell>
+                  <TableCell size="small">{row.tool}</TableCell>
+                  <TableCell size="small">{row.job}</TableCell>
+                  <TableCell size="small">{row.programName}</TableCell>
+                  <TableCell size="small">{row.fuso}</TableCell>
+                  <TableCell size="small">{row.torque}</TableCell>
+                  <TableCell size="small">
                     <Box
                       sx={{
                         display: 'inline-block',
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        backgroundColor: row.status === 'OK' ? '#20878b' : '#f24f4f',
+                        backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
                     >
-                      {row.status}
+                      {row.torqueStatus}
                     </Box>
                   </TableCell>
-                  <TableCell size="small">{row.resultTime}</TableCell>
-                  <TableCell size="small">{row.identifier}</TableCell>
-                  <TableCell size="small">{row.programName}</TableCell>
-                  <TableCell size="small">{row.finalTorque}</TableCell>
-                  <TableCell size="small">{row.torqueStatus}</TableCell>
+                  <TableCell size="small">{row.angle}</TableCell>
+
+                  <TableCell size="small">
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.angleStatus}
+                    </Box>
+                  </TableCell>
+
+                  <TableCell size="small">
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.generalStatus}
+                    </Box>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
