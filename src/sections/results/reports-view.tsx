@@ -31,7 +31,7 @@ type Order = 'asc' | 'desc';
 
 interface DataRow {
   resultTime: string;
-  id: number;
+  id: string;
   tool: string;
   job: number;
   programName: string;
@@ -45,7 +45,7 @@ interface DataRow {
 
 const initialData = Array.from({ length: 200 }, (_, i) => ({
   resultTime: `2024/01/${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-  id: i + 1,
+  id: `${i + 1}`,
   tool: 'MAKITA',
   job: 1,
   programName: `PVT${(i % 5) + 1}`,
@@ -62,8 +62,12 @@ export default function ResultPage() {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
   const [filters, setFilters] = useState({
+    id: '',
+    tool: '',
     programName: '',
     status: '',
+    startDate: '',
+    endDate: '',
   });
 
   // Função para ordenar os dados
@@ -85,8 +89,10 @@ export default function ResultPage() {
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters({ ...filters, [name]: value });
-    const filteredData = initialData.filter(
+    const filteredData = paginatedData.filter(
       (row) =>
+        (filters.id ? row.id === filters.id : true) &&
+        (filters.tool ? row.tool === filters.tool : true) &&
         (filters.programName ? row.programName.includes(filters.programName) : true) &&
         (filters.status ? row.generalStatus === filters.status : true)
     );
@@ -100,9 +106,9 @@ export default function ResultPage() {
   );
 
   return (
-    <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Results
+    <>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
+        Resultados
       </Typography>
 
       {/* Menu de Filtros */}
@@ -111,80 +117,52 @@ export default function ResultPage() {
         spacing={2}
         sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
       >
-        {/* Data */}
-        <Grid item xs={6} sm={3} md={2}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="Início" sx={{ width: '100%' }} />
-          </LocalizationProvider>
-        </Grid>
-
-        <Grid item xs={6} sm={3} md={2}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="Fim" sx={{ width: '100%' }} />
-          </LocalizationProvider>
+        {/* ID */}
+        <Grid item xs={12} sm={6} md={6}>
+          <TextField
+            label="Identificador"
+            name="id"
+            variant="outlined"
+            value={filters.id}
+            onChange={handleFilterChange}
+            fullWidth
+          />
         </Grid>
 
         {/* Ferramentas */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
-            label="Tool Structure"
-            name="status"
+            label="Ferramentas"
+            name="tools"
             variant="outlined"
-            value={filters.status}
+            value={filters.tool}
             onChange={handleFilterChange}
             fullWidth
           >
             <MenuItem value="">Todos</MenuItem>
-            <MenuItem value="OK">Apertadeira 1</MenuItem>
-            <MenuItem value="NOK">Apertadeira 2</MenuItem>
+            <MenuItem value="STANLEY">STANLEY</MenuItem>
+            <MenuItem value="MAKITA">MAKITA</MenuItem>
           </TextField>
         </Grid>
 
-        {/* Resultados */}
-
-        <Grid item xs={12} sm={6} md={4}>
+        {/* Ferramentas */}
+        <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
-            label="Max results"
-            name="status"
+            label="Programas"
+            name="programName"
             variant="outlined"
-            value={filters.status}
+            value={filters.programName}
             onChange={handleFilterChange}
             fullWidth
           >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="NOK">50</MenuItem>
-            <MenuItem value="OK">100</MenuItem>
-            <MenuItem value="OK">300</MenuItem>
-            <MenuItem value="OK">500</MenuItem>
-            <MenuItem value="NOK">1000</MenuItem>
+            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="101-M001/task 1">101-M001/task 1</MenuItem>
           </TextField>
         </Grid>
-        {/* Program name */}
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Program name"
-            name="programName"
-            variant="outlined"
-            value={filters.programName}
-            onChange={handleFilterChange}
-            fullWidth
-          />
-        </Grid>
 
-        {/* Bolt */}
-        <Grid item xs={12} sm={6} md={4}>
-          <TextField
-            label="Bolt"
-            name="programName"
-            variant="outlined"
-            value={filters.programName}
-            onChange={handleFilterChange}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
             label="Status"
@@ -199,18 +177,31 @@ export default function ResultPage() {
             <MenuItem value="NOK">NOK</MenuItem>
           </TextField>
         </Grid>
+
+        {/* Data */}
+        <Grid item xs={6} sm={3} md={3}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="Início" sx={{ width: '100%' }} />
+          </LocalizationProvider>
+        </Grid>
+
+        <Grid item xs={6} sm={3} md={3}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="Fim" sx={{ width: '100%' }} />
+          </LocalizationProvider>
+        </Grid>
+
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="contained" onClick={() => setData(initialData)}>
             Limpar Filtros
           </Button>
           <Button variant="contained" onClick={() => setData(initialData)}>
-            Run report
+            Pesquisar
           </Button>
         </Grid>
       </Grid>
 
       {/* Tabela de Dados */}
-      <Grid item xs={12} sm={12} md={12}>
         <TableContainer component={Paper}>
           <Toolbar
             sx={{
@@ -234,7 +225,7 @@ export default function ResultPage() {
               </Tooltip>
             </div>
           </Toolbar>
-          <Table>
+          <Table stickyHeader sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
                 <TableCell size="small">
@@ -349,7 +340,7 @@ export default function ResultPage() {
               {paginatedData.map((row, index) => (
                 <TableRow
                   key={row.id}
-                  sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
+                  sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5'}}
                 >
                   <TableCell size="small">{row.resultTime}</TableCell>
                   <TableCell size="small">{row.id}</TableCell>
@@ -420,8 +411,7 @@ export default function ResultPage() {
             onRowsPerPageChange={table.onChangeRowsPerPage}
           />
         </TableContainer>
-      </Grid>
-    </DashboardContent>
+    </>
   );
 }
 
