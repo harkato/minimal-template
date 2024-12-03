@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef} from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -38,7 +38,7 @@ interface DataRow {
   job: number;
   programName: string;
   fuso: number;
-  torque: number;
+  torque: string;
   torqueStatus: string;
   angle: string;
   angleStatus: string;
@@ -66,6 +66,42 @@ const initialFilters = {
   status: '',
   startDate: '',
   endDate: '',
+};
+
+// Função para converter dados em CSV
+const convertToCSV = (rows: DataRow[]) => {
+  const headers = [
+    'Data e hora',
+    'Id',
+    'Ferramenta',
+    'Job',
+    'Programa',
+    'Fuso',
+    'Torque',
+    'Status Torque',
+    'Ângulo',
+    'Status ângulo',
+    'Status Geral',
+  ];
+  const csvRows = rows.map(
+    (row) =>
+      `${row.resultTime},${row.id},${row.tool},${row.job},${row.programName},${row.fuso},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus},${row.generalStatus}`
+  );
+  return [headers.join(','), ...csvRows].join('\n');
+};
+
+// Função para baixar o arquivo CSV
+const downloadCSV = (rows: DataRow[]) => {
+  const csvData = convertToCSV(rows);
+  const blob = new Blob([csvData], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'table-data.csv';
+  link.click();
+
+  URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
 export default function ResultPage() {
@@ -110,6 +146,48 @@ export default function ResultPage() {
     table.page * table.rowsPerPage,
     table.page * table.rowsPerPage + table.rowsPerPage
   );
+
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    if (tableRef.current) {
+      // Faz referência ao conteúdo da tabela e imprime
+      const printContent = tableRef.current.innerHTML;
+
+      // Cria uma nova janela para impressão
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Resultados</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 20px;
+                }
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                }
+                th, td {
+                  border: 1px solid black;
+                  padding: 8px;
+                  text-align: left;
+                }
+                th {
+                  background-color: #f2f2f2;
+                }
+              </style>
+            </head>
+            <body>${printContent}</body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
+  };
 
   return (
     <>
@@ -187,15 +265,25 @@ export default function ResultPage() {
         {/* Data */}
         <Grid item xs={6} sm={3} md={3}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker name="startDate" label="Início" value={startDate}
-          onChange={(newDate) => setStartDate(newDate)} sx={{ width: '100%' }} />
+            <DatePicker
+              name="startDate"
+              label="Início"
+              value={startDate}
+              onChange={(newDate) => setStartDate(newDate)}
+              sx={{ width: '100%' }}
+            />
           </LocalizationProvider>
         </Grid>
 
         <Grid item xs={6} sm={3} md={3}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker name="endDate" label="Fim" value={endDate}
-          onChange={(newDate) => setEndDate(newDate)} sx={{ width: '100%' }} />
+            <DatePicker
+              name="endDate"
+              label="Fim"
+              value={endDate}
+              onChange={(newDate) => setEndDate(newDate)}
+              sx={{ width: '100%' }}
+            />
           </LocalizationProvider>
         </Grid>
 
@@ -227,20 +315,20 @@ export default function ResultPage() {
             p: (theme) => theme.spacing(0, 1, 0, 3),
           }}
         >
-          
-          <div >
+          <div>
             <Tooltip title="Save or Export">
-              <IconButton>
+              <IconButton onClick={() => downloadCSV(paginatedData)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
             <Tooltip title="Print">
-              <IconButton>
+              <IconButton onClick={handlePrint}>
                 <Iconify icon="material-symbols:print" />
               </IconButton>
             </Tooltip>
           </div>
         </Toolbar>
+        <div ref={tableRef}>
         <Table stickyHeader sx={{ minWidth: 650 }} size="small">
           <TableHead>
             <TableRow>
@@ -417,6 +505,7 @@ export default function ResultPage() {
             ))}
           </TableBody>
         </Table>
+        </div>
         <TablePagination
           component="div"
           page={table.page}
