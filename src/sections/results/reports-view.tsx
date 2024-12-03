@@ -223,12 +223,12 @@ export default function ResultPage() {
           sx={{
             height: 50,
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             p: (theme) => theme.spacing(0, 1, 0, 3),
           }}
         >
-          <div />
-          <div>
+          
+          <div >
             <Tooltip title="Save or Export">
               <IconButton>
                 <Iconify icon="material-symbols:save" />
