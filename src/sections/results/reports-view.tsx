@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/en-gb';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
@@ -20,14 +21,10 @@ import {
   Grid,
   TablePagination,
   Toolbar,
-  OutlinedInput,
-  InputAdornment,
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
-import { set } from 'zod';
 
 type Order = 'asc' | 'desc';
 
@@ -38,23 +35,23 @@ interface DataRow {
   job: number;
   programName: string;
   fuso: number;
-  torque: string;
+  torque: number;
   torqueStatus: string;
-  angle: string;
+  angle: number;
   angleStatus: string;
   generalStatus: string;
 }
 
 const initialData = Array.from({ length: 200 }, (_, i) => ({
-  resultTime: `2024/01/${String((i % 31) + 1).padStart(2, '0')} ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
+  resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
   id: `${i + 1}`,
   tool: 'MAKITA',
   job: 1,
   programName: `PVT${(i % 5) + 1}`,
   fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
-  torque: (Math.random() * 25).toFixed(1), // Torque aleatório entre 0 e 25 com uma casa decimal
+  torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
   torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-  angle: (Math.random() * 90).toFixed(1),
+  angle: parseFloat((Math.random() * 90).toFixed(1)),
   angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
   generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
 }));
@@ -261,7 +258,7 @@ export default function ResultPage() {
           </TextField>
         </Grid>
 
-        {/* Ferramentas */}
+        {/* Programas */}
         <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
@@ -295,7 +292,7 @@ export default function ResultPage() {
 
         {/* Data */}
         <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
             <DatePicker
               name="startDate"
               label="Início"
@@ -307,7 +304,7 @@ export default function ResultPage() {
         </Grid>
 
         <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
             <DatePicker
               name="endDate"
               label="Fim"
@@ -329,7 +326,7 @@ export default function ResultPage() {
       </Grid>
 
       {/* Tabela de Dados */}
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
         <Toolbar
           sx={{
             height: 50,
@@ -340,7 +337,7 @@ export default function ResultPage() {
         >
           <div>
             <Tooltip title="Save or Export">
-              <IconButton onClick={() => downloadCSV(paginatedData)}>
+              <IconButton onClick={() => downloadCSV(filteredData)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
@@ -355,7 +352,7 @@ export default function ResultPage() {
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'resultTime'}
                     direction={orderBy === 'resultTime' ? order : 'asc'}
@@ -364,7 +361,7 @@ export default function ResultPage() {
                     Data do Resultado
                   </TableSortLabel>
                 </TableCell>
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'id'}
                     direction={orderBy === 'id' ? order : 'asc'}
@@ -374,7 +371,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'tool'}
                     direction={orderBy === 'tool' ? order : 'asc'}
@@ -384,7 +381,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'job'}
                     direction={orderBy === 'job' ? order : 'asc'}
@@ -394,7 +391,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'programName'}
                     direction={orderBy === 'programName' ? order : 'asc'}
@@ -404,7 +401,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'fuso'}
                     direction={orderBy === 'fuso' ? order : 'asc'}
@@ -414,7 +411,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'torque'}
                     direction={orderBy === 'torque' ? order : 'asc'}
@@ -423,7 +420,7 @@ export default function ResultPage() {
                     Torque
                   </TableSortLabel>
                 </TableCell>
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'torqueStatus'}
                     direction={orderBy === 'torqueStatus' ? order : 'asc'}
@@ -433,7 +430,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angle'}
                     direction={orderBy === 'angle' ? order : 'asc'}
@@ -442,7 +439,7 @@ export default function ResultPage() {
                     Ângulo
                   </TableSortLabel>
                 </TableCell>
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angleStatus'}
                     direction={orderBy === 'angleStatus' ? order : 'asc'}
@@ -452,7 +449,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell size="small">
+                <TableCell>
                   <TableSortLabel
                     active={orderBy === 'generalStatus'}
                     direction={orderBy === 'generalStatus' ? order : 'asc'}
@@ -469,14 +466,14 @@ export default function ResultPage() {
                   key={row.id}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell size="small">{row.resultTime}</TableCell>
-                  <TableCell size="small">{row.id}</TableCell>
-                  <TableCell size="small">{row.tool}</TableCell>
-                  <TableCell size="small">{row.job}</TableCell>
-                  <TableCell size="small">{row.programName}</TableCell>
-                  <TableCell size="small">{row.fuso}</TableCell>
-                  <TableCell size="small">{row.torque}</TableCell>
-                  <TableCell size="small">
+                  <TableCell>{row.resultTime}</TableCell>
+                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row.tool}</TableCell>
+                  <TableCell>{row.job}</TableCell>
+                  <TableCell>{row.programName}</TableCell>
+                  <TableCell>{row.fuso}</TableCell>
+                  <TableCell>{row.torque}</TableCell>
+                  <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -491,9 +488,9 @@ export default function ResultPage() {
                       {row.torqueStatus}
                     </Box>
                   </TableCell>
-                  <TableCell size="small">{row.angle}</TableCell>
+                  <TableCell>{row.angle}</TableCell>
 
-                  <TableCell size="small">
+                  <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -509,7 +506,7 @@ export default function ResultPage() {
                     </Box>
                   </TableCell>
 
-                  <TableCell size="small">
+                  <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
