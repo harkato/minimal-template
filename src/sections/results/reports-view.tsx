@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef} from 'react';
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -104,6 +104,34 @@ const downloadCSV = (rows: DataRow[]) => {
   URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
+const applyFilters = (
+  data: DataRow[],
+  filters: typeof initialFilters,
+  startDate: Dayjs | null,
+  endDate: Dayjs | null
+) =>
+  data.filter((row) => {
+    const isIdMatch = filters.id ? row.id.includes(filters.id) : true;
+    const isToolMatch = filters.tool ? row.tool === filters.tool : true;
+    const isProgramNameMatch = filters.programName
+      ? row.programName.includes(filters.programName)
+      : true;
+    const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
+
+    const resultDate = dayjs(row.resultTime);
+    const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
+    const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
+
+    return (
+      isIdMatch &&
+      isToolMatch &&
+      isProgramNameMatch &&
+      isStatusMatch &&
+      isStartDateMatch &&
+      isEndDateMatch
+    );
+  });
+
 export default function ResultPage() {
   const [data, setData] = useState(initialData);
   const [order, setOrder] = useState<Order>('asc');
@@ -112,6 +140,10 @@ export default function ResultPage() {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
+  const filteredData = useMemo(
+    () => applyFilters(data, filters, startDate, endDate),
+    [data, filters, startDate, endDate]
+  );
   // Função para ordenar os dados
   const handleRequestSort = (property: keyof DataRow) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -128,21 +160,20 @@ export default function ResultPage() {
   };
 
   // Função para aplicar filtros
+
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters({ ...filters, [name]: value });
-    const filteredData = paginatedData.filter(
-      (row) =>
-        (filters.id ? row.id === filters.id : true) &&
-        (filters.tool ? row.tool === filters.tool : true) &&
-        (filters.programName ? row.programName.includes(filters.programName) : true) &&
-        (filters.status ? row.generalStatus === filters.status : true)
-    );
-    setData(filteredData);
+  };
+
+  const handleResetFilters = () => {
+    setFilters(initialFilters);
+    setStartDate(null);
+    setEndDate(null);
   };
 
   const table = useTable();
-  const paginatedData = data.slice(
+  const paginatedData = filteredData.slice(
     table.page * table.rowsPerPage,
     table.page * table.rowsPerPage + table.rowsPerPage
   );
@@ -288,20 +319,12 @@ export default function ResultPage() {
         </Grid>
 
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setFilters(initialFilters);
-              setStartDate(null);
-              setEndDate(null);
-              setData(initialData);
-            }}
-          >
+          <Button variant="contained" onClick={handleResetFilters}>
             Limpar Filtros
           </Button>
-          <Button variant="contained" onClick={() => setData(data)}>
+          {/* <Button variant="contained" onClick={() => setData(data)}>
             Pesquisar
-          </Button>
+          </Button> */}
         </Grid>
       </Grid>
 
@@ -329,187 +352,187 @@ export default function ResultPage() {
           </div>
         </Toolbar>
         <div ref={tableRef}>
-        <Table stickyHeader sx={{ minWidth: 650 }} size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'resultTime'}
-                  direction={orderBy === 'resultTime' ? order : 'asc'}
-                  onClick={() => handleRequestSort('resultTime')}
-                >
-                  Data do Resultado
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'id'}
-                  direction={orderBy === 'id' ? order : 'asc'}
-                  onClick={() => handleRequestSort('id')}
-                >
-                  Id
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'tool'}
-                  direction={orderBy === 'tool' ? order : 'asc'}
-                  onClick={() => handleRequestSort('tool')}
-                >
-                  Nome da Ferramenta
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'job'}
-                  direction={orderBy === 'job' ? order : 'asc'}
-                  onClick={() => handleRequestSort('job')}
-                >
-                  Job
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'programName'}
-                  direction={orderBy === 'programName' ? order : 'asc'}
-                  onClick={() => handleRequestSort('programName')}
-                >
-                  Nome do Programa
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'fuso'}
-                  direction={orderBy === 'fuso' ? order : 'asc'}
-                  onClick={() => handleRequestSort('fuso')}
-                >
-                  Fuso
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'torque'}
-                  direction={orderBy === 'torque' ? order : 'asc'}
-                  onClick={() => handleRequestSort('torque')}
-                >
-                  Torque
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'torqueStatus'}
-                  direction={orderBy === 'torqueStatus' ? order : 'asc'}
-                  onClick={() => handleRequestSort('torqueStatus')}
-                >
-                  Status Torque
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'angle'}
-                  direction={orderBy === 'angle' ? order : 'asc'}
-                  onClick={() => handleRequestSort('angle')}
-                >
-                  Ângulo
-                </TableSortLabel>
-              </TableCell>
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'angleStatus'}
-                  direction={orderBy === 'angleStatus' ? order : 'asc'}
-                  onClick={() => handleRequestSort('angleStatus')}
-                >
-                  Status Ângulo
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell size="small">
-                <TableSortLabel
-                  active={orderBy === 'generalStatus'}
-                  direction={orderBy === 'generalStatus' ? order : 'asc'}
-                  onClick={() => handleRequestSort('generalStatus')}
-                >
-                  Status Geral
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((row, index) => (
-              <TableRow
-                key={row.id}
-                sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
-              >
-                <TableCell size="small">{row.resultTime}</TableCell>
-                <TableCell size="small">{row.id}</TableCell>
-                <TableCell size="small">{row.tool}</TableCell>
-                <TableCell size="small">{row.job}</TableCell>
-                <TableCell size="small">{row.programName}</TableCell>
-                <TableCell size="small">{row.fuso}</TableCell>
-                <TableCell size="small">{row.torque}</TableCell>
+          <Table stickyHeader sx={{ minWidth: 650 }} size="small">
+            <TableHead>
+              <TableRow>
                 <TableCell size="small">
-                  <Box
-                    sx={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      borderRadius: '8px',
-                      color: 'white',
-                      backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
+                  <TableSortLabel
+                    active={orderBy === 'resultTime'}
+                    direction={orderBy === 'resultTime' ? order : 'asc'}
+                    onClick={() => handleRequestSort('resultTime')}
                   >
-                    {row.torqueStatus}
-                  </Box>
+                    Data do Resultado
+                  </TableSortLabel>
                 </TableCell>
-                <TableCell size="small">{row.angle}</TableCell>
-
                 <TableCell size="small">
-                  <Box
-                    sx={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      borderRadius: '8px',
-                      color: 'white',
-                      backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
+                  <TableSortLabel
+                    active={orderBy === 'id'}
+                    direction={orderBy === 'id' ? order : 'asc'}
+                    onClick={() => handleRequestSort('id')}
                   >
-                    {row.angleStatus}
-                  </Box>
+                    Id
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell size="small">
-                  <Box
-                    sx={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      borderRadius: '8px',
-                      color: 'white',
-                      backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}
+                  <TableSortLabel
+                    active={orderBy === 'tool'}
+                    direction={orderBy === 'tool' ? order : 'asc'}
+                    onClick={() => handleRequestSort('tool')}
                   >
-                    {row.generalStatus}
-                  </Box>
+                    Nome da Ferramenta
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'job'}
+                    direction={orderBy === 'job' ? order : 'asc'}
+                    onClick={() => handleRequestSort('job')}
+                  >
+                    Job
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'programName'}
+                    direction={orderBy === 'programName' ? order : 'asc'}
+                    onClick={() => handleRequestSort('programName')}
+                  >
+                    Nome do Programa
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'fuso'}
+                    direction={orderBy === 'fuso' ? order : 'asc'}
+                    onClick={() => handleRequestSort('fuso')}
+                  >
+                    Fuso
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'torque'}
+                    direction={orderBy === 'torque' ? order : 'asc'}
+                    onClick={() => handleRequestSort('torque')}
+                  >
+                    Torque
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'torqueStatus'}
+                    direction={orderBy === 'torqueStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('torqueStatus')}
+                  >
+                    Status Torque
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'angle'}
+                    direction={orderBy === 'angle' ? order : 'asc'}
+                    onClick={() => handleRequestSort('angle')}
+                  >
+                    Ângulo
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'angleStatus'}
+                    direction={orderBy === 'angleStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('angleStatus')}
+                  >
+                    Status Ângulo
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell size="small">
+                  <TableSortLabel
+                    active={orderBy === 'generalStatus'}
+                    direction={orderBy === 'generalStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('generalStatus')}
+                  >
+                    Status Geral
+                  </TableSortLabel>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {paginatedData.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
+                >
+                  <TableCell size="small">{row.resultTime}</TableCell>
+                  <TableCell size="small">{row.id}</TableCell>
+                  <TableCell size="small">{row.tool}</TableCell>
+                  <TableCell size="small">{row.job}</TableCell>
+                  <TableCell size="small">{row.programName}</TableCell>
+                  <TableCell size="small">{row.fuso}</TableCell>
+                  <TableCell size="small">{row.torque}</TableCell>
+                  <TableCell size="small">
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.torqueStatus}
+                    </Box>
+                  </TableCell>
+                  <TableCell size="small">{row.angle}</TableCell>
+
+                  <TableCell size="small">
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.angleStatus}
+                    </Box>
+                  </TableCell>
+
+                  <TableCell size="small">
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.generalStatus}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
         <TablePagination
           component="div"
           page={table.page}
-          count={data.length}
+          count={filteredData.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
