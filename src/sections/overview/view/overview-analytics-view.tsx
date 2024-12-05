@@ -104,9 +104,9 @@ export function OverviewAnalyticsView() {
               <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
             </Grid>
           ))}
-        <Grid xs={6}>
+        {/* <Grid xs={6}>
           <AnalyticsChartCard id="12" />
-        </Grid>
+        </Grid> */}
 
         <Grid xs={12} md={6} lg={12}>
           <TorqueChart />
