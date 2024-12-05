@@ -169,6 +169,15 @@ export default function ResultPage() {
     setEndDate(null);
   };
 
+  const handleSearch = () => {
+    // Por enquanto, só atualiza os dados filtrados
+    const updatedData = applyFilters(data, filters, startDate, endDate);
+    setData(updatedData);
+  
+    // No futuro, aqui você pode integrar com uma API para buscar dados do banco
+    console.log('Filtros aplicados:', filters, startDate, endDate);
+  };
+
   const table = useTable();
   const paginatedData = filteredData.slice(
     table.page * table.rowsPerPage,
@@ -206,6 +215,16 @@ export default function ResultPage() {
                 th {
                   background-color: #f2f2f2;
                 }
+                
+                /* Ocultar setas de ordenação durante a impressão */
+              th::after {
+                content: none !important; /* Remove qualquer ícone ou seta */
+              }
+                th .sorting::after,
+              th .sorting_asc::after,
+              th .sorting_desc::after {
+                display: none !important; /* Remover setas de ordenação */
+              }
               </style>
             </head>
             <body>${printContent}</body>
@@ -270,7 +289,7 @@ export default function ResultPage() {
             fullWidth
           >
             <MenuItem value="">Todos</MenuItem>
-            <MenuItem value="101-M001/task 1">101-M001/task 1</MenuItem>
+            <MenuItem value="101-M001/task 1">PVT1</MenuItem>
           </TextField>
         </Grid>
 
@@ -292,7 +311,7 @@ export default function ResultPage() {
 
         {/* Data */}
         <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <DatePicker
               name="startDate"
               label="Início"
@@ -304,7 +323,7 @@ export default function ResultPage() {
         </Grid>
 
         <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <DatePicker
               name="endDate"
               label="Fim"
@@ -319,9 +338,9 @@ export default function ResultPage() {
           <Button variant="contained" onClick={handleResetFilters}>
             Limpar Filtros
           </Button>
-          {/* <Button variant="contained" onClick={() => setData(data)}>
+          <Button variant="contained" onClick={handleSearch}>
             Pesquisar
-          </Button> */}
+          </Button>
         </Grid>
       </Grid>
 
