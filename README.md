@@ -17,6 +17,12 @@ npm install --global yarn
 
 yarn --version
 ```
+#### Baixando o Projeto
+Com o git instalado, clone o repositório
+
+```sh
+git clone https://github.com/harkato/minimal-template.git && cd minimal-template
+```
 
 #### Instalando as dependências
 
