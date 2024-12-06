@@ -21,19 +21,17 @@ import { useTranslation } from 'react-i18next';
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { BarLabel } from '@mui/x-charts';
 
-import AreaChartNew from 'src/components/chart/AreaChartNew';
+import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
-import { AnalyticsChartBar } from '../analytics-chart-bar'
+import { AnalyticsChartBar } from '../analytics-chart-bar';
 import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsChartCard } from '../analytics-chart-card';
 import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-
-
 
 // ----------------------------------------------------------------------
 
@@ -70,108 +68,106 @@ export function OverviewAnalyticsView() {
 
   return (
     <DashboardContent maxWidth="xl">
-       
-        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-          TOP 5 NOK
-        </Typography>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+        TOP 5 NOK
+      </Typography>
 
-        <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
-        
-          <Grid xs={12} sm={6} md={2}>
-            <AnalyticsWidgetSummary
-              title="Coxim do motor"
-              percent={-2.6}
-              total={70}
-              color="success"
-              icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
-              chart={{
-                categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-                series: [22, 8, 35, 50, 82, 84, 77, 70],
-              }}
-            />
-          </Grid>
-
-          <Grid xs={12} sm={6} md={2}>
-            <AnalyticsWidgetSummary
-              title="Amortecedor"
-              percent={3.2}
-              total={54}
-              color="error"
-              icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-              chart={{
-                categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-                series: [56, 47, 40, 62, 73, 30, 23, 54],
-              }}
-            />
-          </Grid>
-
-          <Grid xs={12} sm={6} md={2}>
-            <AnalyticsWidgetSummary
-              title="Air Bag"
-              percent={0}
-              total={53}
-              color="warning"
-              icon={<img alt="icon" src="/assets/icons/glass/dash.png" />}
-              chart={{
-                categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-                series: [40, 70, 50, 28, 70, 75, 53, 53],
-              }}
-            />
-          </Grid>
-
-          <Grid xs={12} sm={6} md={2}>
-            <AnalyticsWidgetSummary
-              title="Coluna de direção"
-              percent={3.6}
-              total={73}
-              color="error"
-              icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-              chart={{
-                categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-                series: [56, 30, 23, 54, 47, 40, 62, 73],
-              }}
-            />
-          </Grid>
-
-          <Grid xs={12} sm={6} md={2}>
-            <AnalyticsWidgetSummary
-              title="Cinto coluna B"
-              percent={-4.3}
-              total={40}
-              color="success"
-              icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
-              chart={{
-                categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-                series: [22, 8, 35, 50, 82, 84, 67, 40],
-              }}
-            />
-          </Grid>
-        </Grid>
-      
-        {/* ================================GRAFICO DE AREA================================ */}
-        <Grid xs={12} md={6} lg={4}>
-          <Card>
-          <AreaChartNew />
-          </Card>
-        </Grid>
-
-        {/* ================================NOK POR TURNO================================== */}        
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsConversionRates
-            title="NOK POR TURNO"
-            subheader="última semana"
+      <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
+        <Grid xs={12} sm={6} md={2}>
+          <AnalyticsWidgetSummary
+            title="Coxim do motor"
+            percent={-2.6}
+            total={70}
+            color="success"
+            icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
             chart={{
-              categories: ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
-              series: [
-                { name: '1º TURNO', data: [44, 55, 41, 64, 22, 0] },
-                { name: '2º TURNO', data: [53, 32, 33, 52, 13, 0] },
-                { name: '3º TURNO', data: [15, 22, 33, 25, 31, 0] },
-              ],
+              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
+              series: [22, 8, 35, 50, 82, 84, 77, 70],
             }}
           />
         </Grid>
 
-    {/* ================================================================== */}
+        <Grid xs={12} sm={6} md={2}>
+          <AnalyticsWidgetSummary
+            title="Amortecedor"
+            percent={3.2}
+            total={54}
+            color="error"
+            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
+            chart={{
+              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
+              series: [56, 47, 40, 62, 73, 30, 23, 54],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={2}>
+          <AnalyticsWidgetSummary
+            title="Air Bag"
+            percent={0}
+            total={53}
+            color="warning"
+            icon={<img alt="icon" src="/assets/icons/glass/dash.png" />}
+            chart={{
+              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
+              series: [40, 70, 50, 28, 70, 75, 53, 53],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={2}>
+          <AnalyticsWidgetSummary
+            title="Coluna de direção"
+            percent={3.6}
+            total={73}
+            color="error"
+            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
+            chart={{
+              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
+              series: [56, 30, 23, 54, 47, 40, 62, 73],
+            }}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={2}>
+          <AnalyticsWidgetSummary
+            title="Cinto coluna B"
+            percent={-4.3}
+            total={40}
+            color="success"
+            icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
+            chart={{
+              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
+              series: [22, 8, 35, 50, 82, 84, 67, 40],
+            }}
+          />
+        </Grid>
+      </Grid>
+
+      {/* ================================GRAFICO DE AREA================================ */}
+      <Grid sx={{mt: 2}} xs={12} md={6} lg={12}>
+        <Card>
+          <AreaChartNew />
+        </Card>
+      </Grid>
+
+      {/* ================================NOK POR TURNO================================== */}
+      <Grid xs={12} md={6} lg={4}>
+        <AnalyticsConversionRates
+          title="NOK POR TURNO"
+          subheader="última semana"
+          chart={{
+            categories: ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
+            series: [
+              { name: '1º TURNO', data: [44, 55, 41, 64, 22, 0] },
+              { name: '2º TURNO', data: [53, 32, 33, 52, 13, 0] },
+              { name: '3º TURNO', data: [15, 22, 33, 25, 31, 0] },
+            ],
+          }}
+        />
+      </Grid>
+
+      {/* ================================================================== */}
       <Grid container sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
           {t('dashboard.process')}
@@ -214,12 +210,6 @@ export function OverviewAnalyticsView() {
               <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
             </Grid>
           ))}
-        <Grid xs={12}>
-          <AnalyticsChartCard id="12" />
-        </Grid>
-
-        
-
 
         {/* <Grid xs={12} md={6} lg={12}>
           <TorqueChart />
@@ -254,33 +244,36 @@ export function OverviewAnalyticsView() {
 
         <Grid xs={12} md={6} lg={8}>
           <Card>
-          <h2 style={{ textAlign: 'center' }}>Dispersão</h2>
-          <ScatterChart
-            width={900}
-            height={400} 
-            series={[{ data: [
-              { x: 100, y: 200, id: 1 },
-              { x: 120, y: 100, id: 2 },
-              { x: 170, y: 300, id: 3 },
-              { x: 140, y: 250, id: 4 },
-              { x: 150, y: 400, id: 5 },
-              { x: 110, y: 280, id: 6 },
-              { x: 300, y: 300, id: 7 },
-              { x: 400, y: 500, id: 8 },
-              { x: 200, y: 700, id: 9 },
-              { x: 340, y: 350, id: 10 },
-              { x: 560, y: 500, id: 11 },
-              { x: 230, y: 780, id: 12 },
-              { x: 500, y: 400, id: 13 },
-              { x: 300, y: 500, id: 14 },
-              { x: 240, y: 300, id: 15 },
-              { x: 320, y: 550, id: 16 },
-              { x: 500, y: 400, id: 17 },
-              { x: 420, y: 280, id: 18 },
-          ]}]}
-          grid={{ vertical: true, horizontal: true }}          
-          />
-
+            <h2 style={{ textAlign: 'center' }}>Dispersão</h2>
+            <ScatterChart
+              width={900}
+              height={400}
+              series={[
+                {
+                  data: [
+                    { x: 100, y: 200, id: 1 },
+                    { x: 120, y: 100, id: 2 },
+                    { x: 170, y: 300, id: 3 },
+                    { x: 140, y: 250, id: 4 },
+                    { x: 150, y: 400, id: 5 },
+                    { x: 110, y: 280, id: 6 },
+                    { x: 300, y: 300, id: 7 },
+                    { x: 400, y: 500, id: 8 },
+                    { x: 200, y: 700, id: 9 },
+                    { x: 340, y: 350, id: 10 },
+                    { x: 560, y: 500, id: 11 },
+                    { x: 230, y: 780, id: 12 },
+                    { x: 500, y: 400, id: 13 },
+                    { x: 300, y: 500, id: 14 },
+                    { x: 240, y: 300, id: 15 },
+                    { x: 320, y: 550, id: 16 },
+                    { x: 500, y: 400, id: 17 },
+                    { x: 420, y: 280, id: 18 },
+                  ],
+                },
+              ]}
+              grid={{ vertical: true, horizontal: true }}
+            />
           </Card>
         </Grid>
 
@@ -295,15 +288,9 @@ export function OverviewAnalyticsView() {
           />
         </Grid> */}
 
-        
         <Grid xs={12} md={6} lg={4}>
-          <AnalyticsChartBar            
-          />
+          <AnalyticsChartBar />
         </Grid>
-
-        
-
-        
 
         {/* <Grid xs={12} md={6} lg={4}>
           <AnalyticsCurrentSubject

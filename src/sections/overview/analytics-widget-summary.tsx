@@ -108,12 +108,23 @@ export function AnalyticsWidgetSummary({
         }}
       >
         <Box sx={{ flexGrow: 1, minWidth: 112 }}>
-          <Box sx={{ mb: 1, typography: 'subtitle2' }}>{title}</Box>
+          {/* <Box sx={{ mb: 1, typography: 'h6' }}>{title}</Box> */}
+          <Box 
+            sx={{ 
+              mb: 1, 
+              typography: 'h6', 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap' 
+            }}
+          >
+            {title}
+          </Box>
           <Box sx={{ typography: 'h4' }}>{fShortenNumber(total)}</Box>
         </Box>
 
         <Chart
-          type="line"
+          type="bar"
           series={[{ data: chart.series }]}
           options={chartOptions}
           width={84}
