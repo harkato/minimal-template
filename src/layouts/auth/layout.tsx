@@ -28,41 +28,42 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
 
   return (
     <LayoutSection
+      headerSection={null}
       /** **************************************
        * Header
        *************************************** */
-      headerSection={
-        <HeaderSection
-          layoutQuery={layoutQuery}
-          slotProps={{
-            container: { maxWidth: false },
-            toolbar: { sx: { bgcolor: 'transparent', backdropFilter: 'unset' } },
-          }}
-          sx={{
-            position: { [layoutQuery]: 'fixed' },
+      // headerSection={
+      //   <HeaderSection
+      //     layoutQuery={layoutQuery}
+      //     slotProps={{
+      //       container: { maxWidth: false },
+      //       toolbar: { sx: { bgcolor: 'transparent', backdropFilter: 'unset' } },
+      //     }}
+      //     sx={{
+      //       position: { [layoutQuery]: 'fixed' },
 
-            ...header?.sx,
-          }}
-          slots={{
-            topArea: (
-              <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
-                This is an info Alert.
-              </Alert>
-            ),
-            leftArea: <Logo />,
-            rightArea: (
-              <Link
-                component={RouterLink}
-                href="#"
-                color="inherit"
-                sx={{ typography: 'subtitle2' }}
-              >
-                Need help?
-              </Link>
-            ),
-          }}
-        />
-      }
+      //       ...header?.sx,
+      //     }}
+      //     slots={{
+      //       topArea: (
+      //         <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
+      //           This is an info Alert.
+      //         </Alert>
+      //       ),
+      //       leftArea: <Logo />,
+      //       rightArea: (
+      //         <Link
+      //           component={RouterLink}
+      //           href="#"
+      //           color="inherit"
+      //           sx={{ typography: 'subtitle2' }}
+      //         >
+      //           Need help?
+      //         </Link>
+      //       ),
+      //     }}
+      //   />
+      // }
       /** **************************************
        * Footer
        *************************************** */
@@ -82,7 +83,8 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center center',
-          backgroundImage: `url(/assets/background/overlay.jpg)`,
+          backgroundImage: `url(/assets/background/overlay-carro.jpg)`,
+          filter: 'blur(4px)',
           [stylesMode.dark]: { opacity: 0.08 },
         },
         ...sx,
