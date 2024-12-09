@@ -215,9 +215,9 @@ export function OverviewAnalyticsView() {
             </Grid>
           ))}
         {/* ========================================CARD TORQUE============================== */}
-        <Grid xs={12}>
+        {/* <Grid xs={12}>
           <AnalyticsChartCard id="12" />
-        </Grid>
+        </Grid> */}
 
         {/* <Grid xs={12} md={6} lg={12}>
           <TorqueChart />
