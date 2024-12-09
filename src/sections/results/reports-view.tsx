@@ -377,7 +377,7 @@ export default function ResultPage() {
                     direction={orderBy === 'resultTime' ? order : 'asc'}
                     onClick={() => handleRequestSort('resultTime')}
                   >
-                    Data do Resultado
+                    Data
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
@@ -396,7 +396,7 @@ export default function ResultPage() {
                     direction={orderBy === 'tool' ? order : 'asc'}
                     onClick={() => handleRequestSort('tool')}
                   >
-                    Nome da Ferramenta
+                    Ferramenta
                   </TableSortLabel>
                 </TableCell>
 
@@ -416,7 +416,7 @@ export default function ResultPage() {
                     direction={orderBy === 'programName' ? order : 'asc'}
                     onClick={() => handleRequestSort('programName')}
                   >
-                    Nome do Programa
+                    Programa
                   </TableSortLabel>
                 </TableCell>
 
