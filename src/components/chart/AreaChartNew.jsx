@@ -23,7 +23,7 @@ export  function AreaChartNew() {
           {/* <Typography variant="h5" align="center">Torque Ângulo Tempo</Typography> */}
         </Grid>
         <Grid item>
-          <Stack direction="row" alignItems="center" spacing={0}>
+          <Stack direction="row" alignItems="center" margin= '20px 20px 0px 0px' spacing={5}>
             <Button
               size="small"
               onClick={() => setSlot('TORQUE')}
@@ -42,11 +42,11 @@ export  function AreaChartNew() {
             </Button>
             <Button
               size="small"
-              onClick={() => setSlot('NOK')}
-              color={slot === 'NOK' ? 'primary' : 'secondary'}
-              variant={slot === 'NOK' ? 'outlined' : 'text'}
+              onClick={() => setSlot('TORQUE X ÂNGULO')}
+              color={slot === 'TORQUE X ÂNGULO' ? 'primary' : 'secondary'}
+              variant={slot === 'TORQUE X ÂNGULO' ? 'outlined' : 'text'}
             >
-              NOK
+              TORQUE X ÂNGULO
             </Button>
           </Stack>
         </Grid>

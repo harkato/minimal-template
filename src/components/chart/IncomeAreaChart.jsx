@@ -46,8 +46,7 @@ export default function IncomeAreaChart({ slot }) {
       colors: [theme.palette.primary.main, theme.palette.primary[700]], 
       xaxis: {
         title: {
-          text: 'TEMPO',
-          colors: secondary,
+          text: slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' :'TEMPO',
         },
         // categories:
         //   slot === 'torque'
@@ -79,7 +78,9 @@ export default function IncomeAreaChart({ slot }) {
       },
       yaxis: {
         title: {
-          text: slot,
+          text: slot === 'TORQUE X ÂNGULO' ? 'TORQUE' 
+          :slot === 'ÂNGULO' ? 'ÂNGULO'
+          :'TORQUE',
         },
         labels: {
           style: {

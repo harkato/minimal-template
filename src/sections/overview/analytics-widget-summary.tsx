@@ -42,7 +42,7 @@ export function AnalyticsWidgetSummary({
   const theme = useTheme();
 
   const chartColors = [theme.palette[color].dark];
-
+  // tabela do Card
   const chartOptions = useChart({
     chart: { sparkline: { enabled: true } },
     colors: chartColors,
@@ -61,6 +61,7 @@ export function AnalyticsWidgetSummary({
     ...chart.options,
   });
 
+  // % do Card lado superior direito
   const renderTrending = (
     <Box
       sx={{
@@ -95,9 +96,18 @@ export function AnalyticsWidgetSummary({
       }}
       {...other}
     >
-      <Box sx={{ width: 48, height: 48, mb: 3 }}>{icon}</Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <Box sx={{ width: 40, height: 40 }}>{icon}</Box>
+  <Chart
+    type="bar"
+    series={[{ data: chart.series }]}
+    options={chartOptions}
+    width={70}
+    height={56}
+  />
+</Box>
 
-      {renderTrending}
+      {/* {renderTrending} */}
 
       <Box
         sx={{
@@ -109,6 +119,7 @@ export function AnalyticsWidgetSummary({
       >
         <Box sx={{ flexGrow: 1, minWidth: 112 }}>
           {/* <Box sx={{ mb: 1, typography: 'h6' }}>{title}</Box> */}
+          {/* Nome da tarefa */}
           <Box 
             sx={{ 
               mb: 1, 
@@ -120,16 +131,17 @@ export function AnalyticsWidgetSummary({
           >
             {title}
           </Box>
-          <Box sx={{ typography: 'h4' }}>{fShortenNumber(total)}</Box>
+          {/* taxa de  NOK/OK */}
+          <Box sx={{ typography: 'h3', textAlign: 'center'}}>{fShortenNumber(total)}</Box>
         </Box>
 
-        <Chart
+        {/* <Chart
           type="bar"
           series={[{ data: chart.series }]}
           options={chartOptions}
-          width={84}
+          width={70}
           height={56}
-        />
+        /> */}
       </Box>
 
       <SvgColor

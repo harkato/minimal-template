@@ -1,3 +1,4 @@
+
 import type { CardProps } from '@mui/material/Card';
 import type { ChartOptions } from 'src/components/chart';
 
@@ -12,6 +13,7 @@ import { Chart, useChart } from 'src/components/chart';
 type Props = CardProps & {
   title?: string;
   subheader?: string;
+  
   chart: {
     colors?: string[];
     categories?: string[];
@@ -32,6 +34,7 @@ export function AnalyticsWebsiteVisits({ title, subheader, chart, ...other }: Pr
   ];
 
   const chartOptions = useChart({
+    
     colors: chartColors,
     stroke: {
       width: 2,
@@ -39,6 +42,7 @@ export function AnalyticsWebsiteVisits({ title, subheader, chart, ...other }: Pr
     },
     xaxis: {
       categories: chart.categories,
+
     },
     legend: {
       show: true,
@@ -65,3 +69,6 @@ export function AnalyticsWebsiteVisits({ title, subheader, chart, ...other }: Pr
     </Card>
   );
 }
+
+export default AnalyticsWebsiteVisits;
+

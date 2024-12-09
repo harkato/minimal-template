@@ -8,9 +8,16 @@ const AreaChart = () => {
     chart: {
       type: 'area',
     },
+
+    title: {
+      text: 'Ângulo/Torque X Tempo'
+    },
     
     xAxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      categories: ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'],
+      title: {
+        text: 'Tempo',
+      },
     },
     yAxis: {
       title: {
@@ -30,11 +37,11 @@ const AreaChart = () => {
     },
     series: [
       {
-        name: 'Usuários Ativos',
+        name: 'Ângulo',
         data: [29, 71, 106, 129, 144, 176, 135, 148, 216, 194, 95, 54],
       },
       {
-        name: 'Usuários Inativos',
+        name: 'Torque',
         data: [8, 10, 15, 26, 23, 38, 23, 32, 48, 55, 35, 28],
       },
     ],

@@ -6,6 +6,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete'
 import TorqueChart from 'src/components/chart/torquechart';
 
+// import AreaChartNew from 'src/components/chart/AreaChartNew';
+
 export type Props = CardProps & {
   id: string;
   onDelete?: (id: string) => void;
@@ -54,6 +56,7 @@ export function AnalyticsChartCard({
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <TorqueChart/>
+          {/* <AreaChartNew /> */}
         </CardContent>
       </Collapse>
 
