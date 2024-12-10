@@ -24,11 +24,16 @@
     "contrastText": "#FFFFFF"
   },
   "success": {
-    "lighter": "#D3FCD2",
-    "light": "#77ED8B",
-    "main": "#22C55E",
-    "dark": "#118D57",
-    "darker": "#065E49",
+    "lighter": "#49c7cc",
+
+    "light": "#37abb0",
+
+    "main": "#20878b",
+
+    "dark": "#196f73",
+
+    "darker": "#0f4a4d",
+
     "contrastText": "#ffffff"
   },
   "warning": {
@@ -40,11 +45,11 @@
     "contrastText": "#1C252E"
   },
   "error": {
-    "lighter": "#FFE9D5",
-    "light": "#FFAC82",
-    "main": "#FF5630",
-    "dark": "#B71D18",
-    "darker": "#7A0916",
+    "lighter": "#f09c9c",
+    "light": "#f27272",
+    "main": "#f24f4f",
+    "dark": "#bf3232",
+    "darker": "#8f1d1d",
     "contrastText": "#FFFFFF"
   },
   "grey": {
