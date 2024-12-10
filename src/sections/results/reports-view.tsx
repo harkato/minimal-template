@@ -186,55 +186,138 @@ export default function ResultPage() {
 
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const handlePrint = () => {
-    if (tableRef.current) {
-      // Faz referência ao conteúdo da tabela e imprime
-      const printContent = tableRef.current.innerHTML;
+  // Função de impressão da tabela atual
+  // const handlePrint = () => {
+  //   if (tableRef.current) {
+  //     // Clona o nó da tabela
+  //     const tableClone = tableRef.current.cloneNode(true) as HTMLElement;
+  
+  //     // Remove as setas (ícones de ordenação) do clone
+  //     const sortLabels = tableClone.querySelectorAll('.MuiTableSortLabel-icon');
+  //     sortLabels.forEach((icon) => {
+  //       icon.remove();
+  //     });
+  
+  //     // Obter o conteúdo atualizado do clone
+  //     const printContent = tableClone.innerHTML;
+  
+  //     // Cria uma nova janela para impressão
+  //     const printWindow = window.open('', '_blank');
+  //     if (printWindow) {
+  //       printWindow.document.write(`
+  //         <html>
+  //           <head>
+  //             <title>Resultados</title>
+  //             <style>
+  //               body {
+  //                 font-family: Arial, sans-serif;
+  //                 margin: 20px;
+  //               }
+  //               table {
+  //                 width: 100%;
+  //                 border-collapse: collapse;
+  //               }
+  //               th, td {
+  //                 border: 1px solid black;
+  //                 padding: 8px;
+  //                 text-align: left;
+  //               }
+  //               th {
+  //                 background-color: #f2f2f2;
+  //               }
+  //             </style>
+  //           </head>
+  //           <body>${printContent}</body>
+  //         </html>
+  //       `);
+  //       printWindow.document.close();
+  //       printWindow.print();
+  //     }
+  //   }
+  // };
 
-      // Cria uma nova janela para impressão
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Resultados</title>
-              <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  margin: 20px;
-                }
-                table {
-                  width: 100%;
-                  border-collapse: collapse;
-                }
-                th, td {
-                  border: 1px solid black;
-                  padding: 8px;
-                  text-align: left;
-                }
-                th {
-                  background-color: #f2f2f2;
-                }
-                
-                /* Ocultar setas de ordenação durante a impressão */
-              th::after {
-                content: none !important; /* Remove qualquer ícone ou seta */
+  const handlePrintAllPages = () => {
+    const fullTable = document.createElement('div');
+  
+    fullTable.innerHTML = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Id</th>
+            <th>Ferramenta</th>
+            <th>Job</th>
+            <th>Programa</th>
+            <th>Fuso</th>
+            <th>Torque</th>
+            <th>Status Torque</th>
+            <th>Ângulo</th>
+            <th>Status Ângulo</th>
+            <th>Status Geral</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredData
+            .map((row, index) => `
+              <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
+                <td>${row.resultTime}</td>
+                <td>${row.id}</td>
+                <td>${row.tool}</td>
+                <td>${row.job}</td>
+                <td>${row.programName}</td>
+                <td>${row.fuso}</td>
+                <td>${row.torque}</td>
+                <td style="color: white; background-color: ${
+                  row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f'
+                };">${row.torqueStatus}</td>
+                <td>${row.angle}</td>
+                <td style="color: white; background-color: ${
+                  row.angleStatus === 'OK' ? '#20878b' : '#f24f4f'
+                };">${row.angleStatus}</td>
+                <td style="color: white; background-color: ${
+                  row.generalStatus === 'OK' ? '#20878b' : '#f24f4f'
+                };">${row.generalStatus}</td>
+              </tr>
+            `)
+            .join('')}
+        </tbody>
+      </table>
+    `;
+  
+    // Cria a janela de impressão com os dados completos
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Resultados</title>
+            <style>
+              body {
+                font-family: Poppins, sans-serif;
+                margin: 20px;
               }
-                th .sorting::after,
-              th .sorting_asc::after,
-              th .sorting_desc::after {
-                display: none !important; /* Remover setas de ordenação */
+              table {
+                width: 100%;
+                border-collapse: collapse;
               }
-              </style>
-            </head>
-            <body>${printContent}</body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-      }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+            </style>
+          </head>
+          <body>${fullTable.innerHTML}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
     }
   };
+  
 
   return (
     <>
@@ -361,7 +444,7 @@ export default function ResultPage() {
               </IconButton>
             </Tooltip>
             <Tooltip title="Print">
-              <IconButton onClick={handlePrint}>
+              <IconButton onClick={handlePrintAllPages}>
                 <Iconify icon="material-symbols:print" />
               </IconButton>
             </Tooltip>
