@@ -147,13 +147,6 @@ export function OverviewAnalyticsView() {
             />
           </Grid>
         </Grid>
-      
-        {/* ================================GRAFICO DE AREA================================ */}
-        <Grid xs={12} md={6} lg={4} paddingTop={5}>
-          <Card>
-          <AreaChartNew />
-          </Card>
-        </Grid>
 
         {/* ================================NOK POR TURNO================================== */}        
         {/* <Grid xs={12} md={6} lg={4}>
@@ -172,7 +165,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      <Grid container sx={{ justifyContent: 'space-between' }}>
+      <Grid container sx={{ justifyContent: 'space-between' }} paddingTop={5}>
         <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
           {t('dashboard.process')}
         </Typography>
@@ -214,6 +207,14 @@ export function OverviewAnalyticsView() {
               <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
             </Grid>
           ))}
+
+           {/* ================================GRAFICO DE AREA================================ */}
+        {/* <Grid xs={12} md={6} lg={12} paddingTop={5}>
+          <Card>
+          <AreaChartNew />
+          </Card>
+        </Grid> */}
+
         {/* ========================================CARD TORQUE============================== */}
         {/* <Grid xs={12}>
           <AnalyticsChartCard id="12" />

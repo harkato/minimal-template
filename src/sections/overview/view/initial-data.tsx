@@ -40,11 +40,11 @@ export const initialData = [
       nokVin: 1.679,
       target: 0.8,
       topIssues: [
-        { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
-        { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
-        { code: '3182 01', description: 'Quadro Auxiliar LD', occurrences: 3 },
-        { code: '6902 01', description: 'Travessas na carroceria', occurrences: 3 },
-        { code: '4107 01', description: 'Suporte bomba de vácuo', occurrences: 3 },
+        { code: '2490 01', description: "Banco Novo Polo", occurrences: 8 },
+        { code: '3109 01', description: 'Banco Polo Track ', occurrences: 4 },
+        { code: '3182 01', description: 'Banco UP', occurrences: 3 },
+        { code: '6902 01', description: 'Banco Gol  ', occurrences: 3 },
+        { code: '4107 01', description: 'Banco Polo TSI', occurrences: 3 },
       ],
     },
     {

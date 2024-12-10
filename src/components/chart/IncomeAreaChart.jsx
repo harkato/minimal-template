@@ -43,15 +43,14 @@ export default function IncomeAreaChart({ slot }) {
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
-      colors: [theme.palette.primary.main, theme.palette.primary[700]], 
+      colors: [theme.palette.primary.main, theme.palette.primary[700]],
       xaxis: {
         title: {
-          text: slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' :'TEMPO',
+          text: slot === 'TORQUE X ÂNGULO' ? 'TORQUE' : 'TEMPO',
         },
-        // categories:
-        //   slot === 'torque'
-        //     ? ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
-        //     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        categories: 
+          slot === 'TORQUE X ÂNGULO' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35, 40, 28, 51, 42, 109, 100] 
+          : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'],
         labels: {
           style: {
             colors: [
@@ -78,7 +77,7 @@ export default function IncomeAreaChart({ slot }) {
       },
       yaxis: {
         title: {
-          text: slot === 'TORQUE X ÂNGULO' ? 'TORQUE' 
+          text: slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' 
           :slot === 'ÂNGULO' ? 'ÂNGULO'
           :'TORQUE',
         },
@@ -100,8 +99,8 @@ export default function IncomeAreaChart({ slot }) {
       data: [0, 86, 28, 115, 48, 210, 136]
     },
     // {
-    //   name: 'angulo',
-    //   data: [0, 43, 14, 56, 24, 105, 68]
+    //   name: 'angulo',
+    //   data: [0, 43, 14, 56, 24, 105, 68]
     // }
   ]);
 
@@ -110,12 +109,11 @@ export default function IncomeAreaChart({ slot }) {
       {
         name: slot,
         data: slot === 'TORQUE' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35, 40, 28, 51, 42, 109, 100] 
-        : slot === 'ÂNGULO' ? [-31, -20, -8, 21, 42, 9, -100]
-        : [1, 2, 3, 4, 5, 6, 7]
-      },
+          :  [-31, -20, -8, 21, 42, 9, -100, -50, -41, -31, -20, -8, 21, 42, 9, -100, -50, -41] 
+        },
       // {
-      //   name: 'Ângulo',
-      //   data: slot === 'torque' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
+      //   name: 'Ângulo',
+      //   data: slot === 'torque' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
       // }
     ]);
   }, [slot]);
