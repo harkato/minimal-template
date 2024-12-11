@@ -91,7 +91,7 @@ export function OverviewAnalyticsView() {
 
         return updatedData;
       });
-    }, 5000); // Atualiza a cada 5 segundos
+    }, 20000); // Atualiza a cada 20 segundos
 
     return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   }, []);
