@@ -74,15 +74,15 @@ const convertToCSV = (rows: DataRow[]) => {
     'Job',
     'Programa',
     'Fuso',
+    'Status Geral',
     'Torque',
     'Status Torque',
     'Ângulo',
     'Status ângulo',
-    'Status Geral',
   ];
   const csvRows = rows.map(
     (row) =>
-      `${row.resultTime},${row.id},${row.tool},${row.job},${row.programName},${row.fuso},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus},${row.generalStatus}`
+      `${row.resultTime},${row.id},${row.tool},${row.job},${row.programName},${row.fuso},${row.generalStatus},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus}`
   );
   return [headers.join(','), ...csvRows].join('\n');
 };
@@ -249,11 +249,11 @@ export default function ResultPage() {
             <th>Job</th>
             <th>Programa</th>
             <th>Fuso</th>
+            <th>Status Geral</th>
             <th>Torque</th>
             <th>Status Torque</th>
             <th>Ângulo</th>
             <th>Status Ângulo</th>
-            <th>Status Geral</th>
           </tr>
         </thead>
         <tbody>
@@ -266,6 +266,9 @@ export default function ResultPage() {
                 <td>${row.job}</td>
                 <td>${row.programName}</td>
                 <td>${row.fuso}</td>
+                <td style="color: white; background-color: ${
+                  row.generalStatus === 'OK' ? '#20878b' : '#f24f4f'
+                };">${row.generalStatus}</td>
                 <td>${row.torque}</td>
                 <td style="color: white; background-color: ${
                   row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f'
@@ -274,9 +277,6 @@ export default function ResultPage() {
                 <td style="color: white; background-color: ${
                   row.angleStatus === 'OK' ? '#20878b' : '#f24f4f'
                 };">${row.angleStatus}</td>
-                <td style="color: white; background-color: ${
-                  row.generalStatus === 'OK' ? '#20878b' : '#f24f4f'
-                };">${row.generalStatus}</td>
               </tr>
             `)
             .join('')}
@@ -515,6 +515,16 @@ export default function ResultPage() {
 
                 <TableCell>
                   <TableSortLabel
+                    active={orderBy === 'generalStatus'}
+                    direction={orderBy === 'generalStatus' ? order : 'asc'}
+                    onClick={() => handleRequestSort('generalStatus')}
+                  >
+                    Status Geral
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell>
+                  <TableSortLabel
                     active={orderBy === 'torque'}
                     direction={orderBy === 'torque' ? order : 'asc'}
                     onClick={() => handleRequestSort('torque')}
@@ -531,7 +541,7 @@ export default function ResultPage() {
                     Status Torque
                   </TableSortLabel>
                 </TableCell>
-
+                  
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angle'}
@@ -551,15 +561,7 @@ export default function ResultPage() {
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'generalStatus'}
-                    direction={orderBy === 'generalStatus' ? order : 'asc'}
-                    onClick={() => handleRequestSort('generalStatus')}
-                  >
-                    Status Geral
-                  </TableSortLabel>
-                </TableCell>
+                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -574,6 +576,21 @@ export default function ResultPage() {
                   <TableCell>{row.job}</TableCell>
                   <TableCell>{row.programName}</TableCell>
                   <TableCell>{row.fuso}</TableCell>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {row.generalStatus}
+                    </Box>
+                  </TableCell>
                   <TableCell>{row.torque}</TableCell>
                   <TableCell>
                     <Box
@@ -608,21 +625,7 @@ export default function ResultPage() {
                     </Box>
                   </TableCell>
 
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {row.generalStatus}
-                    </Box>
-                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>
