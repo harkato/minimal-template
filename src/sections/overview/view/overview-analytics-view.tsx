@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
@@ -32,6 +32,7 @@ import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsChartCard } from '../analytics-chart-card';
 import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
+import { initialDataTopFive } from './initial-data-top-five';
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +40,7 @@ export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
 
   const [cardData, setCardData] = useState(initialData);
+  const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
 
@@ -65,6 +67,54 @@ export function OverviewAnalyticsView() {
   const handleDeleteCard = (id: string) => {
     setCardData((prevData) => prevData.filter((card) => card.id !== id));
   };
+
+  // Simulando atualizações em tempo real
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTopFiveData((prevData) => {
+        const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
+        const updatedCard = prevData[randomIndex];
+
+        // Atualiza apenas o card selecionado
+        const updatedData = prevData.map((card, index) =>
+          index === randomIndex
+            ? {
+                ...updatedCard,
+                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+                title: updatedCard.title.includes('Novo')
+                  ? updatedCard.title.replace('Novo ', '')
+                  : `Novo ${updatedCard.title}`, // Alterna o título
+              }
+            : card
+        );
+
+        return updatedData;
+      });
+    }, 5000); // Atualiza a cada 5 segundos
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar
+  }, []);
+
+  const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+
+  const statusToColor: Record<
+    string,
+    'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
+  > = {
+    success: 'success',
+    error: 'error',
+    warning: 'warning',
+    primary: 'primary',
+    secondary: 'secondary',
+    info: 'info',
+  };
+
+  function getColor(
+    status: string
+  ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
+    return statusToColor[status] || 'primary';
+  }
 
   return (
     <DashboardContent maxWidth="xl">
@@ -104,21 +154,20 @@ export function OverviewAnalyticsView() {
       </Typography>
 
       <Grid container spacing={2}>
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Coxim do motor"
-            percent={-2.6}
-            total={0.757}
-            color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [22, 8, 35, 50, 82, 84, 77, 70],
-            }}
-          />
-        </Grid>
+        {sortedTopFiveData.map((item, index) => (
+          <Grid key={index} xs={12} sm={6} md={2.4}>
+            <AnalyticsWidgetSummary
+              title={item.title}
+              percent={item.percent}
+              total={item.total}
+              color={getColor(item.color)}
+              icon={item.icon}
+              chart={item.chart}
+            />
+          </Grid>
+        ))}
 
-        <Grid xs={12} sm={6} md={2.4}>
+        {/* <Grid xs={12} sm={6} md={2.4}>
           <AnalyticsWidgetSummary
             title="Amortecedor"
             percent={3.2}
@@ -172,7 +221,7 @@ export function OverviewAnalyticsView() {
               series: [22, 8, 35, 50, 82, 84, 67, 40],
             }}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
 
       {/* ================================GRAFICO DE AREA================================ */}
