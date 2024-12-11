@@ -9,7 +9,7 @@
     },
 
     "dashboard": {
-        "process": "Main processes",
+        "process": "Tools",
         "newProcess": "New Process",
         "applySelection": "Apply selection"
     },

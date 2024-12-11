@@ -24,7 +24,7 @@ export const defaultFont = 'Poppins';
 
 export const primaryFont = setFont(defaultFont);
 
-export const secondaryFont = setFont('Barlow');
+export const secondaryFont = setFont(defaultFont);
 
 // ----------------------------------------------------------------------
 
