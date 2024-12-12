@@ -34,7 +34,7 @@ export const initialData = [
     {
       id: '3',
       title: 'BANCOS',
-      color: '#f24f4f',
+      color: '#ffd666',
       vehicles: 28,
       nok: 47,
       nokVin: 1.679,

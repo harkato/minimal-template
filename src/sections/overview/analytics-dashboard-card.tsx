@@ -74,7 +74,7 @@ export function AnalyticsDashboardCard({
               <Typography variant="body2">Limite: {target}</Typography>
             </Grid>
             <Grid>
-              <Typography variant="h3">Taxa: {nokVin.toFixed(3)}</Typography>
+              <Typography variant="h3">Taxa: {nokVin.toFixed(2)}</Typography>
             </Grid>
           </Grid>
 
