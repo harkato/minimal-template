@@ -78,7 +78,7 @@ export function fShortenNumber(inputValue: InputNumberValue, options?: Options) 
 
   const fm = new Intl.NumberFormat(locale.code, {
     notation: 'compact',
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 3,
     ...options,
   }).format(number);
 

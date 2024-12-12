@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Menu,
   MenuItem,
+  Box,
 } from '@mui/material';
 
 import { _tasks, _posts, _timeline } from 'src/_mock';
@@ -23,6 +24,12 @@ import { BarLabel } from '@mui/x-charts';
 
 import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Switch from '@mui/material/Switch';
+import Slider from '@mui/material/Slider';
+
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
@@ -34,6 +41,8 @@ import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
 
+
+
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
@@ -43,6 +52,32 @@ export function OverviewAnalyticsView() {
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
+
+  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.5, 0.8]); // Iniciando taxa de alerta e atenção
+  const [open, setOpen] = useState(false);
+  const [top5, setTop5] = useState(false);
+  const [ferramenta, setFerramenta] = useState(false);
+
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    setTaxaTop5(newValue as number[]);
+  };
+
+  function getColor(taxaAtual: number){
+    return taxaAtual >= taxaTop5[1]
+    ? "error"
+    : taxaAtual >= taxaTop5[0]
+    ? "warning"
+    : "success"
+  }
+
+  function getIcon(taxaAtual: number){
+    if (taxaAtual >= taxaTop5[1]) {
+      return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+    } if (taxaAtual >= taxaTop5[0]) {
+      return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+    }
+      return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
+  }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -98,23 +133,23 @@ export function OverviewAnalyticsView() {
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
-  const statusToColor: Record<
-    string,
-    'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
-  > = {
-    success: 'success',
-    error: 'error',
-    warning: 'warning',
-    primary: 'primary',
-    secondary: 'secondary',
-    info: 'info',
-  };
+  // const statusToColor: Record<
+  //   string,
+  //   'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
+  // > = {
+  //   success: 'success',
+  //   error: 'error',
+  //   warning: 'warning',
+  //   primary: 'primary',
+  //   secondary: 'secondary',
+  //   info: 'info',
+  // };
 
-  function getColor(
-    status: string
-  ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
-    return statusToColor[status] || 'primary';
-  }
+  // function getColor(
+  //   status: string
+  // ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
+  //   return statusToColor[status] || 'primary';
+  // }
 
   return (
     <DashboardContent maxWidth="xl">
@@ -149,7 +184,7 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
         TOP 5 NOK
       </Typography>
 
@@ -160,8 +195,10 @@ export function OverviewAnalyticsView() {
               title={item.title}
               percent={item.percent}
               total={item.total}
-              color={getColor(item.color)}
-              icon={item.icon}
+              // color={getColor(item.color)}
+              // icon={item.icon}
+              color={getColor(item.total)}
+              icon={getIcon(item.total)}
               chart={item.chart}
             />
           </Grid>
@@ -249,7 +286,7 @@ export function OverviewAnalyticsView() {
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
       <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
-        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
           {t('dashboard.process')}
         </Typography>
       </Grid>

@@ -2,7 +2,8 @@ export const initialData = [
     {
       id: '1',
       title: 'FAHRWERK',
-      color: '#20878b',
+      // color: '#20878b',
+      color: 'success',
       vehicles: 37,
       nok: 28,
       nokVin: 0.757,
@@ -18,7 +19,8 @@ export const initialData = [
     {
       id: '2',
       title: 'ZP6',
-      color: '#f24f4f',
+      // color: '#f24f4f',
+      color: 'warning',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -34,7 +36,8 @@ export const initialData = [
     {
       id: '3',
       title: 'BANCOS',
-      color: '#f24f4f',
+      // color: '#f24f4f',
+      color: 'error',
       vehicles: 28,
       nok: 47,
       nokVin: 1.679,
@@ -50,7 +53,7 @@ export const initialData = [
     {
       id: '4',
       title: 'BANCOS',
-      color: '#f24f4f',
+      color: 'error',
       // color: '#f52f2f',
       vehicles: 28,
       nok: 47,
@@ -67,7 +70,8 @@ export const initialData = [
     {
       id: '5',
       title: 'ZP6',
-      color: '#20878b',
+      // color: '#20878b',
+      color: 'error',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
@@ -83,7 +87,9 @@ export const initialData = [
     {
       id: '6',
       title: 'ZP6',
-      color: '#20878b', // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c,
+      // color: '#20878b', 
+      // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c,
+      color: 'error',
       vehicles: 37,
       nok: 21,
       nokVin: 0.568,
