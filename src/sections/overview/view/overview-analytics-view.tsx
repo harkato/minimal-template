@@ -166,62 +166,6 @@ export function OverviewAnalyticsView() {
             />
           </Grid>
         ))}
-
-        {/* <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Amortecedor"
-            percent={3.2}
-            total={0.89}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [56, 47, 40, 62, 73, 30, 23, 54],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Air Bag"
-            percent={0}
-            total={0.95}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/dash.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [40, 70, 50, 28, 70, 75, 53, 53],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Coluna de direção"
-            percent={3.6}
-            total={0.73}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [56, 30, 23, 54, 47, 40, 62, 73],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Cinto coluna B"
-            percent={-4.3}
-            total={0.84}
-            color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [22, 8, 35, 50, 82, 84, 67, 40],
-            }}
-          />
-        </Grid> */}
       </Grid>
 
       {/* ================================GRAFICO DE AREA================================ */}
