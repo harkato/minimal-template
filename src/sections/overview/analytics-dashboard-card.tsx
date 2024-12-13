@@ -79,7 +79,7 @@ export function AnalyticsDashboardCard({
           </Grid>
 
           <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
-            Top 5 Quitações:
+            Top 5 Programas:
           </Typography>
 
           <TableContainer component={Paper} style={{ backgroundColor: 'white', borderRadius: '5px' }}>
