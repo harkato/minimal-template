@@ -44,6 +44,8 @@ export function OverviewAnalyticsView() {
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
 
+  const [taxaApertadeira, setTaxaApertadeira] = useState<number[]>([0.6, 0.8]);
+  
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
@@ -114,6 +116,14 @@ export function OverviewAnalyticsView() {
     status: string
   ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
     return statusToColor[status] || 'primary';
+  }
+
+  function getColorApertadeira(taxaAtual: number){
+    return taxaAtual >= taxaApertadeira[1]
+    ? "#f24f4f"
+    : taxaAtual >= taxaApertadeira[0]
+    ? "#ffd666"
+    : "#20878b"
   }
 
   return (
@@ -203,7 +213,7 @@ export function OverviewAnalyticsView() {
           .filter((data) => selectedCards.includes(data.id))
           .map((data) => (
             <Grid xs={12} sm={6} md={4} key={data.id}>
-              <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
+              <AnalyticsDashboardCard {...data} color={getColorApertadeira(data.nokVin)} onDelete={handleDeleteCard} />
             </Grid>
           ))}
         {/* ========================================CARD TORQUE============================== */}
