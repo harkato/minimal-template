@@ -19,14 +19,17 @@ import {
 import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { SvgColor } from 'src/components/svg-color';
-import { Iconify } from 'src/components/iconify';
+import DeleteIcon from '@mui/icons-material/Delete'
+
+import type { ColorType } from 'src/theme/core/palette';
+import { useTheme } from '@mui/material/styles';
+import { varAlpha, bgGradient } from 'src/theme/styles';
 
 export type Props = CardProps & {
   id: string;
   title: string;
   color: string;
+  // color?: ColorType;
   vehicles: number;
   nok: number;
   nokVin: number;
@@ -39,7 +42,7 @@ export type Props = CardProps & {
 export function AnalyticsDashboardCard({
   id,
   title,
-  color,
+  color = 'error',
   vehicles,
   nok,
   nokVin,
@@ -51,18 +54,36 @@ export function AnalyticsDashboardCard({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
 
+  const theme = useTheme();
+
+  const bgColor = [theme.palette[color as ColorType].lighter];
+  
   const handleExpandClick = () => setExpanded(!expanded);
 
   return (
-    <Card sx={{ bgcolor: 'common.white' }}>
+    <Card 
+    sx={{ bgcolor: `${color}.lighter` }} >
       <Box>
         <CardHeader
           title={title}
+          // sx={{
+          //   bgcolor: color,
+          //   color: '#FFFFFF',
+          //   padding: '20px',
+          //   cursor: 'pointer',
+          // }}
           sx={{
+            ...bgGradient({
+              color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.48)}`,
+            }),
+            p: 3,
+            boxShadow: 'none',
             bgcolor: color,
-            color: '#FFFFFF',
             padding: '20px',
+            position: 'relative',
             cursor: 'pointer',
+            color: `${color}.darker`,
+            backgroundColor: 'common.white',
           }}
           onClick={handleExpandClick}
           action={
@@ -119,10 +140,7 @@ export function AnalyticsDashboardCard({
             Top 5 Programas:
           </Typography>
 
-          <TableContainer
-            component={Paper}
-            style={{ backgroundColor: 'white', borderRadius: '5px' }}
-          >
+          <TableContainer component={Paper} style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
             <Table>
               <TableBody>
                 {topIssues.map((issue, index) => (
@@ -137,6 +155,7 @@ export function AnalyticsDashboardCard({
           </TableContainer>
         </CardContent>
       </Collapse>
+
     </Card>
   );
 }
