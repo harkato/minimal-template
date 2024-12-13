@@ -12,7 +12,8 @@ export type Props = CardProps & {
   vehicles: number;
   nok: number;
   nokVin: number;
-  target: number;
+  targetAlert: number;
+  targetCritical: number;
   topIssues: { code: string; description: string; occurrences: number }[];
   onDelete?: (id: string) => void;
 }
@@ -24,7 +25,8 @@ export function AnalyticsDashboardCard({
   vehicles,
   nok,
   nokVin,
-  target,
+  targetAlert,
+  targetCritical,
   topIssues,
   onDelete,
   ...other
@@ -71,7 +73,7 @@ export function AnalyticsDashboardCard({
             <Grid>
               <Typography variant="body2">Veículos: {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
-              <Typography variant="body2">Limite: {target}</Typography>
+              <Typography variant="body2">Limites: {targetAlert} / {targetCritical}</Typography>
             </Grid>
             <Grid>
               <Typography variant="h3">Taxa: {nokVin.toFixed(2)}</Typography>

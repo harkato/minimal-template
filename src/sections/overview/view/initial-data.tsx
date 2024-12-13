@@ -6,7 +6,8 @@ export const initialData = [
     vehicles: 37,
     nok: 28,
     nokVin: 0.757,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
       { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
@@ -22,7 +23,8 @@ export const initialData = [
     vehicles: 37,
     nok: 21,
     nokVin: 0.568,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
       { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
@@ -38,7 +40,8 @@ export const initialData = [
     vehicles: 28,
     nok: 47,
     nokVin: 1.679,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
       { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
@@ -55,7 +58,8 @@ export const initialData = [
     vehicles: 28,
     nok: 47,
     nokVin: 1.679,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
       { code: '3109 01', description: 'Suporte quadro auxiliar LE', occurrences: 4 },
@@ -71,7 +75,8 @@ export const initialData = [
     vehicles: 37,
     nok: 21,
     nokVin: 0.568,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
       { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
@@ -87,7 +92,8 @@ export const initialData = [
     vehicles: 37,
     nok: 21,
     nokVin: 0.568,
-    target: 0.8,
+    targetAlert: 0.6,
+    targetCritical: 0.8,
     topIssues: [
       { code: '2638 01', description: 'Duto freio no agregado hidráulico', occurrences: 4 },
       { code: '3402 01', description: 'Roda dianteira LD', occurrences: 3 },
