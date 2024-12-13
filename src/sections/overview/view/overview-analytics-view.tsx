@@ -46,6 +46,12 @@ import { BarLabel } from '@mui/x-charts';
 
 import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Switch from '@mui/material/Switch';
+import Slider from '@mui/material/Slider';
+
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
@@ -256,23 +262,23 @@ export function OverviewAnalyticsView() {
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
-  const statusToColor: Record<
-    string,
-    'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
-  > = {
-    success: 'success',
-    error: 'error',
-    warning: 'warning',
-    primary: 'primary',
-    secondary: 'secondary',
-    info: 'info',
-  };
+  // const statusToColor: Record<
+  //   string,
+  //   'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
+  // > = {
+  //   success: 'success',
+  //   error: 'error',
+  //   warning: 'warning',
+  //   primary: 'primary',
+  //   secondary: 'secondary',
+  //   info: 'info',
+  // };
 
-  function getColor(
-    status: string
-  ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
-    return statusToColor[status] || 'primary';
-  }
+  // function getColor(
+  //   status: string
+  // ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
+  //   return statusToColor[status] || 'primary';
+  // }
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
@@ -596,23 +602,25 @@ export function OverviewAnalyticsView() {
       {/* ================================TP 5===================================== */}
       {top5 &&
         <div id="top5">
-          <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+          <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
 
-          <Grid container spacing={2}>
-            {sortedTopFiveData.map((item, index) => (
-              <Grid key={index} xs={12} sm={6} md={2.4}>
-                <AnalyticsWidgetSummary
-                  title={item.title}
-                  percent={item.percent}
-                  total={item.total}
-                  color={getColor(item.color)}
-                  icon={item.icon}
-                  chart={item.chart}
-                />
-              </Grid>
-            ))}
+      <Grid container spacing={2}>
+        {sortedTopFiveData.map((item, index) => (
+          <Grid key={index} xs={12} sm={6} md={2.4}>
+            <AnalyticsWidgetSummary
+              title={item.title}
+              percent={item.percent}
+              total={item.total}
+              // color={getColor(item.color)}
+              // icon={item.icon}
+              color={getColor(item.total)}
+              icon={getIcon(item.total)}
+              chart={item.chart}
+            />
+          </Grid>
+        ))}
 
             {/* <Grid xs={12} sm={6} md={2.4}>
           <AnalyticsWidgetSummary
@@ -701,7 +709,7 @@ export function OverviewAnalyticsView() {
       {ferramentas &&
         <div id="ferramentas">
           <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
-            <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+            <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
               {t('dashboard.process')}
             </Typography>
           </Grid>
