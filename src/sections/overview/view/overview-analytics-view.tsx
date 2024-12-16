@@ -45,13 +45,6 @@ import { ScatterChart } from '@mui/x-charts/ScatterChart';
 import { BarLabel } from '@mui/x-charts';
 
 import { AreaChartNew } from 'src/components/chart/AreaChartNew';
-
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Switch from '@mui/material/Switch';
-import Slider from '@mui/material/Slider';
-
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
 import { AnalyticsCurrentSubject } from '../analytics-current-subject';
@@ -192,6 +185,7 @@ export function OverviewAnalyticsView() {
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
+  const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
   const [openListTop5, setOpenListTop5] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
@@ -200,13 +194,30 @@ export function OverviewAnalyticsView() {
   const [pendingValue, setPendingValue] = React.useState<LabelType[]>([]);
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
-  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.2, 0.7]);
+  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
   const theme = useTheme();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  // function getColor(taxaAtual: number) {
+  //   return taxaAtual >= taxaTop5[1]
+  //     ? "error"
+  //     : taxaAtual >= taxaTop5[0]
+  //       ? "warning"
+  //       : "success"
+  // }
+
+  // function getIcon(taxaAtual: number) {
+  //   if (taxaAtual >= taxaTop5[1]) {
+  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+  //   } if (taxaAtual >= taxaTop5[0]) {
+  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+  //   }
+  //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
+  // }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -282,16 +293,11 @@ export function OverviewAnalyticsView() {
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
-  
-    if (Array.isArray(newValue)) {
-      const secondValue = newValue[1]; // Obtém o segundo índice
-      setTopFiveData((prevTopFiveData) =>
-        prevTopFiveData.map((item) => ({
-          ...item,
-          target: secondValue, // Atualiza o campo target para cada objeto
-        }))
-      );
-    }
+    setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
+  };
+
+  const handleChangeTaxa = (event: Event, newValue: number | number[]) => {
+    setValueTools(newValue as number[]); // Atualiza o estado do slider
   };
 
   const handleClickTop5 = () => {
@@ -317,6 +323,7 @@ export function OverviewAnalyticsView() {
 
   const handleCloseLabel = () => {
     setValueLabel(pendingValue);
+    console.log('teste')
     if (anchorEl) {
       anchorEl.focus();
     }
@@ -340,7 +347,7 @@ export function OverviewAnalyticsView() {
         >
           {t('dashboard.newProcess')}
         </Button>
-        <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        {/*         <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
           {cardData.map((card) => (
             <MenuItem key={card.id}>
               <FormControlLabel
@@ -357,7 +364,7 @@ export function OverviewAnalyticsView() {
           <Button onClick={handleApplySelection} color="primary">
             {t('dashboard.applySelection')}
           </Button>
-        </Menu>
+        </Menu> */}
 
         <Modal
           open={open}
@@ -383,13 +390,13 @@ export function OverviewAnalyticsView() {
                       <TextField id="outlined-basic" sx={{ width: '100px' }} label="Max." variant="outlined" />
                     </div> */}
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
-                      <div style={{ alignSelf: 'end' }}>
+{/*                       <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
                           style={{ color: 'blue', textAlign: 'center', }}
                           control={<Switch checked={top5} onChange={(event) => setTop5(event.target.checked)} defaultChecked />}
                           label=""
                         />
-                      </div>
+                      </div> */}
                       <Slider
                         getAriaLabel={() => 'Temperature range'}
                         value={value}
@@ -416,13 +423,13 @@ export function OverviewAnalyticsView() {
                     <ListItemButton sx={{
                       pl: 4, flexDirection: 'column'
                     }}>
-                      <div style={{ alignSelf: 'end' }}>
+{/*                       <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
                           style={{ color: 'blue', textAlign: 'center', }}
                           control={<Switch checked={ferramentas} onChange={(event) => setFerramentas(event.target.checked)} />}
                           label=""
                         />
-                      </div>
+                      </div> */}
                       <Box sx={{
                         width: 600, display: 'flex', flexDirection: 'column', fontSize: 13,
                         '@media (max-width: 768px)': {
@@ -431,7 +438,7 @@ export function OverviewAnalyticsView() {
                         },
                       }}>
                         <Button disableRipple aria-describedby={id} sx={{
-                          alignSelf: 'center', width: '85%', color: 'black', marginBottom: '20px',
+                          alignSelf: 'center', width: '85%', color: 'black', marginBottom: '10px',
                           '@media (max-width: 768px)': {
                             // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
                             alignSelf: 'center', // Ocupa 90% da largura da tela
@@ -446,15 +453,11 @@ export function OverviewAnalyticsView() {
                               key={label.name}
                               sx={{
                                 mb: '20px',
-                                mr: -10,
                                 height: 20,
                                 padding: '.15em 4px',
                                 fontWeight: 400,
                                 lineHeight: '15px',
                                 borderRadius: '2px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
                                 width: '100%',
                               }}
                               style={{
@@ -467,7 +470,7 @@ export function OverviewAnalyticsView() {
                           ))}
                         </div>
                       </Box>
-                      <StyledPopper id={id} open={openLabels} anchorEl={anchorEl} placement="bottom-start">
+                      <StyledPopper id={id} open={openLabels} anchorEl={anchorEl} placement="bottom">
                         <ClickAwayListener onClickAway={handleCloseLabel}>
                           <div>
                             <Autocomplete
@@ -491,6 +494,7 @@ export function OverviewAnalyticsView() {
                                 ) {
                                   return;
                                 }
+                                console.log(newValue)
                                 setPendingValue(newValue);
                               }}
                               disableCloseOnSelect
@@ -574,17 +578,30 @@ export function OverviewAnalyticsView() {
                         Taxa
                       </Typography> */}
                         <Slider
-                          aria-label="Small steps"
+                          getAriaLabel={() => 'Temperature range'}
+                          value={valueTools}
+                          onChange={handleChangeTaxa}
+                          valueLabelDisplay="auto"
+                          getAriaValueText={valuetext}
+                          disabled={!ferramentas}
+                          min={0.0}
+                          step={0.1}
+                          max={1.0}
+
+                        />
+                        {/*                         <Slider
+                          aria-label="Temperature range"
                           defaultValue={0.5}
                           min={0.0}
                           step={0.1}
                           marks
                           max={1.0}
+                          onChange={handleChangeTaxa}
                           getAriaValueText={valuetext}
                           valueLabelDisplay="auto"
                           disabled={!ferramentas}
 
-                        />
+                        /> */}
                       </div>
                     </ListItemButton>
 
@@ -606,21 +623,23 @@ export function OverviewAnalyticsView() {
             TOP 5 NOK
           </Typography>
 
-      <Grid container spacing={2}>
-        {sortedTopFiveData.map((item, index) => (
-          <Grid key={index} xs={12} sm={6} md={2.4}>
-            <AnalyticsWidgetSummary
-              title={item.title}
-              percent={item.percent}
-              total={item.total}
-              // color={getColor(item.color)}
-              // icon={item.icon}
-              color={getColor(item.total)}
-              icon={getIcon(item.total)}
-              chart={item.chart}
-            />
-          </Grid>
-        ))}
+          <Grid container spacing={2}>
+            {sortedTopFiveData.map((item, index) => (
+              <Grid key={index} xs={12} sm={6} md={2.4}>
+                <AnalyticsWidgetSummary
+                  title={item.title}
+                  total={item.total}
+                  chart={item.chart}
+                  criticality={taxaTop5}
+                  // color={getColor(item.total)}
+                  // percent={item.percent}
+
+                  // color={getColor(item.color)}
+                  // icon={item.icon}
+                  // icon={getIcon(item.total)}
+                />
+              </Grid>
+            ))}
 
             {/* <Grid xs={12} sm={6} md={2.4}>
           <AnalyticsWidgetSummary
@@ -717,6 +736,9 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
+              .filter((data) =>
+                pendingValue.some((pending) => pending.name === data.title)
+              )
               .map((data) => (
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
@@ -839,63 +861,21 @@ interface LabelType {
 const labels = [
   {
     id: 1,
-    name: "Bomba d'água",
+    name: "FAHRWERK",
     color: '#9fc3da29',
-    description: '2490 01',
+    description: '',
   },
   {
     id: 2,
-    name: 'Suporte quadro auxiliar LE',
+    name: 'ZP6',
     color: '#9fc3da29',
-    description: '3109 01',
+    description: '',
   },
   {
     id: 3,
-    name: 'Quadro Auxiliar LD',
+    name: 'BANCOS',
     color: '#9fc3da29',
-    description: '3182 01',
-  },
-  {
-    id: 4,
-    name: 'Travessas na carroceria',
-    color: '#9fc3da29',
-    description: '6902 01',
-  },
-  {
-    id: 5,
-    name: 'Suporte bomba de vácuo',
-    color: '#9fc3da29',
-    description: '4107 01',
-  },
-  {
-    id: 6,
-    name: 'Duto freio no agregado hidráulico',
-    color: '#9fc3da29',
-    description: '2638 01',
-  },
-  {
-    id: 7,
-    name: "Roda dianteira LD",
-    color: '#9fc3da29',
-    description: '3402 01',
-  },
-  {
-    id: 8,
-    name: 'Dobradiças porta traseira LE',
-    color: '#9fc3da29',
-    description: '4237 01',
-  },
-  {
-    id: 9,
-    name: 'Duto freio agregado hidráulico 740',
-    color: '#9fc3da29',
-    description: '2640 01',
-  },
-  {
-    id: 10,
-    name: 'Batente da tampa dianteira LD',
-    color: '#9fc3da29',
-    description: '4208 01',
+    description: '',
   },
 ];
 

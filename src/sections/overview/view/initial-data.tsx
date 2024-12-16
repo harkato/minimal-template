@@ -40,7 +40,7 @@ export const initialData = [
       color: 'error',
       vehicles: 28,
       nok: 47,
-      nokVin: 1.679,
+      nokVin: 0.679,
       target: 0.8,
       topIssues: [
         { code: '2490 01', description: "Banco Novo Polo", occurrences: 8 },
@@ -57,7 +57,7 @@ export const initialData = [
       // color: '#f52f2f',
       vehicles: 28,
       nok: 47,
-      nokVin: 1.679,
+      nokVin: 0.679,
       target: 0.8,
       topIssues: [
         { code: '2490 01', description: "Bomba d'água", occurrences: 8 },
