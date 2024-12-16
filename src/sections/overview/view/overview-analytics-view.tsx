@@ -34,6 +34,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
@@ -55,8 +57,6 @@ import { AnalyticsChartCard } from '../analytics-chart-card';
 import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 
 // ----------------------------------------------------------------------
 const style = {
@@ -108,9 +108,9 @@ const StyledAutocompletePopper = styled('div')(({ theme }) => ({
         backgroundColor: 'transparent',
       },
       [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
-      {
-        backgroundColor: theme.palette.action.hover,
-      },
+        {
+          backgroundColor: theme.palette.action.hover,
+        },
       ...theme.applyStyles('dark', {
         borderBottom: `1px solid  ${'#30363d'}`,
       }),
@@ -254,13 +254,13 @@ export function OverviewAnalyticsView() {
         const updatedData = prevData.map((card, index) =>
           index === randomIndex
             ? {
-              ...updatedCard,
-              total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-              percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-              title: updatedCard.title.includes('Novo')
-                ? updatedCard.title.replace('Novo ', '')
-                : `Novo ${updatedCard.title}`, // Alterna o título
-            }
+                ...updatedCard,
+                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+                title: updatedCard.title.includes('Novo')
+                  ? updatedCard.title.replace('Novo ', '')
+                  : `Novo ${updatedCard.title}`, // Alterna o título
+              }
             : card
         );
 
@@ -323,7 +323,7 @@ export function OverviewAnalyticsView() {
 
   const handleCloseLabel = () => {
     setValueLabel(pendingValue);
-    console.log('teste')
+    console.log('teste');
     if (anchorEl) {
       anchorEl.focus();
     }
@@ -390,7 +390,7 @@ export function OverviewAnalyticsView() {
                       <TextField id="outlined-basic" sx={{ width: '100px' }} label="Max." variant="outlined" />
                     </div> */}
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
-{/*                       <div style={{ alignSelf: 'end' }}>
+                      {/*                       <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
                           style={{ color: 'blue', textAlign: 'center', }}
                           control={<Switch checked={top5} onChange={(event) => setTop5(event.target.checked)} defaultChecked />}
@@ -407,11 +407,8 @@ export function OverviewAnalyticsView() {
                         min={0.0}
                         step={0.1}
                         max={1.0}
-
                       />
-
                     </ListItemButton>
-
                   </List>
                 </Collapse>
                 <ListItemButton onClick={handleClickAperto}>
@@ -420,32 +417,49 @@ export function OverviewAnalyticsView() {
                 </ListItemButton>
                 <Collapse in={openListAperto} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    <ListItemButton sx={{
-                      pl: 4, flexDirection: 'column'
-                    }}>
-{/*                       <div style={{ alignSelf: 'end' }}>
+                    <ListItemButton
+                      sx={{
+                        pl: 4,
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/*                       <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
                           style={{ color: 'blue', textAlign: 'center', }}
                           control={<Switch checked={ferramentas} onChange={(event) => setFerramentas(event.target.checked)} />}
                           label=""
                         />
                       </div> */}
-                      <Box sx={{
-                        width: 600, display: 'flex', flexDirection: 'column', fontSize: 13,
-                        '@media (max-width: 768px)': {
-                          // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                          columnCount: 1, // Ocupa 90% da largura da tela
-                        },
-                      }}>
-                        <Button disableRipple aria-describedby={id} sx={{
-                          alignSelf: 'center', width: '85%', color: 'black', marginBottom: '10px',
+                      <Box
+                        sx={{
+                          width: 600,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          fontSize: 13,
                           '@media (max-width: 768px)': {
                             // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                            alignSelf: 'center', // Ocupa 90% da largura da tela
+                            columnCount: 1, // Ocupa 90% da largura da tela
                           },
                         }}
-                          onClick={handleClick}>
-                          <span style={{ alignSelf: 'center', marginBottom: '20px' }}>Ferramentas</span>
+                      >
+                        <Button
+                          disableRipple
+                          aria-describedby={id}
+                          sx={{
+                            alignSelf: 'center',
+                            width: '85%',
+                            color: 'black',
+                            marginBottom: '10px',
+                            '@media (max-width: 768px)': {
+                              // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+                              alignSelf: 'center', // Ocupa 90% da largura da tela
+                            },
+                          }}
+                          onClick={handleClick}
+                        >
+                          <span style={{ alignSelf: 'center', marginBottom: '20px' }}>
+                            Ferramentas
+                          </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {valueLabel.map((label) => (
@@ -470,7 +484,12 @@ export function OverviewAnalyticsView() {
                           ))}
                         </div>
                       </Box>
-                      <StyledPopper id={id} open={openLabels} anchorEl={anchorEl} placement="bottom">
+                      <StyledPopper
+                        id={id}
+                        open={openLabels}
+                        anchorEl={anchorEl}
+                        placement="bottom"
+                      >
                         <ClickAwayListener onClickAway={handleCloseLabel}>
                           <div>
                             <Autocomplete
@@ -478,7 +497,7 @@ export function OverviewAnalyticsView() {
                               multiple
                               onClose={(
                                 event: React.ChangeEvent<{}>,
-                                reason: AutocompleteCloseReason,
+                                reason: AutocompleteCloseReason
                               ) => {
                                 if (reason === 'escape') {
                                   handleCloseLabel();
@@ -494,14 +513,16 @@ export function OverviewAnalyticsView() {
                                 ) {
                                   return;
                                 }
-                                console.log(newValue)
+                                console.log(newValue);
                                 setPendingValue(newValue);
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
                               renderOption={(props, option, { selected }) => {
+                                /* eslint-disable react/prop-types */
                                 const { key, ...optionProps } = props;
+                                /* eslint-disable react/prop-types */
                                 return (
                                   <li key={key} {...optionProps}>
                                     <Box
@@ -524,11 +545,11 @@ export function OverviewAnalyticsView() {
                                       style={{ backgroundColor: option.color }}
                                     />
                                     <Box
-                                      sx={(t) => ({
+                                      sx={() => ({
                                         flexGrow: 1,
                                         '& span': {
                                           color: '#8b949e',
-                                          ...t.applyStyles('light', {
+                                          ...theme.applyStyles('light', {
                                             color: '#586069',
                                           }),
                                         },
@@ -565,14 +586,22 @@ export function OverviewAnalyticsView() {
                                   placeholder="Filtrar ferramentas"
                                 />
                               )}
-                            /*                               slots={{
+                              /*                               slots={{
                                                             Popper: PopperComponent,
                                                           }} */
                             />
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
-                      <div style={{ display: 'block', width: '100%', textAlign: 'center', fontSize: '15px', marginTop: '20px' }}>
+                      <div
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontSize: '15px',
+                          marginTop: '20px',
+                        }}
+                      >
                         Taxa
                         {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
                         Taxa
@@ -587,7 +616,6 @@ export function OverviewAnalyticsView() {
                           min={0.0}
                           step={0.1}
                           max={1.0}
-
                         />
                         {/*                         <Slider
                           aria-label="Temperature range"
@@ -604,7 +632,6 @@ export function OverviewAnalyticsView() {
                         /> */}
                       </div>
                     </ListItemButton>
-
                   </List>
                 </Collapse>
               </List>
@@ -617,7 +644,7 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      {top5 &&
+      {top5 && (
         <div id="top5">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
@@ -698,8 +725,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
           </Grid>
         </div>
-      }
-
+      )}
 
       {/* ================================GRAFICO DE AREA================================ */}
       {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
@@ -725,7 +751,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      {ferramentas &&
+      {ferramentas && (
         <div id="ferramentas">
           <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
             <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
@@ -736,9 +762,7 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) =>
-                pendingValue.some((pending) => pending.name === data.title)
-              )
+              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
@@ -846,7 +870,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
           </Grid>
         </div>
-      }
+      )}
     </DashboardContent>
   );
 }
@@ -861,7 +885,7 @@ interface LabelType {
 const labels = [
   {
     id: 1,
-    name: "FAHRWERK",
+    name: 'FAHRWERK',
     color: '#9fc3da29',
     description: '',
   },
@@ -878,4 +902,3 @@ const labels = [
     description: '',
   },
 ];
-

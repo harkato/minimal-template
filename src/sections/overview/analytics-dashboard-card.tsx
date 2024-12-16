@@ -56,7 +56,7 @@ export function AnalyticsDashboardCard({
           // }}
           sx={{
             ...bgGradient({
-              //color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.48)}`,
+              // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.48)}`,
               color: `${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.8)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel)}`,
             }),
             p: 3,
