@@ -37,6 +37,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
+import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -177,11 +178,18 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
+  
+  const { 
+    cardData, 
+    pendingValue, 
+    setPendingValue, 
+    selectedCards, 
+    setSelectedCards, 
+    handleDeleteCard 
+  } = useDashboard();
 
-  const [cardData, setCardData] = useState(initialData);
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
@@ -191,7 +199,6 @@ export function OverviewAnalyticsView() {
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
-  const [pendingValue, setPendingValue] = React.useState<LabelType[]>([]);
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
@@ -201,6 +208,7 @@ export function OverviewAnalyticsView() {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  
 
   // function getColor(taxaAtual: number) {
   //   return taxaAtual >= taxaTop5[1]
@@ -237,10 +245,6 @@ export function OverviewAnalyticsView() {
 
   const handleApplySelection = () => {
     handleMenuClose();
-  };
-
-  const handleDeleteCard = (id: string) => {
-    setCardData((prevData) => prevData.filter((card) => card.id !== id));
   };
 
   // Simulando atualizações em tempo real
