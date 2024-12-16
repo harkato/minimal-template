@@ -127,7 +127,7 @@ export function AnalyticsDashboardCard({
               <TableBody>
                 {topIssues.map((issue, index) => (
                   <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                    <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
+                    {/* <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell> */}
                     <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
                     <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
                   </TableRow>
