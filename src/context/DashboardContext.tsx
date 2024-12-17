@@ -25,10 +25,11 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cardData, setCardData] = useState(initialData);
   const [pendingValue, setPendingValue] = useState<LabelType[]>([]);
-  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [selectedCards, setSelectedCards] = useState<string[]>(cardData.map((card) => card.id));
 
   const handleDeleteCard = (id: string) => {
-    setCardData((prevData) => prevData.filter((card) => card.id !== id));
+    setPendingValue((prevPending) => prevPending.filter((item) => item.name !== id));
+    setSelectedCards((prevSelected) => prevSelected.filter((cardId) => cardId !== id));
   };
 
   // Use useMemo para memorizar o valor

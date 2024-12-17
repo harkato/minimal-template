@@ -184,7 +184,7 @@ export function OverviewAnalyticsView() {
     pendingValue, 
     setPendingValue, 
     selectedCards, 
-    setSelectedCards, 
+    setSelectedCards,
     handleDeleteCard 
   } = useDashboard();
 
@@ -274,6 +274,10 @@ export function OverviewAnalyticsView() {
 
     return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   }, []);
+
+  useEffect(() => {
+    console.log('pendingValue atualizado:', pendingValue);
+  }, [pendingValue]);
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
@@ -499,6 +503,7 @@ export function OverviewAnalyticsView() {
                             <Autocomplete
                               open
                               multiple
+                              key={pendingValue.length}
                               onClose={(
                                 event: React.ChangeEvent<{}>,
                                 reason: AutocompleteCloseReason
@@ -518,7 +523,7 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 console.log(newValue);
-                                setPendingValue(newValue);
+                                setPendingValue([...newValue]);
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -769,7 +774,7 @@ export function OverviewAnalyticsView() {
               .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
+                  <AnalyticsDashboardCard {...data} onDelete={() => handleDeleteCard(data.title)} />
                 </Grid>
               ))}
             {/* ========================================CARD TORQUE============================== */}
