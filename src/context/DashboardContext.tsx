@@ -3,7 +3,7 @@ import { Props } from 'src/sections/overview/analytics-dashboard-card';
 import { initialData } from 'src/sections/overview/view/initial-data';
 
 // Define o tipo do valor do contexto
-interface DashboardContextProps {
+export interface DashboardContextProps {
   cardData: Array<Props>;
   pendingValue: LabelType[];
   setPendingValue: React.Dispatch<React.SetStateAction<LabelType[]>>;
