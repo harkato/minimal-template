@@ -179,6 +179,7 @@ export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
 
   const [cardData, setCardData] = useState(initialData);
+  const [filteredCardData, setFilteredCardData] = useState<any[]>([]);
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
@@ -192,15 +193,24 @@ export function OverviewAnalyticsView() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
   const [pendingValue, setPendingValue] = React.useState<LabelType[]>([]);
+  const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
+  const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
+  const handleClose = () => {
+    // Fecha o componente relacionado ao rótulo
+    handleCloseLabel();
+
+    // Fecha o modal
+    setOpen(false);
+  };
 
   // function getColor(taxaAtual: number) {
   //   return taxaAtual >= taxaTop5[1]
@@ -227,8 +237,8 @@ export function OverviewAnalyticsView() {
     setMenuAnchorEl(null);
   };
 
-  const handleToggleCard = (id: string) => {
-    setSelectedCards((prevSelected) =>
+/*   const handleToggleCard = (id: string) => {
+    setFilteredCardData((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((cardId) => cardId !== id)
         : [...prevSelected, id]
@@ -237,10 +247,11 @@ export function OverviewAnalyticsView() {
 
   const handleApplySelection = () => {
     handleMenuClose();
-  };
+  }; */
 
   const handleDeleteCard = (id: string) => {
-    setCardData((prevData) => prevData.filter((card) => card.id !== id));
+    setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
+    // setCardData((prevData) => prevData.filter((card) => card.id !== id));
   };
 
   // Simulando atualizações em tempo real
@@ -513,8 +524,26 @@ export function OverviewAnalyticsView() {
                                 ) {
                                   return;
                                 }
-                                console.log(newValue);
                                 setPendingValue(newValue);
+                                if (reason === 'selectOption') {
+                                  // Primeiro converte para 'unknown', depois para o tipo desejado
+                                  const selectedCards = cardData.filter((card) =>
+                                    (newValue as unknown as { id: number }[]).some(
+                                      (selected) => Number(selected.id) === Number(card.id)  // Garantir que ambos sejam números
+                                    )
+                                  );
+                              
+                                  setFilteredCardData((prev) => [
+                                    ...prev,
+                                    ...selectedCards.filter((card) => !prev.some((c) => c.id === card.id)),
+                                  ]);
+                                } else if (reason === 'removeOption') {
+                                  setFilteredCardData((prev) =>
+                                    prev.filter((card) => !(newValue as unknown as { id: number }[]).some((removed) => removed.id === card.id))
+                                  );
+                                }
+                                
+                                console.log(filteredCardData)
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -658,12 +687,12 @@ export function OverviewAnalyticsView() {
                   total={item.total}
                   chart={item.chart}
                   criticality={taxaTop5}
-                  // color={getColor(item.total)}
-                  // percent={item.percent}
+                // color={getColor(item.total)}
+                // percent={item.percent}
 
-                  // color={getColor(item.color)}
-                  // icon={item.icon}
-                  // icon={getIcon(item.total)}
+                // color={getColor(item.color)}
+                // icon={item.icon}
+                // icon={getIcon(item.total)}
                 />
               </Grid>
             ))}
@@ -760,10 +789,11 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {cardData
+            {filteredCardData
               .filter((data) => selectedCards.includes(data.id))
               .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
+
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
                 </Grid>
@@ -898,6 +928,24 @@ const labels = [
   {
     id: 3,
     name: 'BANCOS',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 4,
+    name: 'TACTO12',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 5,
+    name: 'R2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 6,
+    name: 'FRONTEND',
     color: '#9fc3da29',
     description: '',
   },

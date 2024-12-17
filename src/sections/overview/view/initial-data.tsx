@@ -52,7 +52,7 @@ export const initialData = [
     },
     {
       id: '4',
-      title: 'BANCOS',
+      title: 'TACTO12',
       color: 'error',
       // color: '#f52f2f',
       vehicles: 28,
@@ -69,7 +69,7 @@ export const initialData = [
     },
     {
       id: '5',
-      title: 'ZP6',
+      title: 'R2',
       // color: '#20878b',
       color: 'error',
       vehicles: 37,
@@ -86,7 +86,7 @@ export const initialData = [
     },
     {
       id: '6',
-      title: 'ZP6',
+      title: 'FRONTEND',
       // color: '#20878b', 
       // #2c7562 #38816f #448d7a #296c5b #228488 #12595e #20878b #10555c,
       color: 'error',
