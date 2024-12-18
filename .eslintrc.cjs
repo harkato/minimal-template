@@ -35,6 +35,8 @@ module.exports = {
     'no-underscore-dangle': 0,
     'no-restricted-exports': 0,
     'no-promise-executor-return': 0,
+    'import/no-named-as-default': 0,
+    'import/order': 0,
     'import/prefer-default-export': 0,
     'prefer-destructuring': [1, { object: true, array: false }],
     // typescript
@@ -42,6 +44,7 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 0,
     '@typescript-eslint/consistent-type-exports': 1,
     '@typescript-eslint/consistent-type-imports': 1,
+    '@typescript-eslint/no-shadow': 0,
     '@typescript-eslint/no-unused-vars': [1, { args: 'none' }],
     // react
     'react/no-children-prop': 0,
@@ -52,6 +55,7 @@ module.exports = {
     'react/function-component-definition': 0,
     'react/jsx-no-duplicate-props': [1, { ignoreCase: false }],
     'react/jsx-no-useless-fragment': [1, { allowExpressions: true }],
+    'react/prop-types': 0,
     'react/no-unstable-nested-components': [1, { allowAsProps: true }],
     // jsx-a11y
     'jsx-a11y/anchor-is-valid': 0,

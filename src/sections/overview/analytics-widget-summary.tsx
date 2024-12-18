@@ -13,15 +13,17 @@ import { varAlpha, bgGradient } from 'src/theme/styles';
 import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 import { Chart, useChart } from 'src/components/chart';
+import React from 'react';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title: string;
   total: number;
-  percent: number;
-  color?: ColorType;
-  icon: React.ReactNode;
+  // percent: number;
+  // color?: ColorType;
+  // icon: React.ReactNode;
+  criticality: number[];
   chart: {
     series: number[];
     categories: string[];
@@ -30,18 +32,20 @@ type Props = CardProps & {
 };
 
 export function AnalyticsWidgetSummary({
-  icon,
+  // icon,
   title,
   total,
   chart,
-  percent,
+  // percent,
   color = 'primary',
+  criticality,
   sx,
   ...other
 }: Props) {
   const theme = useTheme();
 
-  const chartColors = [theme.palette[color].dark];
+  const cor: ColorType = (getColor(total) as ColorType)
+  const chartColors = [theme.palette[cor].darker]
   // tabela do Card
   const chartOptions = useChart({
     chart: { sparkline: { enabled: true } },
@@ -61,43 +65,67 @@ export function AnalyticsWidgetSummary({
     ...chart.options,
   });
 
+  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.5, 0.8]); // Iniciando taxa de alerta e atenção
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    setTaxaTop5(newValue as number[]);
+  };
+  function getColor(taxaAtual: number): string {
+    if (taxaAtual >= criticality[1]) {
+      return "error";
+    } if (taxaAtual >= criticality[0]) {
+      return "warning";
+    }
+    return "success";
+  }
+  function getIcon(taxaAtual: number){
+    if (taxaAtual >= criticality[1]) {
+      return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+    } if (taxaAtual >= criticality[0]) {
+      return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+    }
+      return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
+  }
+
   // % do Card lado superior direito
-  const renderTrending = (
-    <Box
-      sx={{
-        top: 16,
-        gap: 0.5,
-        right: 16,
-        display: 'flex',
-        position: 'absolute',
-        alignItems: 'center',
-      }}
-    >
-      <Iconify width={20} icon={percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'} />
-      <Box component="span" sx={{ typography: 'subtitle2' }}>
-        {percent > 0 && '+'}
-        {fPercent(percent)}
-      </Box>
-    </Box>
-  );
+  // const renderTrending = (
+  //   <Box
+  //     sx={{
+  //       top: 16,
+  //       gap: 0.5,
+  //       right: 16,
+  //       display: 'flex',
+  //       position: 'absolute',
+  //       alignItems: 'center',
+  //     }}
+  //   >
+  //     <Iconify width={20} icon={percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'} />
+  //     <Box component="span" sx={{ typography: 'subtitle2' }}>
+  //       {percent > 0 && '+'}
+  //       {fPercent(percent)}
+  //     </Box>
+  //   </Box>
+  // );
 
   return (
     <Card
       sx={{
         ...bgGradient({
-          color: `135deg, ${varAlpha(theme.vars.palette[color].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color].lightChannel, 0.48)}`,
+          // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}`,
+          color: `${varAlpha(theme.vars.palette[cor].mainChannel, 0.7)}, ${varAlpha(theme.vars.palette[cor].mainChannel)}`,
+          // color: '#FFEA00, #FEDF01'
+          // color: 'yellow, red',
         }),
         p: 3,
         boxShadow: 'none',
         position: 'relative',
-        color: `${color}.darker`,
+        color: `${cor}.darker`,
         backgroundColor: 'common.white',
         ...sx,
       }}
       {...other}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-  <Box sx={{ width: 40, height: 40 }}>{icon}</Box>
+  <Box sx={{ width: 40, height: 40 }}>{getIcon(total)}</Box>
   <Chart
     type="bar"
     series={[{ data: chart.series }]}
@@ -154,7 +182,7 @@ export function AnalyticsWidgetSummary({
           height: 240,
           opacity: 0.24,
           position: 'absolute',
-          color: `${color}.main`,
+          color: `${cor}.darker`,
         }}
       />
     </Card>
