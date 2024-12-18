@@ -209,23 +209,6 @@ export function OverviewAnalyticsView() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   
-
-  // function getColor(taxaAtual: number) {
-  //   return taxaAtual >= taxaTop5[1]
-  //     ? "error"
-  //     : taxaAtual >= taxaTop5[0]
-  //       ? "warning"
-  //       : "success"
-  // }
-
-  // function getIcon(taxaAtual: number) {
-  //   if (taxaAtual >= taxaTop5[1]) {
-  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-  //   } if (taxaAtual >= taxaTop5[0]) {
-  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
-  //   }
-  //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
-  // }
   const [taxaApertadeira, setTaxaApertadeira] = useState<number[]>([0.6, 0.8]);
   
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -277,24 +260,6 @@ export function OverviewAnalyticsView() {
   }, []);
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
-
-  // const statusToColor: Record<
-  //   string,
-  //   'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
-  // > = {
-  //   success: 'success',
-  //   error: 'error',
-  //   warning: 'warning',
-  //   primary: 'primary',
-  //   secondary: 'secondary',
-  //   info: 'info',
-  // };
-
-  // function getColor(
-  //   status: string
-  // ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
-  //   return statusToColor[status] || 'primary';
-  // }
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
@@ -670,12 +635,6 @@ export function OverviewAnalyticsView() {
                   total={item.total}
                   chart={item.chart}
                   criticality={taxaTop5}
-                  // color={getColor(item.total)}
-                  // percent={item.percent}
-
-                  // color={getColor(item.color)}
-                  // icon={item.icon}
-                  // icon={getIcon(item.total)}
                 />
               </Grid>
             ))}
