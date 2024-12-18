@@ -275,10 +275,6 @@ export function OverviewAnalyticsView() {
     return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   }, []);
 
-  useEffect(() => {
-    console.log('pendingValue atualizado:', pendingValue);
-  }, [pendingValue]);
-
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
   // const statusToColor: Record<
@@ -325,13 +321,12 @@ export function OverviewAnalyticsView() {
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setPendingValue(valueLabel);
+    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
   const handleCloseLabel = () => {
     setValueLabel(pendingValue);
-    console.log('teste');
     if (anchorEl) {
       anchorEl.focus();
     }
@@ -470,7 +465,7 @@ export function OverviewAnalyticsView() {
                           </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
-                          {valueLabel.map((label) => (
+                          {pendingValue.map((label) => (
                             <Box
                               key={label.name}
                               sx={{
@@ -503,7 +498,7 @@ export function OverviewAnalyticsView() {
                             <Autocomplete
                               open
                               multiple
-                              key={pendingValue.length}
+                              key={openLabels ? pendingValue.length : 0}
                               onClose={(
                                 event: React.ChangeEvent<{}>,
                                 reason: AutocompleteCloseReason
@@ -522,7 +517,6 @@ export function OverviewAnalyticsView() {
                                 ) {
                                   return;
                                 }
-                                console.log(newValue);
                                 setPendingValue([...newValue]);
                               }}
                               disableCloseOnSelect
