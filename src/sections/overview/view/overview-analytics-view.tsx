@@ -897,7 +897,7 @@ interface LabelType {
 const labels = [
   {
     id: 1,
-    name: 'FAHRWERK',
+    name: 'MAKITA',
     color: '#9fc3da29',
     description: '',
   },
