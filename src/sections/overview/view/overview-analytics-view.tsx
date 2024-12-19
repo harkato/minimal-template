@@ -759,7 +759,7 @@ export function OverviewAnalyticsView() {
                   {...data} 
                     targetAlert = {targetTools[0]}
                     targetCritical={targetTools[1]}
-                    onDelete={handleDeleteCard} 
+                    onDelete={() => handleDeleteCard(data.title)} 
                   />
                 </Grid>
               ))}
