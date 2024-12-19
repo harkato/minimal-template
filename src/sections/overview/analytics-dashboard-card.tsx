@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, IconButton, Collapse, Box, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CardHeader, Grid } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Collapse, Box, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CardHeader, Grid, Modal, Slider } from '@mui/material';
 import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -8,6 +8,33 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import type { ColorType } from 'src/theme/core/palette';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
+
+const style = {
+  position: 'absolute',
+  alignContent: 'center',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+
+  '@media (max-width: 768px)': {
+    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+    width: '90%', // Ocupa 90% da largura da tela
+  },
+};
+
+const [open, setOpen] = React.useState(false);
+
+const handleOpen = () => setOpen(true);
+
+const handleClose = () => {
+  // Fecha o modal
+  setOpen(false);
+};
 
 export type Props = CardProps & {
   id: string;
@@ -20,6 +47,7 @@ export type Props = CardProps & {
   target: number;
   topIssues: { code: string; description: string; occurrences: number }[];
   onDelete?: (id: string) => void;
+  valueTools: number;
 }
 
 export function AnalyticsDashboardCard({
@@ -122,6 +150,24 @@ export function AnalyticsDashboardCard({
         </CardContent>
       </Collapse>
 
+      <Modal           
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+                <Box sx={style}>
+                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                        <Slider
+                          getAriaLabel={() => 'Temperature range'}
+                          valueLabelDisplay="auto"
+                          min={0.0}
+                          step={0.1}
+                          max={1.0}
+                        />
+                  </Typography>
+                  </Box>
+    </Modal>
     </Card>
   );
 }
