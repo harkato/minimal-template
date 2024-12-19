@@ -70,7 +70,7 @@ export function AnalyticsDashboardCard({
     }
   };
   function getColor(): string {
-    console.log(targetAlert)
+    //console.log(targetAlert)
       if (nokVin >= newTargetCritical) {
         return '#F24F4F';
       } if (nokVin >= newTargetAlert) {

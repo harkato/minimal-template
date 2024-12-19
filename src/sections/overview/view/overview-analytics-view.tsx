@@ -438,7 +438,7 @@ export function OverviewAnalyticsView() {
                               sx={{
                                 mb: '20px',
                                 height: 20,
-                                padding: '.15em 4px',
+                                padding: '.20em 10px',
                                 fontWeight: 400,
                                 lineHeight: '15px',
                                 borderRadius: '2px',
@@ -447,6 +447,8 @@ export function OverviewAnalyticsView() {
                               style={{
                                 backgroundColor: label.color,
                                 color: theme.palette.getContrastText(label.color),
+                                borderRadius: '8px',
+                                textAlign: 'center'
                               }}
                             >
                               {label.name}
@@ -898,7 +900,7 @@ const labels = [
   },
   {
     id: 4,
-    name: 'TACTO12',
+    name: 'TÁCTO12',
     color: '#9fc3da29',
     description: '',
   },
