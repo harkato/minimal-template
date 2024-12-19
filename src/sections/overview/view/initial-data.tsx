@@ -1,7 +1,7 @@
 export const initialData = [
   {
     id: '1',
-    title: 'FAHRWERK',
+    title: 'MAKITA',
     // color: '#20878b',
     color: 'success',
     vehicles: 37,

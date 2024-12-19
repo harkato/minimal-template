@@ -287,13 +287,13 @@ export function OverviewAnalyticsView() {
 
   const isLargeScreen = window.innerWidth > 768;
 
-  function getColorApertadeira(taxaAtual: number){
-    return taxaAtual >= taxaApertadeira[1]
-    ? "#f24f4f"
-    : taxaAtual >= taxaApertadeira[0]
-    ? "#ffd666"
-    : "#20878b"
-  }
+  // function getColorApertadeira(taxaAtual: number){
+  //   return taxaAtual >= taxaApertadeira[1]
+  //   ? "#f24f4f"
+  //   : taxaAtual >= taxaApertadeira[0]
+  //   ? "#ffd666"
+  //   : "#20878b"
+  // }
 
   return (
     <DashboardContent maxWidth="xl">
