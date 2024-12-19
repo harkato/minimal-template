@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
+
 export type Props = CardProps & {
   id: string;
   title: string;
