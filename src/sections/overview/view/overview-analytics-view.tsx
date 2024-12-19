@@ -82,54 +82,6 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-interface PopperComponentProps {
-  anchorEl?: any;
-  disablePortal?: boolean;
-  open: boolean;
-}
-
-const StyledAutocompletePopper = styled('div')(({ theme }) => ({
-  [`& .${autocompleteClasses.paper}`]: {
-    boxShadow: 'none',
-    margin: 0,
-    color: 'inherit',
-    fontSize: 13,
-  },
-  [`& .${autocompleteClasses.listbox}`]: {
-    backgroundColor: '#fff',
-
-    padding: 0,
-    [`& .${autocompleteClasses.option}`]: {
-      minHeight: 'auto',
-      alignItems: 'flex-start',
-      padding: 8,
-      borderBottom: `1px solid  ${' #eaecef'}`,
-
-      '&[aria-selected="true"]': {
-        backgroundColor: 'transparent',
-      },
-      [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
-        {
-          backgroundColor: theme.palette.action.hover,
-        },
-      ...theme.applyStyles('dark', {
-        borderBottom: `1px solid  ${'#30363d'}`,
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#1c2128',
-    }),
-  },
-  [`&.${autocompleteClasses.popperDisablePortal}`]: {
-    position: 'relative',
-  },
-}));
-
-function PopperComponent(props: PopperComponentProps) {
-  const { disablePortal, anchorEl, open, ...other } = props;
-  return <StyledAutocompletePopper {...other} />;
-}
-
 const StyledPopper = styled(Popper)(({ theme }) => ({
   border: `1px solid ${'#e1e4e8'}`,
   boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
@@ -189,38 +141,63 @@ export function OverviewAnalyticsView() {
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
   const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
+  const [open2, setOpen2] = React.useState(false);
   const [openListTop5, setOpenListTop5] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
+  const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
+  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);  
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
+  const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  
-  const [taxaApertadeira, setTaxaApertadeira] = useState<number[]>([0.6, 0.8]);
-  
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+
+  const handleClose = () => {
+    // Fecha o componente relacionado ao rótulo
+    handleCloseLabel();
+
+    // Fecha o modal
+    setOpen(false);
+  };
+
+  // function getColor(taxaAtual: number) {
+  //   return taxaAtual >= taxaTop5[1]
+  //     ? "error"
+  //     : taxaAtual >= taxaTop5[0]
+  //       ? "warning"
+  //       : "success"
+  // }
+
+  // function getIcon(taxaAtual: number) {
+  //   if (taxaAtual >= taxaTop5[1]) {
+  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+  //   } if (taxaAtual >= taxaTop5[0]) {
+  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+  //   }
+  //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
+  // }
+
+/*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
-  };
+  }; */
 
-  const handleToggleCard = (id: string) => {
-    setSelectedCards((prevSelected) =>
+/*   const handleToggleCard = (id: string) => {
+    setFilteredCardData((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((cardId) => cardId !== id)
         : [...prevSelected, id]
@@ -229,7 +206,12 @@ export function OverviewAnalyticsView() {
 
   const handleApplySelection = () => {
     handleMenuClose();
-  };
+  }; */
+
+/*   const handleDeleteCard = (id: string) => {
+    setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
+    // setCardData((prevData) => prevData.filter((card) => card.id !== id));
+  }; */
 
   // Simulando atualizações em tempo real
   useEffect(() => {
@@ -267,7 +249,8 @@ export function OverviewAnalyticsView() {
   };
 
   const handleChangeTaxa = (event: Event, newValue: number | number[]) => {
-    setValueTools(newValue as number[]); // Atualiza o estado do slider
+    setValueTools(newValue as number[]); // Atualiza o estado do slider da apertadeira
+    setTargetTools(newValue as number[]); // Atualiza o estado da apertadeira
   };
 
   const handleClickTop5 = () => {
@@ -282,9 +265,9 @@ export function OverviewAnalyticsView() {
       setChecked(event.target.checked);
     }; */
 
-  const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
+/*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
     setTaxaTop5(newValue as number[]);
-  };
+  }; */
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     // setPendingValue(valueLabel);
@@ -434,7 +417,7 @@ export function OverviewAnalyticsView() {
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center', marginBottom: '20px' }}>
+                          <span style={{ alignSelf: 'center' }}>
                             Ferramentas
                           </span>
                         </Button>
@@ -491,7 +474,27 @@ export function OverviewAnalyticsView() {
                                 ) {
                                   return;
                                 }
-                                setPendingValue([...newValue]);
+                                setPendingValue(newValue);
+/*                                 if (reason === 'selectOption') {
+                                  // Primeiro converte para 'unknown', depois para o tipo desejado
+                                  const selectedCards = cardData.filter((card) =>
+                                    (newValue as unknown as { id: number }[]).some(
+                                      (selected) => Number(selected.id) === Number(card.id)  // Garantir que ambos sejam números
+                                    )
+                                  );
+                              
+                                  setFilteredCardData((prev) => [
+                                    ...prev,
+                                    ...selectedCards.filter((card) => !prev.some((c) => c.id === card.id)),
+                                  ]);
+                                } else if (reason === 'removeOption') {
+                                  setFilteredCardData((prev) =>
+                                    prev.filter((card) => !(newValue as unknown as { id: number }[]).some((removed) => removed.id === card.id))
+                                  );
+                                }
+                                
+                                console.log(filteredCardData)
+                                setPendingValue([...newValue]); */
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -563,9 +566,6 @@ export function OverviewAnalyticsView() {
                                   placeholder="Filtrar ferramentas"
                                 />
                               )}
-                              /*                               slots={{
-                                                            Popper: PopperComponent,
-                                                          }} */
                             />
                           </div>
                         </ClickAwayListener>
@@ -733,10 +733,18 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
+              .filter((data) =>
+                pendingValue.some((pending) => pending.name === data.title)
+              )
               .map((data) => (
+
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard {...data} onDelete={() => handleDeleteCard(data.title)} />
+                  <AnalyticsDashboardCard 
+                  {...data} 
+                    targetAlert = {targetTools[0]}
+                    targetCritical={targetTools[1]}
+                    onDelete={() => handleDeleteCard(data.title)} 
+                  />
                 </Grid>
               ))}
             {/* ========================================CARD TORQUE============================== */}
@@ -869,6 +877,96 @@ const labels = [
   {
     id: 3,
     name: 'BANCOS',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 4,
+    name: 'TACTO12',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 5,
+    name: 'R2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 6,
+    name: 'FRONTEND',
+    color: '#9fc3da29',
+    description: '',
+  },
+    {
+    id: 7,
+    name: 'FAHRWERK2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 8,
+    name: 'ZP62',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 9,
+    name: 'BANCOS2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 10,
+    name: 'TACTO11',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 11,
+    name: 'R3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 12,
+    name: 'FRONTEND2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 13,
+    name: 'FAHRWERK3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 14,
+    name: 'ZP63',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 15,
+    name: 'BANCOS3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 16,
+    name: 'TACTO10',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 17,
+    name: 'R1',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 18,
+    name: 'FRONTEND3',
     color: '#9fc3da29',
     description: '',
   },

@@ -13,7 +13,13 @@ import { varAlpha, bgGradient } from 'src/theme/styles';
 import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 import { Chart, useChart } from 'src/components/chart';
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { blue } from '@mui/material/colors';
+
+// import styled from 'styled-components';
+// import { lighten } from 'polished';
+// import { darken } from 'polished';
 
 // ----------------------------------------------------------------------
 
@@ -43,9 +49,11 @@ export function AnalyticsWidgetSummary({
   ...other
 }: Props) {
   const theme = useTheme();
-
-  const cor: ColorType = (getColor(total) as ColorType)
-  const chartColors = [theme.palette[cor].darker]
+  // const cor: ColorType = (getColor(total) as ColorType)
+  const cor = getColor(total)
+  // const bgColor = [theme.palette[color as ColorType].light]; // lighter
+  
+  const chartColors = ['white']; // dark
   // tabela do Card
   const chartOptions = useChart({
     chart: { sparkline: { enabled: true } },
@@ -66,24 +74,31 @@ export function AnalyticsWidgetSummary({
   });
 
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.5, 0.8]); // Iniciando taxa de alerta e atenção
+
   const handleChange = (event: Event, newValue: number | number[]) => {
     setTaxaTop5(newValue as number[]);
   };
+
   function getColor(taxaAtual: number): string {
     if (taxaAtual >= criticality[1]) {
-      return "error";
+      // return "error";
+      return '#f24f4f';
     } if (taxaAtual >= criticality[0]) {
-      return "warning";
+      // return "warning";
+      return '#FFB300';
     }
-    return "success";
+    // return "success";
+    return '#20878b';
+    
   }
+
   function getIcon(taxaAtual: number){
     if (taxaAtual >= criticality[1]) {
       return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
     } if (taxaAtual >= criticality[0]) {
       return <img alt="icon" src="/assets/icons/glass/dash.png" />;
     }
-      return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
+      return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
   }
 
   // % do Card lado superior direito
@@ -109,31 +124,31 @@ export function AnalyticsWidgetSummary({
   return (
     <Card
       sx={{
-        ...bgGradient({
-          // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}`,
-          color: `${varAlpha(theme.vars.palette[cor].mainChannel, 0.7)}, ${varAlpha(theme.vars.palette[cor].mainChannel)}`,
-          // color: '#FFEA00, #FEDF01'
-          // color: 'yellow, red',
-        }),
+        // ...bgGradient({
+        //   // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}`,
+        //   color: `${cor}, ${cor}`,
+        //   // color: '#FFEA00, #FEDF01'
+        //   // color: 'yellow, red',
+        // }),
         p: 3,
         boxShadow: 'none',
         position: 'relative',
-        color: `${cor}.darker`,
-        backgroundColor: 'common.white',
+        color: `${'white'}`, // darker
+        backgroundColor: `${cor}`,
         ...sx,
-      }}
-      {...other}
-    >
+        }}
+        {...other}
+      >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-  <Box sx={{ width: 40, height: 40 }}>{getIcon(total)}</Box>
-  <Chart
-    type="bar"
-    series={[{ data: chart.series }]}
-    options={chartOptions}
-    width={70}
-    height={56}
-  />
-</Box>
+      <Box sx={{ width: 40, height: 40 }}>{getIcon(total)}</Box>
+        <Chart
+          type="bar"
+          series={[{ data: chart.series }]}
+          options={chartOptions}
+          width={70}
+          height={56}
+        />
+      </Box>
 
       {/* {renderTrending} */}
 
@@ -182,7 +197,7 @@ export function AnalyticsWidgetSummary({
           height: 240,
           opacity: 0.24,
           position: 'absolute',
-          color: `${cor}.darker`,
+          color: `white`,
         }}
       />
     </Card>
