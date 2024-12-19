@@ -34,7 +34,10 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
+import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -55,8 +58,6 @@ import { AnalyticsChartCard } from '../analytics-chart-card';
 import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 
 // ----------------------------------------------------------------------
 const style = {
@@ -79,54 +80,6 @@ const style = {
 
 function valuetext(value: number) {
   return `${value}°C`;
-}
-
-interface PopperComponentProps {
-  anchorEl?: any;
-  disablePortal?: boolean;
-  open: boolean;
-}
-
-const StyledAutocompletePopper = styled('div')(({ theme }) => ({
-  [`& .${autocompleteClasses.paper}`]: {
-    boxShadow: 'none',
-    margin: 0,
-    color: 'inherit',
-    fontSize: 13,
-  },
-  [`& .${autocompleteClasses.listbox}`]: {
-    backgroundColor: '#fff',
-
-    padding: 0,
-    [`& .${autocompleteClasses.option}`]: {
-      minHeight: 'auto',
-      alignItems: 'flex-start',
-      padding: 8,
-      borderBottom: `1px solid  ${' #eaecef'}`,
-
-      '&[aria-selected="true"]': {
-        backgroundColor: 'transparent',
-      },
-      [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
-      {
-        backgroundColor: theme.palette.action.hover,
-      },
-      ...theme.applyStyles('dark', {
-        borderBottom: `1px solid  ${'#30363d'}`,
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#1c2128',
-    }),
-  },
-  [`&.${autocompleteClasses.popperDisablePortal}`]: {
-    position: 'relative',
-  },
-}));
-
-function PopperComponent(props: PopperComponentProps) {
-  const { disablePortal, anchorEl, open, ...other } = props;
-  return <StyledAutocompletePopper {...other} />;
 }
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
@@ -177,29 +130,31 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
+  
+  const { 
+    cardData, 
+    pendingValue, 
+    setPendingValue, 
+    selectedCards, 
+    setSelectedCards,
+    handleDeleteCard 
+  } = useDashboard();
 
-  const [cardData, setCardData] = useState(initialData);
-  const [filteredCardData, setFilteredCardData] = useState<any[]>([]);
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [selectedCards, setSelectedCards] = useState(cardData.map((card) => card.id)); // Inicialmente, todos os cards estão selecionados
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
   const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
+  const [open2, setOpen2] = React.useState(false);
   const [openListTop5, setOpenListTop5] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
-  const [pendingValue, setPendingValue] = React.useState<LabelType[]>([]);
-  const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
-  const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
-  const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
 
   const handleOpen = () => setOpen(true);
@@ -229,13 +184,13 @@ export function OverviewAnalyticsView() {
   //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
   // }
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+/*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
-  };
+  }; */
 
 /*   const handleToggleCard = (id: string) => {
     setFilteredCardData((prevSelected) =>
@@ -249,10 +204,10 @@ export function OverviewAnalyticsView() {
     handleMenuClose();
   }; */
 
-  const handleDeleteCard = (id: string) => {
+/*   const handleDeleteCard = (id: string) => {
     setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
     // setCardData((prevData) => prevData.filter((card) => card.id !== id));
-  };
+  }; */
 
   // Simulando atualizações em tempo real
   useEffect(() => {
@@ -265,13 +220,13 @@ export function OverviewAnalyticsView() {
         const updatedData = prevData.map((card, index) =>
           index === randomIndex
             ? {
-              ...updatedCard,
-              total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-              percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-              title: updatedCard.title.includes('Novo')
-                ? updatedCard.title.replace('Novo ', '')
-                : `Novo ${updatedCard.title}`, // Alterna o título
-            }
+                ...updatedCard,
+                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+                title: updatedCard.title.includes('Novo')
+                  ? updatedCard.title.replace('Novo ', '')
+                  : `Novo ${updatedCard.title}`, // Alterna o título
+              }
             : card
         );
 
@@ -323,18 +278,17 @@ export function OverviewAnalyticsView() {
       setChecked(event.target.checked);
     }; */
 
-  const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
+/*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
     setTaxaTop5(newValue as number[]);
-  };
+  }; */
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setPendingValue(valueLabel);
+    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
   const handleCloseLabel = () => {
     setValueLabel(pendingValue);
-    console.log('teste')
     if (anchorEl) {
       anchorEl.focus();
     }
@@ -418,11 +372,8 @@ export function OverviewAnalyticsView() {
                         min={0.0}
                         step={0.1}
                         max={1.0}
-
                       />
-
                     </ListItemButton>
-
                   </List>
                 </Collapse>
                 <ListItemButton onClick={handleClickAperto}>
@@ -441,25 +392,39 @@ export function OverviewAnalyticsView() {
                           label=""
                         />
                       </div> */}
-                      <Box sx={{
-                        width: 600, display: 'flex', flexDirection: 'column', fontSize: 13,
-                        '@media (max-width: 768px)': {
-                          // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                          columnCount: 1, // Ocupa 90% da largura da tela
-                        },
-                      }}>
-                        <Button disableRipple aria-describedby={id} sx={{
-                          alignSelf: 'center', width: '85%', color: 'black', marginBottom: '10px',
+                      <Box
+                        sx={{
+                          width: 600,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          fontSize: 13,
                           '@media (max-width: 768px)': {
                             // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                            alignSelf: 'center', // Ocupa 90% da largura da tela
+                            columnCount: 1, // Ocupa 90% da largura da tela
                           },
                         }}
-                          onClick={handleClick}>
-                          <span style={{ alignSelf: 'center', marginBottom: '20px' }}>Ferramentas</span>
+                      >
+                        <Button
+                          disableRipple
+                          aria-describedby={id}
+                          sx={{
+                            alignSelf: 'center',
+                            width: '85%',
+                            color: 'black',
+                            marginBottom: '10px',
+                            '@media (max-width: 768px)': {
+                              // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+                              alignSelf: 'center', // Ocupa 90% da largura da tela
+                            },
+                          }}
+                          onClick={handleClick}
+                        >
+                          <span style={{ alignSelf: 'center' }}>
+                            Ferramentas
+                          </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
-                          {valueLabel.map((label) => (
+                          {pendingValue.map((label) => (
                             <Box
                               key={label.name}
                               sx={{
@@ -481,15 +446,21 @@ export function OverviewAnalyticsView() {
                           ))}
                         </div>
                       </Box>
-                      <StyledPopper id={id} open={openLabels} anchorEl={anchorEl} placement="bottom">
+                      <StyledPopper
+                        id={id}
+                        open={openLabels}
+                        anchorEl={anchorEl}
+                        placement="bottom"
+                      >
                         <ClickAwayListener onClickAway={handleCloseLabel}>
                           <div>
                             <Autocomplete
                               open
                               multiple
+                              key={openLabels ? pendingValue.length : 0}
                               onClose={(
                                 event: React.ChangeEvent<{}>,
-                                reason: AutocompleteCloseReason,
+                                reason: AutocompleteCloseReason
                               ) => {
                                 if (reason === 'escape') {
                                   handleCloseLabel();
@@ -506,7 +477,7 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 setPendingValue(newValue);
-                                if (reason === 'selectOption') {
+/*                                 if (reason === 'selectOption') {
                                   // Primeiro converte para 'unknown', depois para o tipo desejado
                                   const selectedCards = cardData.filter((card) =>
                                     (newValue as unknown as { id: number }[]).some(
@@ -525,12 +496,15 @@ export function OverviewAnalyticsView() {
                                 }
                                 
                                 console.log(filteredCardData)
+                                setPendingValue([...newValue]); */
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
                               renderOption={(props, option, { selected }) => {
+                                /* eslint-disable react/prop-types */
                                 const { key, ...optionProps } = props;
+                                /* eslint-disable react/prop-types */
                                 return (
                                   <li key={key} {...optionProps}>
                                     <Box
@@ -553,11 +527,11 @@ export function OverviewAnalyticsView() {
                                       style={{ backgroundColor: option.color }}
                                     />
                                     <Box
-                                      sx={(t) => ({
+                                      sx={() => ({
                                         flexGrow: 1,
                                         '& span': {
                                           color: '#8b949e',
-                                          ...t.applyStyles('light', {
+                                          ...theme.applyStyles('light', {
                                             color: '#586069',
                                           }),
                                         },
@@ -594,14 +568,19 @@ export function OverviewAnalyticsView() {
                                   placeholder="Filtrar ferramentas"
                                 />
                               )}
-                            /*                               slots={{
-                                                            Popper: PopperComponent,
-                                                          }} */
                             />
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
-                      <div style={{ display: 'block', width: '100%', textAlign: 'center', fontSize: '15px', marginTop: '20px' }}>
+                      <div
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontSize: '15px',
+                          marginTop: '20px',
+                        }}
+                      >
                         Taxa
                         {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
                         Taxa
@@ -616,7 +595,6 @@ export function OverviewAnalyticsView() {
                           min={0.0}
                           step={0.1}
                           max={1.0}
-
                         />
                         {/*                         <Slider
                           aria-label="Temperature range"
@@ -633,7 +611,6 @@ export function OverviewAnalyticsView() {
                         /> */}
                       </div>
                     </ListItemButton>
-
                   </List>
                 </Collapse>
               </List>
@@ -646,7 +623,7 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      {top5 &&
+      {top5 && (
         <div id="top5">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
@@ -727,8 +704,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
           </Grid>
         </div>
-      }
-
+      )}
 
       {/* ================================GRAFICO DE AREA================================ */}
       {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
@@ -754,7 +730,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      {ferramentas &&
+      {ferramentas && (
         <div id="ferramentas">
           <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
             <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
@@ -763,15 +739,13 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {filteredCardData
+            {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) =>
-                pendingValue.some((pending) => pending.name === data.title)
-              )
+              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
 
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard {...data} onDelete={handleDeleteCard} />
+                  <AnalyticsDashboardCard {...data} onDelete={() => handleDeleteCard(data.title)} />
                 </Grid>
               ))}
             {/* ========================================CARD TORQUE============================== */}
@@ -876,7 +850,7 @@ export function OverviewAnalyticsView() {
         </Grid> */}
           </Grid>
         </div>
-      }
+      )}
     </DashboardContent>
   );
 }
@@ -891,7 +865,7 @@ interface LabelType {
 const labels = [
   {
     id: 1,
-    name: "FAHRWERK",
+    name: 'FAHRWERK',
     color: '#9fc3da29',
     description: '',
   },
@@ -925,5 +899,76 @@ const labels = [
     color: '#9fc3da29',
     description: '',
   },
+    {
+    id: 7,
+    name: 'FAHRWERK2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 8,
+    name: 'ZP62',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 9,
+    name: 'BANCOS2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 10,
+    name: 'TACTO11',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 11,
+    name: 'R3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 12,
+    name: 'FRONTEND2',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 13,
+    name: 'FAHRWERK3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 14,
+    name: 'ZP63',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 15,
+    name: 'BANCOS3',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 16,
+    name: 'TACTO10',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 17,
+    name: 'R1',
+    color: '#9fc3da29',
+    description: '',
+  },
+  {
+    id: 18,
+    name: 'FRONTEND3',
+    color: '#9fc3da29',
+    description: '',
+  },
 ];
-
