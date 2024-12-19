@@ -27,14 +27,6 @@ const style = {
   },
 };
 
-const [open, setOpen] = React.useState(false);
-
-const handleOpen = () => setOpen(true);
-
-const handleClose = () => {
-  // Fecha o modal
-  setOpen(false);
-};
 
 export type Props = CardProps & {
   id: string;
@@ -47,7 +39,6 @@ export type Props = CardProps & {
   target: number;
   topIssues: { code: string; description: string; occurrences: number }[];
   onDelete?: (id: string) => void;
-  valueTools: number;
 }
 
 export function AnalyticsDashboardCard({
@@ -149,25 +140,6 @@ export function AnalyticsDashboardCard({
           </TableContainer>
         </CardContent>
       </Collapse>
-
-      <Modal           
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-                <Box sx={style}>
-                  <Typography id="modal-modal-title" variant="h6" component="h2">
-                        <Slider
-                          getAriaLabel={() => 'Temperature range'}
-                          valueLabelDisplay="auto"
-                          min={0.0}
-                          step={0.1}
-                          max={1.0}
-                        />
-                  </Typography>
-                  </Box>
-    </Modal>
     </Card>
   );
 }
