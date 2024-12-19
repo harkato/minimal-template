@@ -1,31 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, IconButton, Collapse, Box, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CardHeader, Grid, Modal, Slider } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Collapse, Box, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, CardHeader, Grid, Popover, Slider } from '@mui/material';
 import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete'
-
-import type { ColorType } from 'src/theme/core/palette';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
-
-const style = {
-  position: 'absolute',
-  alignContent: 'center',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-
-  '@media (max-width: 768px)': {
-    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-    width: '90%', // Ocupa 90% da largura da tela
-  },
-};
 
 
 export type Props = CardProps & {
@@ -36,7 +17,8 @@ export type Props = CardProps & {
   vehicles: number;
   nok: number;
   nokVin: number;
-  target: number;
+  targetAlert: number;
+  targetCritical: number;
   topIssues: { code: string; description: string; occurrences: number }[];
   onDelete?: (id: string) => void;
 }
@@ -44,68 +26,137 @@ export type Props = CardProps & {
 export function AnalyticsDashboardCard({
   id,
   title,
-  color = 'error',
+  // color = 'error', 
+  color = '#ff0000',
   vehicles,
   nok,
   nokVin,
-  target,
+  targetAlert,
+  targetCritical,
   topIssues,
   onDelete,
+  // sx,
   ...other
 }: Props) {
   const [expanded, setExpanded] = useState(false);
+  
 
   const theme = useTheme();
 
-  const bgColor = [theme.palette[color as ColorType].lighter];
+  // const bgColor = [theme.palette[color as ColorType].main];
   
   const handleExpandClick = () => setExpanded(!expanded);
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const idPopover = open ? 'simple-popover' : undefined;
+  
+  
+  const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
+  const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
+  const newColor = getColor()
+
+
+  const handleChangeTarget = (event: Event, newValue: number | number[]) => {
+    if (Array.isArray(newValue)) {
+      setNewTargetAlert(newValue[0]);
+      setNewTargetCritical(newValue[1]);
+    }else{
+      setNewTargetAlert(newValue);
+      setNewTargetCritical(newValue);
+    }
+  };
+
+  function getColor(): string {
+    console.log(targetAlert)
+      if (nokVin >= newTargetCritical) { 
+        return '#f24f4f';
+      } if (nokVin >= newTargetAlert) {
+        return '#FFB300';
+      }
+      return '#20878b';    
+  }
+
   return (
     <Card 
-    sx={{ bgcolor: `${color}.lighter` }} >
+    sx={{ bgcolor: `white` }} >
       <Box>
         <CardHeader
           title={title}
-          // sx={{
-          //   bgcolor: color,
-          //   color: '#FFFFFF',
-          //   padding: '20px',
-          //   cursor: 'pointer',
-          // }}
           sx={{
-            ...bgGradient({
-              // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.48)}`,
-              color: `${varAlpha(theme.vars.palette[color as ColorType].mainChannel, 0.8)}, ${varAlpha(theme.vars.palette[color as ColorType].mainChannel)}`,
-            }),
             p: 3,
             boxShadow: 'none',
-            bgcolor: color,
+            // bgcolor: color,
+            bgcolor: newColor,
             padding: '20px',
             position: 'relative',
             cursor: 'pointer',
-            color: `${color}.darker`,
-            backgroundColor: 'common.white',
+            color: `white`,
+            backgroundColor: `${newColor}`,            
           }}
           onClick={handleExpandClick}
           action={
             <>
               <IconButton
-              sx={{ color: `${color}.darker` }}
+              sx={{ color: `white` }}
               onClick={handleExpandClick}
               aria-expanded={expanded}
               aria-label="show more"
             >
               {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
-            <IconButton aria-label="delete" onClick={() => onDelete && onDelete(id)} sx={{ ml: 'auto' }}>
-            <DeleteIcon sx={{ color: `${color}.darker` }} />
-            </IconButton>
+            <IconButton
+                aria-label="settings"
+                onClick={handleClick}
+                sx={{ ml: 'auto' }}
+              >
+                <SettingsIcon htmlColor="white" />
+              </IconButton>
+              <Popover
+                id={idPopover}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+              >
+                <Box sx={{ width: '300px', p: 4, display: 'flex', alignItems: 'flex-end' }}>
+                <Slider 
+                  defaultValue={[targetAlert, targetCritical]}
+                  aria-labelledby="continuous-slider" 
+                  valueLabelDisplay="auto"
+                  min={0.0}
+                  step={0.1}
+                  max={1.0}
+                  onChange={handleChangeTarget}
+                />
+                </Box>
+              </Popover>
+              <IconButton
+                aria-label="delete"
+                onClick={() => onDelete && onDelete(id)}
+                sx={{ ml: 'auto' }}
+              >
+                <DeleteIcon htmlColor="white" />
+              </IconButton>
             </>
-          }
-          
-        />
-        
+          }          
+        />        
       </Box>
       
       <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -114,7 +165,9 @@ export function AnalyticsDashboardCard({
             <Grid>
               <Typography variant="body2">Veículos: {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
-              <Typography variant="body2">Limite: {target}</Typography>
+              <Typography variant="body2">
+                Limites: {newTargetAlert} / {newTargetCritical}
+              </Typography>
             </Grid>
             <Grid>
               <Typography variant="h3">Taxa: {nokVin.toFixed(3)}</Typography>
@@ -140,6 +193,7 @@ export function AnalyticsDashboardCard({
           </TableContainer>
         </CardContent>
       </Collapse>
+
     </Card>
   );
 }

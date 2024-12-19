@@ -151,10 +151,14 @@ export function OverviewAnalyticsView() {
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
+  const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
+  const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
+  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);  
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
+  const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
 
   const handleOpen = () => setOpen(true);
@@ -263,7 +267,8 @@ export function OverviewAnalyticsView() {
   };
 
   const handleChangeTaxa = (event: Event, newValue: number | number[]) => {
-    setValueTools(newValue as number[]); // Atualiza o estado do slider
+    setValueTools(newValue as number[]); // Atualiza o estado do slider da apertadeira
+    setTargetTools(newValue as number[]); // Atualiza o estado da apertadeira
   };
 
   const handleClickTop5 = () => {
@@ -744,11 +749,18 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
+              .filter((data) =>
+                pendingValue.some((pending) => pending.name === data.title)
+              )
               .map((data) => (
 
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard {...data} onDelete={() => handleDeleteCard(data.title)} />
+                  <AnalyticsDashboardCard 
+                  {...data} 
+                    targetAlert = {targetTools[0]}
+                    targetCritical={targetTools[1]}
+                    onDelete={handleDeleteCard} 
+                  />
                 </Grid>
               ))}
             {/* ========================================CARD TORQUE============================== */}
