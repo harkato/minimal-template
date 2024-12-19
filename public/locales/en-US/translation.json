@@ -1,0 +1,27 @@
+{
+    "app": {
+      "portuguese": "Portuguese",
+      "english": "English",
+      "title": "Internationalization of a React application",
+      "subtitle": "Learning to install and configure internationalization library",
+      "select_language": "Select a language",
+      "products": "Products"
+    },
+
+    "dashboard": {
+        "process": "Tools",
+        "newProcess": "New Process",
+        "applySelection": "Apply selection"
+    },
+
+    "users": {
+      "title": "Users",
+      "create": "Create new user"
+    },
+
+    "charts": {
+      "title": "Seats - Failure Rate",
+      "time": "Time",
+      "rate": "Rate"
+    }
+   }
