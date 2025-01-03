@@ -37,6 +37,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
+import { io } from "socket.io-client";
 import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
@@ -60,6 +61,8 @@ import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
 
 // ----------------------------------------------------------------------
+const socket = io('http://localhost:3000'); // URL do servidor
+
 const style = {
   position: 'absolute',
   alignContent: 'center',
@@ -131,6 +134,9 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
   
+  const [mensagem, setMensagem] = useState<string>('');
+  const [resposta, setResposta] = useState<string>('');
+
   const { 
     cardData, 
     pendingValue, 
@@ -213,33 +219,42 @@ export function OverviewAnalyticsView() {
     // setCardData((prevData) => prevData.filter((card) => card.id !== id));
   }; */
 
-  // Simulando atualizações em tempo real
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTopFiveData((prevData) => {
-        const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
-        const updatedCard = prevData[randomIndex];
+    // Recebe atualizações periódicas
+    socket.on('update', (updatedData) => {
+      setTopFiveData(updatedData);
+      console.log(`Recebi a atualização ${JSON.stringify(updatedData)}`);
+    });
 
-        // Atualiza apenas o card selecionado
-        const updatedData = prevData.map((card, index) =>
-          index === randomIndex
-            ? {
-                ...updatedCard,
-                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-                title: updatedCard.title.includes('Novo')
-                  ? updatedCard.title.replace('Novo ', '')
-                  : `Novo ${updatedCard.title}`, // Alterna o título
-              }
-            : card
-        );
-
-        return updatedData;
-      });
-    }, 20000); // Atualiza a cada 20 segundos
-
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   }, []);
+
+  // Simulando atualizações em tempo real
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTopFiveData((prevData) => {
+  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
+  //       const updatedCard = prevData[randomIndex];
+
+  //       // Atualiza apenas o card selecionado
+  //       const updatedData = prevData.map((card, index) =>
+  //         index === randomIndex
+  //           ? {
+  //               ...updatedCard,
+  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+  //               title: updatedCard.title.includes('Novo')
+  //                 ? updatedCard.title.replace('Novo ', '')
+  //                 : `Novo ${updatedCard.title}`, // Alterna o título
+  //             }
+  //           : card
+  //       );
+
+  //       return updatedData;
+  //     });
+  //   }, 20000); // Atualiza a cada 20 segundos
+
+  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
+  // }, []);
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
