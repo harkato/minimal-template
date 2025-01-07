@@ -37,7 +37,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import LineChart from 'src/components/chart/linechart';
@@ -62,6 +62,12 @@ import { initialDataTopFive } from './initial-data-top-five';
 
 // ----------------------------------------------------------------------
 const socket = io('http://localhost:3000'); // URL do servidor
+
+interface DataItem {
+  id: number;
+  title: string;
+  value: number;
+}
 
 const style = {
   position: 'absolute',
@@ -133,17 +139,61 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
-  
-  const [mensagem, setMensagem] = useState<string>('');
-  const [resposta, setResposta] = useState<string>('');
 
-  const { 
-    cardData, 
-    pendingValue, 
-    setPendingValue, 
-    selectedCards, 
+  const [userId, setUserId] = useState<string>("");
+  const [availableData, setAvailableData] = useState<DataItem[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [updates, setUpdates] = useState<DataItem[]>([
+    {
+      id: 0,
+      title: "Default Item",
+      value: 0
+    },
+  ]);
+
+  useEffect(() => {
+    // Recebe a ID do usuário
+    socket.on("user-id", (id: string) => {
+      console.log("Minha ID:", id);
+      setUserId(id);
+    });
+
+    // Recebe atualizações dos dados
+    socket.on("update2", (data: DataItem[]) => {
+      console.log("Dados atualizados:", data);
+      setUpdates(data);
+    });
+
+    // Dados disponíveis (simulado para o exemplo)
+    setAvailableData([
+      { id: 1, title: "Item 1", value: 0 },
+      { id: 2, title: "Item 2", value: 0 },
+      { id: 3, title: "Item 3", value: 0 },
+      { id: 4, title: "Item 4", value: 0 },
+      { id: 5, title: "Item 5", value: 0 },
+    ]);
+  }, []);
+
+  const handleSelectionChange = (id: number) => {
+    const newSelectedIds = selectedIds.includes(id)
+      ? selectedIds.filter((itemId) => itemId !== id) // Remove o ID se já está selecionado
+      : [...selectedIds, id]; // Adiciona o ID se não está selecionado
+
+    setSelectedIds(newSelectedIds);
+
+    // Envia a seleção ao servidor
+    socket.emit("select-data", newSelectedIds);
+  };
+
+  
+
+  const {
+    cardData,
+    pendingValue,
+    setPendingValue,
+    selectedCards,
     setSelectedCards,
-    handleDeleteCard 
+    handleDeleteCard,
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
@@ -161,7 +211,7 @@ export function OverviewAnalyticsView() {
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
-  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);  
+  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
   const [top5, setTop5] = useState(true);
   const [ferramentas, setFerramentas] = useState(true);
   const [filterIds, setFilterIds] = useState([]);
@@ -194,7 +244,7 @@ export function OverviewAnalyticsView() {
   //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
   // }
 
-/*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  /*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
@@ -202,7 +252,7 @@ export function OverviewAnalyticsView() {
     setMenuAnchorEl(null);
   }; */
 
-/*   const handleToggleCard = (id: string) => {
+  /*   const handleToggleCard = (id: string) => {
     setFilteredCardData((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((cardId) => cardId !== id)
@@ -214,7 +264,7 @@ export function OverviewAnalyticsView() {
     handleMenuClose();
   }; */
 
-/*   const handleDeleteCard = (id: string) => {
+  /*   const handleDeleteCard = (id: string) => {
     setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
     // setCardData((prevData) => prevData.filter((card) => card.id !== id));
   }; */
@@ -225,7 +275,6 @@ export function OverviewAnalyticsView() {
       setTopFiveData(updatedData);
       console.log(`Recebi a atualização ${JSON.stringify(updatedData)}`);
     });
-
   }, []);
 
   // Simulando atualizações em tempo real
@@ -280,7 +329,7 @@ export function OverviewAnalyticsView() {
       setChecked(event.target.checked);
     }; */
 
-/*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
+  /*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
     setTaxaTop5(newValue as number[]);
   }; */
 
@@ -312,6 +361,37 @@ export function OverviewAnalyticsView() {
 
   return (
     <DashboardContent maxWidth="xl">
+      <Grid container sx={{ justifyContent: 'flex', mt: 4 }}>
+        <div>
+
+        
+      <h1>Minha ID: {userId}</h1>
+
+      <h2>Selecione as apertadeiras para receber atualizações:</h2>
+      <ul>
+        {availableData.map((item) => (
+          <li key={item.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={selectedIds.includes(item.id)}
+                onChange={() => handleSelectionChange(item.id)}
+              />
+              {item.title}
+            </label>
+          </li>
+        ))}
+      </ul>
+      <h2>Dados Atualizados:</h2>
+      <ul>
+        {updates.map((item) => (
+          <li key={item.id}>
+            {item.title}: {item.value.toFixed(2)}
+          </li>
+        ))}
+      </ul>
+      </div>
+    </Grid>
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
         <Button
           variant="contained"
@@ -432,9 +512,7 @@ export function OverviewAnalyticsView() {
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center' }}>
-                            Ferramentas
-                          </span>
+                          <span style={{ alignSelf: 'center' }}>Ferramentas</span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
@@ -490,7 +568,7 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 setPendingValue(newValue);
-/*                                 if (reason === 'selectOption') {
+                                /*                                 if (reason === 'selectOption') {
                                   // Primeiro converte para 'unknown', depois para o tipo desejado
                                   const selectedCards = cardData.filter((card) =>
                                     (newValue as unknown as { id: number }[]).some(
@@ -748,17 +826,14 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) =>
-                pendingValue.some((pending) => pending.name === data.title)
-              )
+              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
-
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard 
-                  {...data} 
-                    targetAlert = {targetTools[0]}
+                  <AnalyticsDashboardCard
+                    {...data}
+                    targetAlert={targetTools[0]}
                     targetCritical={targetTools[1]}
-                    onDelete={() => handleDeleteCard(data.title)} 
+                    onDelete={() => handleDeleteCard(data.title)}
                   />
                 </Grid>
               ))}
@@ -913,7 +988,7 @@ const labels = [
     color: '#9fc3da29',
     description: '',
   },
-    {
+  {
     id: 7,
     name: 'FAHRWERK2',
     color: '#9fc3da29',
