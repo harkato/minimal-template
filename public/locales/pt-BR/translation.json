@@ -2,6 +2,8 @@
     "app": {
       "portuguese": "Português",
       "english": "Inglês",
+      "french": "Francês",
+      "spanish": "Espanhol",
       "title": "Internacionalização de uma aplicação React",
       "subtitle": "Aprendendo a instalar e configurar biblioteca de internacionalização",
       "select_language": "Selecione uma linguagem",

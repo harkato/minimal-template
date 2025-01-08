@@ -2,6 +2,8 @@
     "app": {
       "portuguese": "Portuguese",
       "english": "English",
+      "french": "French",
+      "spanish": "Spanish",
       "title": "Internationalization of a React application",
       "subtitle": "Learning to install and configure internationalization library",
       "select_language": "Select a language",
@@ -80,7 +82,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "clearFilters": "Clear Filters",
-      "seach": "Seach",
+      "seach": "Search",
       "date": "Date",
       "job": "Job",
       "spindle": "Spindle",
