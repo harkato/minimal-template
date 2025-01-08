@@ -16,7 +16,7 @@ import { Iconify } from 'src/components/iconify';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
-import { ConfigNavDashboard } from '../config-nav-dashboard';
+import { navData } from '../config-nav-dashboard';
 import { Searchbar } from '../components/searchbar';
 import { _workspaces } from '../config-nav-workspace';
 import { MenuButton } from '../components/menu-button';
@@ -45,8 +45,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const layoutQuery: Breakpoint = 'lg';
 
   const toggleExpand = () => setIsExpanded((prev) => !prev);
-
-  const { navData } = ConfigNavDashboard();
 
   return (
     <LayoutSection

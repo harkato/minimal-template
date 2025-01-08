@@ -107,15 +107,10 @@ export const _langs = [
     icon: '/assets/icons/flags/ic-flag-br.svg',
   },
   {
-    value: 'fr-fr',
+    value: 'fr',
     label: 'French',
     icon: '/assets/icons/flags/ic-flag-fr.svg',
   },
-  {
-    value: 'es-es',
-    label: 'Spanish',
-    icon: '/assets/icons/flags/ic-flag-es.svg'
-  }
 ];
 
 // ----------------------------------------------------------------------

@@ -9,7 +9,7 @@ i18n
  .use(initReactI18next) /** inicializa a biblioteca */
  .init({ /** opções de configuração da biblioteca */
    fallbackLng: 'en-US' /** idioma utilizado caso o idioma detectado não seja suportado */,
-   supportedLngs: ['pt-BR', 'en-US', 'fr-FR', 'es-ES'] /** idiomas suportados */,
+   supportedLngs: ['pt-BR', 'en-US'] /** idiomas suportados */,
  });
  
 export default i18n;
