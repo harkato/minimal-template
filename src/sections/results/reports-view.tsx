@@ -25,6 +25,9 @@ import {
   IconButton,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import CheckIcon from '@mui/icons-material/Check';
+import { makeStyles } from '@material-ui/core/styles';
 
 type Order = 'asc' | 'desc';
 
@@ -101,6 +104,28 @@ const downloadCSV = (rows: DataRow[]) => {
   URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
+function getStatusIcon(status: string, i: number) {
+  return status === 'OK' ? (
+    <CheckIcon sx={{ color: '#20878b' }} />
+  ) : i % 2 === 0 ? (
+    <ArrowUpward sx={{ color: '#f24f4f' }} />
+  ) : (
+    <ArrowDownward sx={{ color: '#FFB300' }} />
+  );
+}
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200,
+  },
+}));
+
 const applyFilters = (
   data: DataRow[],
   filters: typeof initialFilters,
@@ -136,6 +161,13 @@ export default function ResultPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
+
+  const classes = useStyles();
+  const getCurrentDateTime = () => {
+    const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
+    const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
+    return isoString;
+  };
 
   const filteredData = useMemo(
     () => applyFilters(data, filters, startDate, endDate),
@@ -393,8 +425,8 @@ export default function ResultPage() {
         </Grid>
 
         {/* Data */}
-        <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+        <Grid item xs={5} sm={5} md={3}>
+          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <DatePicker
               name="startDate"
               label="Início"
@@ -402,11 +434,25 @@ export default function ResultPage() {
               onChange={(newDate) => setStartDate(newDate)}
               sx={{ width: '100%' }}
             />
+          </LocalizationProvider> */}
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+            <TextField
+              id="datetime-local"
+              label="Data inicial"
+              type="datetime-local"
+              defaultValue= {getCurrentDateTime()}
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{ width: '100%' }}
+            />
+
           </LocalizationProvider>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+        <Grid item xs={5} sm={5} md={3}>
+          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <DatePicker
               name="endDate"
               label="Fim"
@@ -414,6 +460,20 @@ export default function ResultPage() {
               onChange={(newDate) => setEndDate(newDate)}
               sx={{ width: '100%' }}
             />
+          </LocalizationProvider> */}
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+            <TextField
+              id="datetime-local"
+              label="Data final"
+              type="datetime-local"
+              defaultValue={getCurrentDateTime()}
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{ width: '100%' }}
+            />
+
           </LocalizationProvider>
         </Grid>
 
@@ -599,12 +659,12 @@ export default function ResultPage() {
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        // backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
                     >
-                      {row.torqueStatus}
+                      {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
                   </TableCell>
                   <TableCell>{row.angle}</TableCell>
@@ -616,12 +676,12 @@ export default function ResultPage() {
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
                     >
-                      {row.angleStatus}
+                      {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
                   </TableCell>
 

@@ -8,7 +8,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
 
-
 export type Props = CardProps & {
   id: string;
   title: string;
@@ -25,8 +24,8 @@ export type Props = CardProps & {
 export function AnalyticsDashboardCard({
   id,
   title,
-  // color = 'error', 
-  color = '#ff0000',
+  // color = 'error',
+  color = '#FF0000',
   vehicles,
   nok,
   nokVin,
@@ -38,33 +37,30 @@ export function AnalyticsDashboardCard({
   ...other
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  
-
   const theme = useTheme();
-
-  // const bgColor = [theme.palette[color as ColorType].main];
-  
-  const handleExpandClick = () => setExpanded(!expanded);
-
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
+  // const handleExpandClick = () => setExpanded(!expanded);
+  const handleExpandClick = (event: any) => {
+    // Verifica se o Popover NÃO está aberto antes de expandir/recolher
+    if (!open) {
+        setExpanded(!expanded);
+    }
+};
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation(); // Impede a propagação do evento para o CardHeader
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const open = Boolean(anchorEl);
   const idPopover = open ? 'simple-popover' : undefined;
-  
-  
   const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
   const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
   const newColor = getColor()
-
-
+  const handleSliderClick = (event: { stopPropagation: () => void; }) => {
+    event.stopPropagation(); // Impede a propagação do evento
+  };
   const handleChangeTarget = (event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
@@ -74,19 +70,16 @@ export function AnalyticsDashboardCard({
       setNewTargetCritical(newValue);
     }
   };
-
   function getColor(): string {
-    console.log(targetAlert)
-      if (nokVin >= newTargetCritical) { 
-        return '#f24f4f';
+      if (nokVin >= newTargetCritical) {
+        return '#F24F4F';
       } if (nokVin >= newTargetAlert) {
         return '#FFB300';
       }
-      return '#20878b';    
+      return '#20878B';
   }
-
   return (
-    <Card 
+    <Card
     sx={{ bgcolor: `white` }} >
       <Box>
         <CardHeader
@@ -99,7 +92,7 @@ export function AnalyticsDashboardCard({
             padding: '20px',
             cursor: 'pointer',
             color: `white`,
-            backgroundColor: `${newColor}`,            
+            backgroundColor: `${newColor}`,
           }}
           onClick={handleExpandClick}
           action={
@@ -132,17 +125,29 @@ export function AnalyticsDashboardCard({
                   vertical: 'bottom',
                   horizontal: 'center',
                 }}
+                BackdropProps={{ // Configuração do backdrop
+                  style: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Cor e opacidade do escurecimento
+                      backdropFilter: 'blur(2px)', // Adiciona um efeito de blur (opcional)
+                  },
+                }}
               >
-                <Box sx={{ width: '300px', p: 4, display: 'flex', alignItems: 'flex-end' }}>
-                <Slider 
-                  defaultValue={[targetAlert, targetCritical]}
-                  aria-labelledby="continuous-slider" 
-                  valueLabelDisplay="auto"
-                  min={0.0}
-                  step={0.1}
-                  max={1.0}
-                  onChange={handleChangeTarget}
-                />
+                <Box sx={{ width: '300px', p: 3, display: 'flex', alignItems: 'flex-end', textAlign: 'center' }}>
+                {/* <div onClick={handleSliderClick} style={{ width: '100%' }}> */}
+                <div style={{ width: '100%' }}>
+                <Typography variant="h5" sx={{ mb: { xs: 1, md: 4 } }}>
+                  Taxa de criticidade
+                </Typography>
+                  <Slider
+                    defaultValue={[newTargetAlert, newTargetCritical]}
+                    aria-labelledby="continuous-slider"
+                    valueLabelDisplay="auto"
+                    min={0.0}
+                    step={0.1}
+                    max={1.0}
+                    onChange={handleChangeTarget}
+                  />
+                </div>
                 </Box>
               </Popover>
               <IconButton
@@ -153,10 +158,9 @@ export function AnalyticsDashboardCard({
                 <DeleteIcon htmlColor="white" />
               </IconButton>
             </>
-          }          
-        />        
+          }
+        />
       </Box>
-
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Grid container sx={{ justifyContent: 'space-between' }}>
@@ -171,15 +175,10 @@ export function AnalyticsDashboardCard({
               <Typography variant="h3">Taxa: {nokVin.toFixed(2)}</Typography>
             </Grid>
           </Grid>
-
           <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
             Top 5 Programas:
           </Typography>
-
-          <TableContainer
-            component={Paper}
-            style={{ backgroundColor: 'white', borderRadius: '5px' }}
-          >
+          <TableContainer component={Paper} style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
             <Table>
               <TableBody>
                 {topIssues.map((issue, index) => (

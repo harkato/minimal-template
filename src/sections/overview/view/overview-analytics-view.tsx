@@ -570,7 +570,7 @@ export function OverviewAnalyticsView() {
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
-                      <div
+{/*                       <div
                         style={{
                           display: 'block',
                           width: '100%',
@@ -579,11 +579,11 @@ export function OverviewAnalyticsView() {
                           marginTop: '20px',
                         }}
                       >
-                        Taxa
+                        Taxa */}
                         {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
                         Taxa
                       </Typography> */}
-                        <Slider
+{/*                         <Slider
                           getAriaLabel={() => 'Temperature range'}
                           value={valueTools}
                           onChange={handleChangeTaxa}
@@ -593,7 +593,7 @@ export function OverviewAnalyticsView() {
                           min={0.0}
                           step={0.1}
                           max={1.0}
-                        />
+                        /> */}
                         {/*                         <Slider
                           aria-label="Temperature range"
                           defaultValue={0.5}
@@ -607,7 +607,7 @@ export function OverviewAnalyticsView() {
                           disabled={!ferramentas}
 
                         /> */}
-                      </div>
+                      {/* </div> */}
                     </ListItemButton>
                   </List>
                 </Collapse>
