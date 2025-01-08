@@ -114,6 +114,12 @@ export function ProductsView() {
         <button type="button" onClick={() => changeLanguage('en-US')}>
           {t('app.english')}
         </button>
+        <button type="button" onClick={() => changeLanguage('fr-FR')}>
+          {t('app.french')}
+        </button>
+        <button type="button" onClick={() => changeLanguage('es-ES')}>
+          {t('app.spanish')}
+        </button>
         
         <DataTable data={tableData} className="display">
             <thead>

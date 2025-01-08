@@ -2,6 +2,8 @@
     "app": {
       "portuguese": "Português",
       "english": "Inglês",
+      "french": "Francês",
+      "spanish": "Espanhol",
       "title": "Internacionalização de uma aplicação React",
       "subtitle": "Aprendendo a instalar e configurar biblioteca de internacionalização",
       "select_language": "Selecione uma linguagem",
@@ -23,5 +25,20 @@
       "seatsFailureRate": "Bancos - Taxa de Falha",
       "time": "Horário",
       "rate": "Taxa"
+    },
+
+    "navigation": {
+      "dashboard": "Painel",
+      "reports": "Relatórios",
+      "statistics": "Estatísticas",
+      "traceAnalysis": "Análise de Rastreamento",
+      "notifications": "Notificações",
+      "toolCenter": "Central de Ferramentas",
+      "commandCenter": "Central de Comando",
+      "administration": "Administração",
+      "home": "Home",
+      "profile": "Perfil",
+      "settings": "Configurações",
+      "logout": "Sair"
     }
    }

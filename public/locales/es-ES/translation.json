@@ -1,0 +1,44 @@
+{
+    "app": {
+      "portuguese": "Português",
+      "english": "English",
+      "french": "Français",
+      "spanish": "Español", 
+      "title": "Internacionalización de una aplicación React",
+      "subtitle": "Aprendiendo a instalar y configurar una biblioteca de internacionalización",
+      "select_language": "Seleccionar un idioma",
+      "products": "Productos"
+    },
+  
+    "dashboard": {
+      "process": "Herramientas",
+      "newProcess": "Nuevo proceso",
+      "applySelection": "Aplicar selección"
+    },
+  
+    "users": {
+      "title": "Usuarios",
+      "create": "Crear nuevo usuario"
+    },
+  
+    "charts": {
+      "title": "Asientos - Tasa de fallas",
+      "time": "Tiempo",
+      "rate": "Tasa"
+    },
+  
+    "navigation": {
+      "dashboard": "Panel de control",
+      "reports": "Informes",
+      "statistics": "Estadísticas",
+      "traceAnalysis": "Análisis de trazas",
+      "notifications": "Notificaciones",
+      "toolCenter": "Centro de herramientas",
+      "commandCenter": "Centro de comando",
+      "administration": "Administración",
+      "home": "Inicio",
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    }
+  }
