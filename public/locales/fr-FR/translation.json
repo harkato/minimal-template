@@ -1,0 +1,44 @@
+{
+    "app": {
+      "portuguese": "Portugais",
+      "english": "Anglais",
+      "french": "Français",
+      "spanish": "Espagnol",
+      "title": "Internationalisation d'une application React",
+      "subtitle": "Apprendre à installer et configurer une bibliothèque d'internationalisation",
+      "select_language": "Sélectionner une langue",
+      "products": "Produits"
+    },
+  
+    "dashboard": {
+      "process": "Outils",
+      "newProcess": "Nouveau processus",
+      "applySelection": "Appliquer la sélection"
+    },
+  
+    "users": {
+      "title": "Utilisateurs",
+      "create": "Créer un nouvel utilisateur"
+    },
+  
+    "charts": {
+      "title": "Sièges - Taux d'échec",
+      "time": "Temps",
+      "rate": "Taux"
+    },
+  
+    "navigation": {
+      "dashboard": "Tableau de bord",
+      "reports": "Rapports",
+      "statistics": "Statistiques",
+      "traceAnalysis": "Analyse de trace",
+      "notifications": "Notifications",
+      "toolCenter": "Centre d'outils",
+      "commandCenter": "Centre de commande",
+      "administration": "Administration",
+      "home": "Accueil",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    }
+  }

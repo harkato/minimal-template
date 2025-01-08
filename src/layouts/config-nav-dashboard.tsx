@@ -1,25 +1,39 @@
 import { Label } from 'src/components/label';
 import { SvgColor } from 'src/components/svg-color';
-
+import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
+
+// Define uma interface NavItem para descrever a estrutura de cada item de navegação
+interface NavItem {
+  title: string;
+  path: string;
+  icon: React.ReactNode;
+  info?: React.ReactNode;
+}
 
 const icon = (name: string) => (
   <SvgColor width="100%" height="100%" src={`/assets/icons/navbar/${name}.svg`} />
 );
 
-export const navData = [
+// Deixa explícito o tipo de retorno da função ConfigNavDashboard como { navData: NavItem[] }. 
+// Isso indica que a função retorna um objeto com uma única propriedade, navData, que é um array de objetos NavItem.
+export const ConfigNavDashboard = (): { navData: NavItem[] } => {
+  const { t } = useTranslation();
+
+  // Declara a variável navData com o tipo NavItem[] para garantir que ela contenha apenas objetos que correspondam à interface definida.
+  const navData: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: t('navigation.dashboard'),
     path: '/',
     icon: icon('ic-dashboard'),
   },
   {
-    title: 'Reports',
+    title: t('navigation.reports'),
     path: '/menu',
     icon: icon('ic-reports'),
   },
   {
-    title: 'Statistics',
+    title: t('navigation.statistics'),
     path: '/products',
     icon: icon('ic-statistics'),
     info: (
@@ -29,28 +43,30 @@ export const navData = [
     ),
   },
   {
-    title: 'Trace Analysis',
+    title: t('navigation.traceAnalysis'),
     path: '/blog',
     icon: icon('ic-trace'),
   },
   {
-    title: 'Notifications',
+    title: t('navigation.notifications'),
     path: '/sign-in',
     icon: icon('ic-notifications'),
   },
   {
-    title: 'Tool Center',
+    title:  t('navigation.toolCenter'),
     path: '/404',
     icon: icon('ic-tool'),
   },
   {
-    title: 'Command Center',
+    title: t('navigation.commandCenter'),
     path: '/command',
     icon: icon('ic-command'),
   },
   {
-    title: 'Administration',
+    title: t('navigation.administration'),
     path: '/admin',
     icon: icon('ic-admin'),
   },
 ];
+return { navData };
+}

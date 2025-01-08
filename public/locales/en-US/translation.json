@@ -2,6 +2,8 @@
     "app": {
       "portuguese": "Portuguese",
       "english": "English",
+      "french": "French",
+      "spanish": "Spanish",
       "title": "Internationalization of a React application",
       "subtitle": "Learning to install and configure internationalization library",
       "select_language": "Select a language",
@@ -23,5 +25,20 @@
       "title": "Seats - Failure Rate",
       "time": "Time",
       "rate": "Rate"
+    },
+
+    "navigation": {
+      "dashboard": "Dashboard",
+      "reports": "Reports",
+      "statistics": "Statistics",
+      "traceAnalysis": "Trace Analysis",
+      "notifications": "Notifications",
+      "toolCenter": "Tool Center",
+      "commandCenter": "Command Center",
+      "administration": "Administration",
+      "home": "Home",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
     }
    }
