@@ -15,42 +15,43 @@ export const navData = [
   },
   {
     title: 'Reports',
-    path: '/menu',
+    // path: '/menu',
+    path: '/results',
     icon: icon('ic-reports'),
   },
-  {
-    title: 'Statistics',
-    path: '/products',
-    icon: icon('ic-statistics'),
-    info: (
-      <Label color="primary">
-        +3
-      </Label>
-    ),
-  },
-  {
-    title: 'Trace Analysis',
-    path: '/blog',
-    icon: icon('ic-trace'),
-  },
-  {
-    title: 'Notifications',
-    path: '/sign-in',
-    icon: icon('ic-notifications'),
-  },
-  {
-    title: 'Tool Center',
-    path: '/404',
-    icon: icon('ic-tool'),
-  },
-  {
-    title: 'Command Center',
-    path: '/command',
-    icon: icon('ic-command'),
-  },
-  {
-    title: 'Administration',
-    path: '/admin',
-    icon: icon('ic-admin'),
-  },
+  // {
+  //   title: 'Statistics',
+  //   path: '/products',
+  //   icon: icon('ic-statistics'),
+  //   info: (
+  //     <Label color="primary">
+  //       +3
+  //     </Label>
+  //   ),
+  // },
+  // {
+  //   title: 'Trace Analysis',
+  //   path: '/blog',
+  //   icon: icon('ic-trace'),
+  // },
+  // {
+  //   title: 'Notifications',
+  //   path: '/sign-in',
+  //   icon: icon('ic-notifications'),
+  // },
+  // {
+  //   title: 'Tool Center',
+  //   path: '/404',
+  //   icon: icon('ic-tool'),
+  // },
+  // {
+  //   title: 'Command Center',
+  //   path: '/command',
+  //   icon: icon('ic-command'),
+  // },
+  // {
+  //   title: 'Administration',
+  //   path: '/admin',
+  //   icon: icon('ic-admin'),
+  // },
 ];
