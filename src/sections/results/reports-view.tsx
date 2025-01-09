@@ -28,6 +28,7 @@ import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
+import { useTranslation } from 'react-i18next';
 
 type Order = 'asc' | 'desc';
 
@@ -161,6 +162,7 @@ export default function ResultPage() {
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const { t, i18n } = useTranslation();
 
   const classes = useStyles();
   const getCurrentDateTime = () => {
@@ -354,7 +356,7 @@ export default function ResultPage() {
   return (
     <>
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
-        Resultados
+        {t('results.results')}
       </Typography>
 
       {/* Menu de Filtros */}
@@ -366,7 +368,7 @@ export default function ResultPage() {
         {/* ID */}
         <Grid item xs={12} sm={6} md={6}>
           <TextField
-            label="Identificador"
+            label={t('results.identifier')}
             name="id"
             variant="outlined"
             value={filters.id}
@@ -379,14 +381,14 @@ export default function ResultPage() {
         <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
-            label="Ferramentas"
+            label={t('results.tools')}
             name="tool"
             variant="outlined"
             value={filters.tool}
             onChange={handleFilterChange}
             fullWidth
           >
-            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="">{t('results.all')}</MenuItem>
             <MenuItem value="STANLEY">STANLEY</MenuItem>
             <MenuItem value="MAKITA">MAKITA</MenuItem>
           </TextField>
@@ -396,14 +398,14 @@ export default function ResultPage() {
         <Grid item xs={12} sm={6} md={6}>
           <TextField
             select
-            label="Programas"
+            label={t('results.programs')}
             name="programName"
             variant="outlined"
             value={filters.programName}
             onChange={handleFilterChange}
             fullWidth
           >
-            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="">{t('results.all')}</MenuItem>
             <MenuItem value="101-M001/task 1">PVT1</MenuItem>
           </TextField>
         </Grid>
@@ -418,7 +420,7 @@ export default function ResultPage() {
             onChange={handleFilterChange}
             fullWidth
           >
-            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value="">{t('results.all')}</MenuItem>
             <MenuItem value="OK">OK</MenuItem>
             <MenuItem value="NOK">NOK</MenuItem>
           </TextField>
@@ -438,7 +440,7 @@ export default function ResultPage() {
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <TextField
               id="datetime-local"
-              label="Data inicial"
+              label={t('results.startDate')}
               type="datetime-local"
               defaultValue= {getCurrentDateTime()}
               className={classes.textField}
@@ -447,7 +449,6 @@ export default function ResultPage() {
               }}
               sx={{ width: '100%' }}
             />
-
           </LocalizationProvider>
         </Grid>
 
@@ -464,7 +465,7 @@ export default function ResultPage() {
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <TextField
               id="datetime-local"
-              label="Data final"
+              label={t('results.endDate')}
               type="datetime-local"
               defaultValue={getCurrentDateTime()}
               className={classes.textField}
@@ -479,10 +480,10 @@ export default function ResultPage() {
 
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="contained" onClick={handleResetFilters}>
-            Limpar Filtros
+          {t('results.clearFilters')}
           </Button>
           <Button variant="contained" onClick={handleSearch}>
-            Pesquisar
+          {t('results.seach')}
           </Button>
         </Grid>
       </Grid>
@@ -498,12 +499,12 @@ export default function ResultPage() {
           }}
         >
           <div>
-            <Tooltip title="Save or Export">
+            <Tooltip title={t('results.saveExport')}>
               <IconButton onClick={() => downloadCSV(filteredData)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Print">
+            <Tooltip title={t('results.print')}>
               <IconButton onClick={handlePrintAllPages}>
                 <Iconify icon="material-symbols:print" />
               </IconButton>
@@ -520,7 +521,7 @@ export default function ResultPage() {
                     direction={orderBy === 'resultTime' ? order : 'asc'}
                     onClick={() => handleRequestSort('resultTime')}
                   >
-                    Data
+                    {t('results.date')}
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
@@ -539,7 +540,7 @@ export default function ResultPage() {
                     direction={orderBy === 'tool' ? order : 'asc'}
                     onClick={() => handleRequestSort('tool')}
                   >
-                    Ferramenta
+                    {t('results.tools')}
                   </TableSortLabel>
                 </TableCell>
 
@@ -549,7 +550,7 @@ export default function ResultPage() {
                     direction={orderBy === 'job' ? order : 'asc'}
                     onClick={() => handleRequestSort('job')}
                   >
-                    Job
+                    {t('results.job')}
                   </TableSortLabel>
                 </TableCell>
 
@@ -559,7 +560,7 @@ export default function ResultPage() {
                     direction={orderBy === 'programName' ? order : 'asc'}
                     onClick={() => handleRequestSort('programName')}
                   >
-                    Programa
+                    {t('results.programs')}
                   </TableSortLabel>
                 </TableCell>
 
@@ -569,7 +570,7 @@ export default function ResultPage() {
                     direction={orderBy === 'fuso' ? order : 'asc'}
                     onClick={() => handleRequestSort('fuso')}
                   >
-                    Fuso
+                    {t('results.spindle')}
                   </TableSortLabel>
                 </TableCell>
 
@@ -579,7 +580,7 @@ export default function ResultPage() {
                     direction={orderBy === 'generalStatus' ? order : 'asc'}
                     onClick={() => handleRequestSort('generalStatus')}
                   >
-                    Status Geral
+                    {t('results.generalStatus')}
                   </TableSortLabel>
                 </TableCell>
 
@@ -592,7 +593,7 @@ export default function ResultPage() {
                     Torque
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <TableSortLabel
                     active={orderBy === 'torqueStatus'}
                     direction={orderBy === 'torqueStatus' ? order : 'asc'}
@@ -600,7 +601,7 @@ export default function ResultPage() {
                   >
                     Status Torque
                   </TableSortLabel>
-                </TableCell>
+                </TableCell> */}
                   
                 <TableCell>
                   <TableSortLabel
@@ -608,19 +609,18 @@ export default function ResultPage() {
                     direction={orderBy === 'angle' ? order : 'asc'}
                     onClick={() => handleRequestSort('angle')}
                   >
-                    Ângulo
+                    {t('results.angle')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angleStatus'}
                     direction={orderBy === 'angleStatus' ? order : 'asc'}
                     onClick={() => handleRequestSort('angleStatus')}
                   >
-                    Status Ângulo
+                    {t('results.statusAngle')}
                   </TableSortLabel>
-                </TableCell>
-
+                </TableCell> */}
                 
               </TableRow>
             </TableHead>
@@ -651,8 +651,24 @@ export default function ResultPage() {
                       {row.generalStatus}
                     </Box>
                   </TableCell>
-                  <TableCell>{row.torque}</TableCell>
                   <TableCell>
+                    {row.torque}
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {getStatusIcon(row.torqueStatus, row.torque)}
+                    </Box>
+                  </TableCell>
+                  {/* coluna de status de torque */}
+                  {/* <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -666,10 +682,25 @@ export default function ResultPage() {
                     >
                       {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
-                  </TableCell>
-                  <TableCell>{row.angle}</TableCell>
+                  </TableCell> */}
 
                   <TableCell>
+                    {row.angle}
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                      >
+                      {getStatusIcon(row.angleStatus, row.angle)}
+                    </Box>
+                    </TableCell>
+                  {/* <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -683,7 +714,7 @@ export default function ResultPage() {
                     >
                       {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
-                  </TableCell>
+                  </TableCell> */}
 
                   
                 </TableRow>

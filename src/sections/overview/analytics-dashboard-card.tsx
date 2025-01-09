@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
+import { useTranslation } from 'react-i18next';
 
 export type Props = CardProps & {
   id: string;
@@ -46,6 +47,7 @@ export function AnalyticsDashboardCard({
         setExpanded(!expanded);
     }
 };
+  const { t, i18n } = useTranslation();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation(); // Impede a propagação do evento para o CardHeader
     setAnchorEl(event.currentTarget);
@@ -136,7 +138,7 @@ export function AnalyticsDashboardCard({
                 {/* <div onClick={handleSliderClick} style={{ width: '100%' }}> */}
                 <div style={{ width: '100%' }}>
                 <Typography variant="h5" sx={{ mb: { xs: 1, md: 4 } }}>
-                  Taxa de criticidade
+                  {t('dashboard.criticalityRate')}
                 </Typography>
                   <Slider
                     defaultValue={[newTargetAlert, newTargetCritical]}
@@ -165,18 +167,18 @@ export function AnalyticsDashboardCard({
         <CardContent>
           <Grid container sx={{ justifyContent: 'space-between' }}>
             <Grid>
-              <Typography variant="body2">Veículos: {vehicles}</Typography>
+              <Typography variant="body2">{t('dashboard.vehicles')} {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
               <Typography variant="body2">
-                Limites: {newTargetAlert} / {newTargetCritical}
+                {t('dashboard.limits')} {newTargetAlert} / {newTargetCritical}
               </Typography>
             </Grid>
             <Grid>
-              <Typography variant="h3">Taxa: {nokVin.toFixed(2)}</Typography>
+              <Typography variant="h3">{t('dashboard.rate')} {nokVin.toFixed(2)}</Typography>
             </Grid>
           </Grid>
           <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
-            Top 5 Programas:
+            {t('dashboard.topPrograms')}
           </Typography>
           <TableContainer component={Paper} style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
             <Table>

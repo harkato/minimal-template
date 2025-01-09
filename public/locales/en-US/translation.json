@@ -2,6 +2,8 @@
     "app": {
       "portuguese": "Portuguese",
       "english": "English",
+      "french": "French",
+      "spanish": "Spanish",
       "title": "Internationalization of a React application",
       "subtitle": "Learning to install and configure internationalization library",
       "select_language": "Select a language",
@@ -11,7 +13,14 @@
     "dashboard": {
         "process": "Tools",
         "newProcess": "New Process",
-        "applySelection": "Apply selection"
+        "applySelection": "Apply selection",
+        "selectTools": "Select Tools",
+        "filterTools": " Filter Tools",
+        "criticalityRate": "Criticality Rate",
+        "topPrograms": "Top 5 Programs:",
+        "limits": "Limits:",
+        "vehicles": "Vehicles:",
+        "rate": "Rate:"          
     },
 
     "users": {
@@ -23,5 +32,64 @@
       "title": "Seats - Failure Rate",
       "time": "Time",
       "rate": "Rate"
+    },
+    
+    "navigation": {
+      "dashboard": "Dashboard",
+      "reports": "Reports",
+      "statistics": "Statistics",
+      "traceAnalysis": "Trace Analysis",
+      "notifications": "Notifications",
+      "toolCenter": "Tool Center",
+      "commandCenter": "Command Center",
+      "administration": "Administration",
+      "home": "Home",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+
+    "notifications": {
+      "beforeThat": "Before that",
+      "new": "New",
+      "viewAll": "view all",
+      "youHave": "You have",
+      "unreadMessages": "unread messages",
+      "notifications": "Notifications"
+    },
+
+    "message": {
+      "invalidName": "Error creating user: invalid name"
+    },
+
+    "reports": {
+      "general": "General",
+      "result": "Result",
+      "user": "User",
+      "event": "Event",
+      "programDetail": "Program Detail",
+      "tightening": "Tightening",
+      "jobResult": "Job Result",
+      "topNOKJob": "Top NOK Job"
+    },
+
+    "results": {
+      "results": "Results",
+      "identifier": "Identifier",
+      "tools": "Tools",
+      "programs": "Programs",
+      "all": "All",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "clearFilters": "Clear Filters",
+      "seach": "Search",
+      "date": "Date",
+      "job": "Job",
+      "spindle": "Spindle",
+      "generalStatus": "Status General",
+      "angle": "Angle",
+      "statusAngle": "Angle Status",
+      "saveExport": "Save or Export",
+      "print": "Print"
     }
    }

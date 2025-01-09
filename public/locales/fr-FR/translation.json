@@ -1,0 +1,95 @@
+{
+    "app": {
+      "portuguese": "Portugais",
+      "english": "Anglais",
+      "french": "Français",
+      "spanish": "Espagnol",
+      "title": "Internationalisation d'une application React",
+      "subtitle": "Apprendre à installer et configurer la bibliothèque d'internationalisation",
+      "select_language": "Sélectionner une langue",
+      "products": "Produits"
+    },
+
+    "dashboard": {
+      "process": "Outils",
+      "newProcess": "Nouveau Processus",
+      "applySelection": "Enregistrer la sélection",
+      "selectTools": "Sélectionner les outils",
+      "filterTools": "Filtrer les outils",
+      "criticalityRate": "Taux de criticité",
+      "topPrograms": "Top 5 des programmes :",
+      "limits": "Limites :",
+      "vehicles": "Véhicules :",
+      "rate": "Taux :"
+    },
+
+    "users": {
+      "title": "Utilisateurs",
+      "create": "Créer un nouvel utilisateur"
+    },
+
+    "charts": {
+      "seatsFailureRate": "Sièges - Taux de Défaillance",
+      "time": "Heure",
+      "rate": "Taux"
+    },
+
+    "navigation": {
+      "dashboard": "Tableau de bord",
+      "reports": "Rapports",
+      "statistics": "Statistiques",
+      "traceAnalysis": "Analyse de Traçage",
+      "notifications": "Notifications",
+      "toolCenter": "Centre d'outils",
+      "commandCenter": "Centre de Commandement",
+      "administration": "Administration",
+      "home": "Accueil",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    },
+
+    "notifications": {
+      "beforeThat": "Avant cela",
+      "new": "Nouveau",
+      "viewAll": "Tout afficher",
+      "youHave": "Vous avez ",
+      "unreadMessages": " messages non lus",
+      "notifications": "Notifications"
+    },
+
+    "message": {
+      "invalidName": "Erreur lors de la création de l'utilisateur : nom invalide"
+    },
+
+    "reports": {
+      "general": "Général",
+      "result": "Résultat",
+      "user": "Utilisateur",
+      "event": "Événement",
+      "programDetail": "Détails du programme",
+      "tightening": "Serrage",
+      "jobResult": "Résultat par Travail",
+      "topNOKJob": "Top NOK par travail"
+    },
+    
+    "results": {
+      "results": "Résultats",
+      "identifier": "Identifiant",
+      "tools": "Outils",
+      "programs": "Programmes",
+      "all": "Tous",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "clearFilters": "Effacer les filtres",
+      "seach": "Rechercher",
+      "date": "Date",
+      "job": "Travail",
+      "spindle": "Broche",
+      "generalStatus": "Statut Général",
+      "angle": "Angle",
+      "statusAngle": "Statut Angle",
+      "saveExport": "Enregistrer ou exporter",
+      "print": "Imprimer"
+    }
+  }

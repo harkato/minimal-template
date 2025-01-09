@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
-
+import { useTranslation } from 'react-i18next';
 import { _myAccount } from 'src/_mock';
 
 // ----------------------------------------------------------------------
@@ -29,7 +29,7 @@ export type AccountPopoverProps = IconButtonProps & {
 
 export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps) {
   const router = useRouter();
-
+  const { t, i18n } = useTranslation();
   const pathname = usePathname();
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
@@ -130,7 +130,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
 
         <Box sx={{ p: 1 }}>
           <Button fullWidth color="error" size="medium" variant="text">
-            Logout
+            {t('navigation.logout')}
           </Button>
         </Box>
       </Popover>

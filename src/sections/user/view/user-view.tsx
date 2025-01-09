@@ -125,7 +125,7 @@ export function UserView() {
       console.log('Nome válido:', formData.name);
       // Aqui você pode processar o envio do formulário
     } catch (e) {
-      alert('Erro ao criar usuário: nome inválido');
+      alert(t('message.invalidName'));
     } finally {
       setFormData(initialFormData);
       handleClose(); // Fecha o diálogo após a submissão

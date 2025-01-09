@@ -372,7 +372,7 @@ export function OverviewAnalyticsView() {
                   </List>
                 </Collapse>
                 <ListItemButton onClick={handleClickAperto}>
-                  <ListItemText primary="Aperto" />
+                  <ListItemText primary={t('dashboard.process')} />
                   {openListAperto ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={openListAperto} timeout="auto" unmountOnExit>
@@ -418,7 +418,7 @@ export function OverviewAnalyticsView() {
                           onClick={handleClick}
                         >
                           <span style={{ alignSelf: 'center' }}>
-                            Ferramentas
+                            {t('dashboard.selectTools')}
                           </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
@@ -563,7 +563,7 @@ export function OverviewAnalyticsView() {
                                   ref={params.InputProps.ref}
                                   inputProps={params.inputProps}
                                   autoFocus
-                                  placeholder="Filtrar ferramentas"
+                                  placeholder={t("dashboard.filterTools")}
                                 />
                               )}
                             />
