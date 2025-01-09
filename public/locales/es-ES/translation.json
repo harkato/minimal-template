@@ -88,6 +88,8 @@
       "spindle": "Husillo",
       "generalStatus": "Estado General",
       "angle": "Ángulo",
-      "statusAngle": "Estado Ángulo"
+      "statusAngle": "Estado Ángulo",
+      "saveExport": "Guardar o exportar",
+      "print": "Imprimir"
     }
   }

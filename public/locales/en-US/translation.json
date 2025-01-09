@@ -88,6 +88,8 @@
       "spindle": "Spindle",
       "generalStatus": "Status General",
       "angle": "Angle",
-      "statusAngle": "Angle Status"
+      "statusAngle": "Angle Status",
+      "saveExport": "Save or Export",
+      "print": "Print"
     }
    }
