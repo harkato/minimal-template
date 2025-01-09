@@ -29,44 +29,45 @@ export const ConfigNavDashboard = (): { navData: NavItem[] } => {
   },
   {
     title: t('navigation.reports'),
-    path: '/menu',
+    // path: '/menu',
+    path: '/results',
     icon: icon('ic-reports'),
   },
-  {
-    title: t('navigation.statistics'),
-    path: '/products',
-    icon: icon('ic-statistics'),
-    info: (
-      <Label color="primary">
-        +3
-      </Label>
-    ),
-  },
-  {
-    title: t('navigation.traceAnalysis'),
-    path: '/blog',
-    icon: icon('ic-trace'),
-  },
-  {
-    title: t('navigation.notifications'),
-    path: '/sign-in',
-    icon: icon('ic-notifications'),
-  },
-  {
-    title:  t('navigation.toolCenter'),
-    path: '/404',
-    icon: icon('ic-tool'),
-  },
-  {
-    title: t('navigation.commandCenter'),
-    path: '/command',
-    icon: icon('ic-command'),
-  },
-  {
-    title: t('navigation.administration'),
-    path: '/admin',
-    icon: icon('ic-admin'),
-  },
+  // {
+  //   title: t('navigation.statistics'),
+  //   path: '/products',
+  //   icon: icon('ic-statistics'),
+  //   info: (
+  //     <Label color="primary">
+  //       +3
+  //     </Label>
+  //   ),
+  // },
+  // {
+  //   title: t('navigation.traceAnalysis'),
+  //   path: '/blog',
+  //   icon: icon('ic-trace'),
+  // },
+  // {
+  //   title: t('navigation.notifications'),
+  //   path: '/sign-in',
+  //   icon: icon('ic-notifications'),
+  // },
+  // {
+  //   title:  t('navigation.toolCenter'),
+  //   path: '/404',
+  //   icon: icon('ic-tool'),
+  // },
+  // {
+  //   title: t('navigation.commandCenter'),
+  //   path: '/command',
+  //   icon: icon('ic-command'),
+  // },
+  // {
+  //   title: t('navigation.administration'),
+  //   path: '/admin',
+  //   icon: icon('ic-admin'),
+  // },
 ];
 return { navData };
 }

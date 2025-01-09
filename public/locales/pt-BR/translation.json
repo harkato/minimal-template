@@ -88,6 +88,8 @@
       "spindle": "Fuso",
       "generalStatus": "Status Geral",
       "angle": "Ângulo",
-      "statusAngle": "Status Ângulo"
+      "statusAngle": "Status Ângulo",
+      "saveExport": "Salvar ou Exportar",
+      "print": "Imprimir"
     }
    }

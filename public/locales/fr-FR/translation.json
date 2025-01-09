@@ -88,6 +88,8 @@
       "spindle": "Broche",
       "generalStatus": "Statut Général",
       "angle": "Angle",
-      "statusAngle": "Statut Angle"
+      "statusAngle": "Statut Angle",
+      "saveExport": "Enregistrer ou exporter",
+      "print": "Imprimer"
     }
   }

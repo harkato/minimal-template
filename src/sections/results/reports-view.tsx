@@ -499,12 +499,12 @@ export default function ResultPage() {
           }}
         >
           <div>
-            <Tooltip title="Save or Export">
+            <Tooltip title={t('results.saveExport')}>
               <IconButton onClick={() => downloadCSV(filteredData)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Print">
+            <Tooltip title={t('results.print')}>
               <IconButton onClick={handlePrintAllPages}>
                 <Iconify icon="material-symbols:print" />
               </IconButton>
@@ -593,7 +593,7 @@ export default function ResultPage() {
                     Torque
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <TableSortLabel
                     active={orderBy === 'torqueStatus'}
                     direction={orderBy === 'torqueStatus' ? order : 'asc'}
@@ -601,7 +601,7 @@ export default function ResultPage() {
                   >
                     Status Torque
                   </TableSortLabel>
-                </TableCell>
+                </TableCell> */}
                   
                 <TableCell>
                   <TableSortLabel
@@ -612,7 +612,7 @@ export default function ResultPage() {
                     {t('results.angle')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angleStatus'}
                     direction={orderBy === 'angleStatus' ? order : 'asc'}
@@ -620,7 +620,7 @@ export default function ResultPage() {
                   >
                     {t('results.statusAngle')}
                   </TableSortLabel>
-                </TableCell>
+                </TableCell> */}
                 
               </TableRow>
             </TableHead>
@@ -651,8 +651,24 @@ export default function ResultPage() {
                       {row.generalStatus}
                     </Box>
                   </TableCell>
-                  <TableCell>{row.torque}</TableCell>
                   <TableCell>
+                    {row.torque}
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {getStatusIcon(row.torqueStatus, row.torque)}
+                    </Box>
+                  </TableCell>
+                  {/* coluna de status de torque */}
+                  {/* <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -666,10 +682,25 @@ export default function ResultPage() {
                     >
                       {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
-                  </TableCell>
-                  <TableCell>{row.angle}</TableCell>
+                  </TableCell> */}
 
                   <TableCell>
+                    {row.angle}
+                    <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                      >
+                      {getStatusIcon(row.angleStatus, row.angle)}
+                    </Box>
+                    </TableCell>
+                  {/* <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -683,7 +714,7 @@ export default function ResultPage() {
                     >
                       {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
-                  </TableCell>
+                  </TableCell> */}
 
                   
                 </TableRow>
