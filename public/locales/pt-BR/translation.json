@@ -13,7 +13,14 @@
     "dashboard": {
         "process": "Ferramentas",
         "newProcess": "Novo Processo",
-        "applySelection": "Salvar seleção"
+        "applySelection": "Salvar seleção",
+        "selectTools": "Selecionar Ferramentas",
+        "filterTools": "Filtrar Ferramentas",
+        "criticalityRate": "Taxa de criticidade",
+        "topPrograms": "Top 5 Programas:",
+        "limits": "Limites:",
+        "vehicles": "Veículos:",
+        "rate": "Taxa:"       
     },
 
     "users": {
@@ -40,5 +47,47 @@
       "profile": "Perfil",
       "settings": "Configurações",
       "logout": "Sair"
+    }, 
+
+    "notifications": {
+      "beforeThat": "Antes disso",
+      "new": "Novo",
+      "viewAll": "Ver tudo",
+      "youHave": "Você tem ",
+      "unreadMessages": " mensagens não lidas",
+      "notifications": "Notificações"
+    },
+
+    "message": {
+      "invalidName": "Erro ao criar usuário: nome inválido"
+    },
+
+    "reports": {
+      "general": "Geral",
+      "result": "Resultado",
+      "user": "Usuário",
+      "event": "Evento",
+      "programDetail": "Detalhes do programa",
+      "tightening": "Aperto",
+      "jobResult": "Resultado por Trabalho",
+      "topNOKJob": "Top NOK por trabalho"
+    },
+    
+    "results": {
+      "results": "Resultados",
+      "identifier": "Identificador",
+      "tools": "Ferramentas",
+      "programs": "Programas",
+      "all": "Todos",
+      "startDate": "Data inicial",
+      "endDate": "Data final",
+      "clearFilters": "Limpar Filtros",
+      "seach": "Pesquisar",
+      "date": "Data",
+      "job": "Trabalho",
+      "spindle": "Fuso",
+      "generalStatus": "Status Geral",
+      "angle": "Ângulo",
+      "statusAngle": "Status Ângulo"
     }
    }

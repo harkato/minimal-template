@@ -25,6 +25,7 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
+import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
 
@@ -38,16 +39,14 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
-
+  const { t, i18n } = useTranslation();
   const [navOpen, setNavOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
 
   const toggleExpand = () => setIsExpanded((prev) => !prev);
-
   const { navData } = ConfigNavDashboard();
-
   return (
     <LayoutSection
       /** **************************************
@@ -105,17 +104,20 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 <AccountPopover
                   data={[
                     {
-                      label: 'Home',
+                      // label: 'Home',
+                      label: t('navigation.home'),
                       href: '/',
                       icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
                     },
                     {
-                      label: 'Profile',
+                      // label: 'Profile',
+                      label: t('navigation.profile'),
                       href: '#',
                       icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
                     },
                     {
-                      label: 'Settings',
+                      // label: 'Settings',
+                      label: t('navigation.settings'),
                       href: '#',
                       icon: <Iconify width={22} icon="solar:settings-bold-duotone" />,
                     },

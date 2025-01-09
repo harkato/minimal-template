@@ -1,44 +1,93 @@
 {
     "app": {
-      "portuguese": "Português",
-      "english": "English",
-      "french": "Français",
-      "spanish": "Español", 
+      "portuguese": "Portugués",
+      "english": "Inglés",
+      "french": "Francés",
+      "spanish": "Español",
       "title": "Internacionalización de una aplicación React",
-      "subtitle": "Aprendiendo a instalar y configurar una biblioteca de internacionalización",
+      "subtitle": "Aprendiendo a instalar y configurar la biblioteca de internacionalización",
       "select_language": "Seleccionar un idioma",
       "products": "Productos"
     },
-  
+
     "dashboard": {
       "process": "Herramientas",
-      "newProcess": "Nuevo proceso",
-      "applySelection": "Aplicar selección"
+      "newProcess": "Nuevo Proceso",
+      "applySelection": "Guardar selección",
+      "selectTools": "Seleccionar Herramientas",
+      "filterTools": "Filtrar Herramientas",
+      "criticalityRate": "Tasa de criticidad",
+      "topPrograms": "Top 5 Programas:",
+      "limits": "Límites:",
+      "vehicles": "Vehículos:",
+      "rate": "Tasa:"
     },
-  
+
     "users": {
       "title": "Usuarios",
       "create": "Crear nuevo usuario"
     },
-  
+
     "charts": {
-      "title": "Asientos - Tasa de fallas",
-      "time": "Tiempo",
+      "seatsFailureRate": "Asientos - Tasa de Fallo",
+      "time": "Hora",
       "rate": "Tasa"
     },
-  
+
     "navigation": {
       "dashboard": "Panel de control",
       "reports": "Informes",
       "statistics": "Estadísticas",
-      "traceAnalysis": "Análisis de trazas",
+      "traceAnalysis": "Análisis de Rastreo",
       "notifications": "Notificaciones",
-      "toolCenter": "Centro de herramientas",
-      "commandCenter": "Centro de comando",
+      "toolCenter": "Centro de Herramientas",
+      "commandCenter": "Centro de Comando",
       "administration": "Administración",
       "home": "Inicio",
       "profile": "Perfil",
       "settings": "Configuración",
       "logout": "Cerrar sesión"
+    },
+
+    "notifications": {
+      "beforeThat": "Antes de eso",
+      "new": "Nuevo",
+      "viewAll": "Ver todo",
+      "youHave": "Tienes ",
+      "unreadMessages": " mensajes no leídos",
+      "notifications": "Notificaciones"
+    },
+
+    "message": {
+      "invalidName": "Error al crear usuario: nombre inválido"
+    },
+
+    "reports": {
+      "general": "General",
+      "result": "Resultado",
+      "user": "Usuario",
+      "event": "Evento",
+      "programDetail": "Detalles del programa",
+      "tightening": "Apretado",
+      "jobResult": "Resultado por Trabajo",
+      "topNOKJob": "Top NOK por trabajo"
+    },
+    
+    "results": {
+      "results": "Resultados",
+      "identifier": "Identificador",
+      "tools": "Herramientas",
+      "programs": "Programas",
+      "all": "Todos",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "clearFilters": "Limpiar filtros",
+      "seach": "Buscar", 
+      "date": "Fecha",
+      "job": "Trabajo",
+      "spindle": "Husillo",
+      "generalStatus": "Estado General",
+      "angle": "Ángulo",
+      "statusAngle": "Estado Ángulo"
     }
   }

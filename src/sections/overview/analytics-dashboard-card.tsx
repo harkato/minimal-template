@@ -7,12 +7,12 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useTheme } from '@mui/material/styles';
 import { varAlpha, bgGradient } from 'src/theme/styles';
+import { useTranslation } from 'react-i18next';
 
 export type Props = CardProps & {
   id: string;
   title: string;
   color: string;
-  // color?: ColorType;
   vehicles: number;
   nok: number;
   nokVin: number;
@@ -20,7 +20,8 @@ export type Props = CardProps & {
   targetCritical: number;
   topIssues: { code: string; description: string; occurrences: number }[];
   onDelete?: (id: string) => void;
-}
+};
+
 export function AnalyticsDashboardCard({
   id,
   title,
@@ -46,6 +47,7 @@ export function AnalyticsDashboardCard({
         setExpanded(!expanded);
     }
 };
+  const { t, i18n } = useTranslation();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation(); // Impede a propagação do evento para o CardHeader
     setAnchorEl(event.currentTarget);
@@ -71,7 +73,6 @@ export function AnalyticsDashboardCard({
     }
   };
   function getColor(): string {
-    //console.log(targetAlert)
       if (nokVin >= newTargetCritical) {
         return '#F24F4F';
       } if (nokVin >= newTargetAlert) {
@@ -91,7 +92,6 @@ export function AnalyticsDashboardCard({
             // bgcolor: color,
             bgcolor: newColor,
             padding: '20px',
-            position: 'relative',
             cursor: 'pointer',
             color: `white`,
             backgroundColor: `${newColor}`,
@@ -134,10 +134,14 @@ export function AnalyticsDashboardCard({
                   },
                 }}
               >
-                <Box sx={{ width: '300px', p: 4, display: 'flex', alignItems: 'flex-end' }}>
-                <div onClick={handleSliderClick} style={{ width: '100%' }}>
+                <Box sx={{ width: '300px', p: 3, display: 'flex', alignItems: 'flex-end', textAlign: 'center' }}>
+                {/* <div onClick={handleSliderClick} style={{ width: '100%' }}> */}
+                <div style={{ width: '100%' }}>
+                <Typography variant="h5" sx={{ mb: { xs: 1, md: 4 } }}>
+                  {t('dashboard.criticalityRate')}
+                </Typography>
                   <Slider
-                    defaultValue={[targetAlert, targetCritical]}
+                    defaultValue={[newTargetAlert, newTargetCritical]}
                     aria-labelledby="continuous-slider"
                     valueLabelDisplay="auto"
                     min={0.0}
@@ -161,27 +165,27 @@ export function AnalyticsDashboardCard({
       </Box>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Grid container sx={{ justifyContent: "space-between" }}>
+          <Grid container sx={{ justifyContent: 'space-between' }}>
             <Grid>
-              <Typography variant="body2">Veículos: {vehicles}</Typography>
+              <Typography variant="body2">{t('dashboard.vehicles')} {vehicles}</Typography>
               <Typography variant="body2">NOK: {nok}</Typography>
               <Typography variant="body2">
-                Limites: {newTargetAlert} / {newTargetCritical}
+                {t('dashboard.limits')} {newTargetAlert} / {newTargetCritical}
               </Typography>
             </Grid>
             <Grid>
-              <Typography variant="h3">Taxa: {nokVin.toFixed(3)}</Typography>
+              <Typography variant="h3">{t('dashboard.rate')} {nokVin.toFixed(2)}</Typography>
             </Grid>
           </Grid>
           <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
-            Top 5 Quitações:
+            {t('dashboard.topPrograms')}
           </Typography>
           <TableContainer component={Paper} style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
             <Table>
               <TableBody>
                 {topIssues.map((issue, index) => (
                   <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                    <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
+                    {/* <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell> */}
                     <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
                     <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
                   </TableRow>

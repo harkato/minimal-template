@@ -243,24 +243,6 @@ export function OverviewAnalyticsView() {
 
   const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
-  // const statusToColor: Record<
-  //   string,
-  //   'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info'
-  // > = {
-  //   success: 'success',
-  //   error: 'error',
-  //   warning: 'warning',
-  //   primary: 'primary',
-  //   secondary: 'secondary',
-  //   info: 'info',
-  // };
-
-  // function getColor(
-  //   status: string
-  // ): 'success' | 'error' | 'warning' | 'primary' | 'secondary' | 'info' | undefined {
-  //   return statusToColor[status] || 'primary';
-  // }
-
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
     setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
@@ -305,6 +287,14 @@ export function OverviewAnalyticsView() {
 
   const isLargeScreen = window.innerWidth > 768;
 
+  // function getColorApertadeira(taxaAtual: number){
+  //   return taxaAtual >= taxaApertadeira[1]
+  //   ? "#f24f4f"
+  //   : taxaAtual >= taxaApertadeira[0]
+  //   ? "#ffd666"
+  //   : "#20878b"
+  // }
+
   return (
     <DashboardContent maxWidth="xl">
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
@@ -317,24 +307,6 @@ export function OverviewAnalyticsView() {
         >
           {t('dashboard.newProcess')}
         </Button>
-        {/*         <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
-          {cardData.map((card) => (
-            <MenuItem key={card.id}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={selectedCards.includes(card.id)}
-                    onChange={() => handleToggleCard(card.id)}
-                  />
-                }
-                label={card.title}
-              />
-            </MenuItem>
-          ))}
-          <Button onClick={handleApplySelection} color="primary">
-            {t('dashboard.applySelection')}
-          </Button>
-        </Menu> */}
 
         <Modal
           open={open}
@@ -382,7 +354,7 @@ export function OverviewAnalyticsView() {
                   </List>
                 </Collapse>
                 <ListItemButton onClick={handleClickAperto}>
-                  <ListItemText primary="Aperto" />
+                  <ListItemText primary={t('dashboard.process')} />
                   {openListAperto ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={openListAperto} timeout="auto" unmountOnExit>
@@ -428,7 +400,7 @@ export function OverviewAnalyticsView() {
                           onClick={handleClick}
                         >
                           <span style={{ alignSelf: 'center' }}>
-                            Ferramentas
+                            {t('dashboard.selectTools')}
                           </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
@@ -487,26 +459,6 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 setPendingValue(newValue);
-/*                                 if (reason === 'selectOption') {
-                                  // Primeiro converte para 'unknown', depois para o tipo desejado
-                                  const selectedCards = cardData.filter((card) =>
-                                    (newValue as unknown as { id: number }[]).some(
-                                      (selected) => Number(selected.id) === Number(card.id)  // Garantir que ambos sejam números
-                                    )
-                                  );
-                              
-                                  setFilteredCardData((prev) => [
-                                    ...prev,
-                                    ...selectedCards.filter((card) => !prev.some((c) => c.id === card.id)),
-                                  ]);
-                                } else if (reason === 'removeOption') {
-                                  setFilteredCardData((prev) =>
-                                    prev.filter((card) => !(newValue as unknown as { id: number }[]).some((removed) => removed.id === card.id))
-                                  );
-                                }
-                                
-                                console.log(filteredCardData)
-                                setPendingValue([...newValue]); */
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -575,59 +527,18 @@ export function OverviewAnalyticsView() {
                                   ref={params.InputProps.ref}
                                   inputProps={params.inputProps}
                                   autoFocus
-                                  placeholder="Filtrar ferramentas"
+                                  placeholder={t("dashboard.filterTools")}
                                 />
                               )}
                             />
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
-{/*                       <div
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          textAlign: 'center',
-                          fontSize: '15px',
-                          marginTop: '20px',
-                        }}
-                      >
-                        Taxa */}
-                        {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
-                        Taxa
-                      </Typography> */}
-{/*                         <Slider
-                          getAriaLabel={() => 'Temperature range'}
-                          value={valueTools}
-                          onChange={handleChangeTaxa}
-                          valueLabelDisplay="auto"
-                          getAriaValueText={valuetext}
-                          disabled={!ferramentas}
-                          min={0.0}
-                          step={0.1}
-                          max={1.0}
-                        /> */}
-                        {/*                         <Slider
-                          aria-label="Temperature range"
-                          defaultValue={0.5}
-                          min={0.0}
-                          step={0.1}
-                          marks
-                          max={1.0}
-                          onChange={handleChangeTaxa}
-                          getAriaValueText={valuetext}
-                          valueLabelDisplay="auto"
-                          disabled={!ferramentas}
-
-                        /> */}
-                      {/* </div> */}
                     </ListItemButton>
                   </List>
                 </Collapse>
               </List>
             </Typography>
-            {/*             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography> */}
           </Box>
         </Modal>
       </Grid>
@@ -647,71 +558,9 @@ export function OverviewAnalyticsView() {
                   total={item.total}
                   chart={item.chart}
                   criticality={taxaTop5}
-                // color={getColor(item.total)}
-                // percent={item.percent}
-
-                // color={getColor(item.color)}
-                // icon={item.icon}
-                // icon={getIcon(item.total)}
                 />
               </Grid>
             ))}
-
-            {/* <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Amortecedor"
-            percent={3.2}
-            total={0.89}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [56, 47, 40, 62, 73, 30, 23, 54],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Air Bag"
-            percent={0}
-            total={0.95}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/dash.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [40, 70, 50, 28, 70, 75, 53, 53],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Coluna de direção"
-            percent={3.6}
-            total={0.73}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/up_red.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [56, 30, 23, 54, 47, 40, 62, 73],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={2.4}>
-          <AnalyticsWidgetSummary
-            title="Cinto coluna B"
-            percent={-4.3}
-            total={0.84}
-            color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/down_green.png" />}
-            chart={{
-              categories: ['9h', '10h', '11h', '12', '13h', '14h', '15h', '16h'],
-              series: [22, 8, 35, 50, 82, 84, 67, 40],
-            }}
-          />
-        </Grid> */}
           </Grid>
         </div>
       )}
@@ -882,7 +731,7 @@ interface LabelType {
 const labels = [
   {
     id: 1,
-    name: 'FAHRWERK',
+    name: 'MAKITA',
     color: '#9fc3da29',
     description: '',
   },
