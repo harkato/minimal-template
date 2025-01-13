@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
@@ -7,6 +7,8 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { PrivateRoute } from './protected';
+import { isAborted } from 'zod';
 
 // ----------------------------------------------------------------------
 
@@ -33,26 +35,38 @@ const renderFallback = (
   </Box>
 );
 
+
+
 export function Router() {
+  const [ isAuthenticated ] = useState(true);
   return useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <PrivateRoute isAuthenticated={isAuthenticated} />
       ),
       children: [
-        { element: <HomePage />, index: true },
-        { path: 'results', element: <ResultsPage /> },
-        { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'menu', element: <Menu />, 
-          children: [ // Subpáginas aninhadas
-            { path: 'result', element: <ResultsPage /> },
-            { path: 'users', element: <UserPage /> },
-          ]
+        {
+          element: (
+            <DashboardLayout>
+              <Suspense fallback={renderFallback}>
+                <Outlet />
+              </Suspense>
+            </DashboardLayout>
+          ),
+          children: [
+            { element: <HomePage />, index: true },
+            { path: 'results', element: <ResultsPage /> },
+            { path: 'user', element: <UserPage /> },
+            { path: 'products', element: <ProductsPage /> },
+            {
+              path: 'menu',
+              element: <Menu />,
+              children: [
+                { path: 'result', element: <ResultsPage /> },
+                { path: 'users', element: <UserPage /> },
+              ],
+            },
+          ],
         },
       ],
     },
@@ -72,5 +86,5 @@ export function Router() {
       path: '*',
       element: <Navigate to="/404" replace />,
     },
-  ]);
+  ])
 }
