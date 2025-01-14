@@ -7,8 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
-import { PrivateRoute } from './protected';
-import { isAborted } from 'zod';
+import { PrivateRoute } from './components/private-route';
 
 // ----------------------------------------------------------------------
 
@@ -38,34 +37,32 @@ const renderFallback = (
 
 
 export function Router() {
-  const [ isAuthenticated ] = useState(true);
+  const isAuthenticated = true;
+  // !!localStorage.getItem('authToken');
+
   return useRoutes([
     {
       element: (
-        <PrivateRoute isAuthenticated={isAuthenticated} />
+        <PrivateRoute isAuthenticated={isAuthenticated}>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </PrivateRoute>
       ),
       children: [
+        { element: <HomePage />, index: true },
+        { path: 'results', element: <ResultsPage /> },
+        { path: 'user', element: <UserPage /> },
+        { path: 'products', element: <ProductsPage /> },
         {
-          element: (
-            <DashboardLayout>
-              <Suspense fallback={renderFallback}>
-                <Outlet />
-              </Suspense>
-            </DashboardLayout>
-          ),
+          path: 'menu',
+          element: <Menu />,
           children: [
-            { element: <HomePage />, index: true },
-            { path: 'results', element: <ResultsPage /> },
-            { path: 'user', element: <UserPage /> },
-            { path: 'products', element: <ProductsPage /> },
-            {
-              path: 'menu',
-              element: <Menu />,
-              children: [
-                { path: 'result', element: <ResultsPage /> },
-                { path: 'users', element: <UserPage /> },
-              ],
-            },
+            // Subpáginas aninhadas
+            { path: 'result', element: <ResultsPage /> },
+            { path: 'users', element: <UserPage /> },
           ],
         },
       ],
