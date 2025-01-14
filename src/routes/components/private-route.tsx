@@ -1,19 +1,11 @@
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "src/context/AuthProvider";
 
-interface PrivateRouteProps {
-  isAuthenticated: boolean;
-  redirectPath?: string;
-  children: ReactNode;
-}
+const PrivateRoute = () => {
+  const user = useAuth();
+  if (!user?.token) return <Navigate to="/sign-in" />;
+  return <Outlet />;
+};
 
-export function PrivateRoute({
-  isAuthenticated,
-  redirectPath = '/sign-in',
-  children,
-}: PrivateRouteProps) {
-  if (!isAuthenticated) {
-    return <Navigate to={redirectPath} replace />;
-  }
-  return <>{children}</>;
-}
+export default PrivateRoute;
