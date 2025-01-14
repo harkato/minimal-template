@@ -1,9 +1,9 @@
-import { useContext, createContext, useState, ReactNode } from "react";
+import { useContext, createContext, useState, ReactNode, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 export interface AuthContextProps {
   token: string;
-  user: User | null;
+  user: any;
   loginAction: (data: LoginData) => Promise<void>;
   logOut: () => void;
 }
@@ -16,7 +16,6 @@ interface User {
   id: number;
   name: string;
   email: string;
-  // Adicione outros campos conforme necessário
 }
 
 interface LoginData {
@@ -30,7 +29,7 @@ const AuthProvider = ({ children }: AuthProviderProps ) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string>(localStorage.getItem("site") || "");
   const navigate = useNavigate();
-  const loginAction = async (data: LoginData): Promise<void> => {
+  const loginAction = useCallback(async (data: LoginData): Promise<void> => {
     try {
       const response = await fetch("your-api-endpoint/auth/login", {
         method: "POST",
@@ -51,25 +50,32 @@ const AuthProvider = ({ children }: AuthProviderProps ) => {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [navigate]);
 
-  const logOut = () => {
+  const logOut = useCallback(() => {
     setUser(null);
     setToken("");
     localStorage.removeItem("site");
     navigate("/login");
-  };
+  }, [navigate]);
+
+  const value = useMemo(
+    () => ({
+      token,
+      user,
+      loginAction,
+      logOut,
+    }),
+    [token, user, loginAction, logOut]
+  );
 
   return (
-    <AuthContext.Provider value={{ token, user, loginAction, logOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-
 };
 
 export default AuthProvider;
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

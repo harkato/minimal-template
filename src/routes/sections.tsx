@@ -7,7 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
-import PrivateRoute from './components/private-route';
+import { PrivateRoute } from './components/private-route';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ export function Router() {
   return useRoutes([
     {
       element: (
-        <PrivateRoute isAuthenticated={isAuthenticated}>
+        <PrivateRoute>
           <DashboardLayout>
             <Suspense fallback={renderFallback}>
               <Outlet />
