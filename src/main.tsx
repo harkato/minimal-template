@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import './i18n';
 
 import App from './app';
+import AuthProvider from './context/AuthProvider';
 
 // ----------------------------------------------------------------------
 

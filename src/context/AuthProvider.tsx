@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export interface AuthContextProps {
   token: string;
-  user: any;
+  user: User | null;
   loginAction: (data: LoginData) => Promise<void>;
   logOut: () => void;
 }
@@ -29,37 +29,32 @@ const AuthProvider = ({ children }: AuthProviderProps ) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string>(localStorage.getItem("site") || "");
   const navigate = useNavigate();
-  const loginAction = useCallback(async (data: LoginData): Promise<void> => {
-    try {
-      const response = await fetch("your-api-endpoint/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const res = await response.json();
-      if (res.data) {
-        setUser(res.data.user);
-        setToken(res.token);
-        localStorage.setItem("site", res.token);
-        navigate("/dashboard");
-        return;
-      }
-      throw new Error(res.message);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [navigate]);
+  const loginAction = useCallback(async (data: LoginData) => 
+    new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if (data.email === "user@mshimizu.com.br" && data.password === "user") {
+          const fakeUser = { id: 1, name: "Usuário teste", email: data.email };
+          const fakeToken = "fake-jwt-token";
+          setUser(fakeUser);
+          setToken(fakeToken);
+          localStorage.setItem("site", fakeToken);
+          navigate("/");
+          resolve();
+        } else {
+          reject(new Error("Invalid email or password"));
+        }
+      }, 1000); // Simulate network delay
+    }),
+    [navigate]);
 
   const logOut = useCallback(() => {
     setUser(null);
     setToken("");
     localStorage.removeItem("site");
-    navigate("/login");
+    navigate("/sign-in");
   }, [navigate]);
 
-  const value = useMemo(
+  const contextValue = useMemo(
     () => ({
       token,
       user,
@@ -70,12 +65,18 @@ const AuthProvider = ({ children }: AuthProviderProps ) => {
   );
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthProvider;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+  }
+  return context;
+};
 
-export const useAuth = () => useContext(AuthContext);
+export default AuthProvider;
