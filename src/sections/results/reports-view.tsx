@@ -652,7 +652,6 @@ export default function ResultPage() {
                     </Box>
                   </TableCell>
                   <TableCell>
-                    {row.torque}
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -663,9 +662,10 @@ export default function ResultPage() {
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
-                    >
+                      >
                       {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
+                      {row.torque}
                   </TableCell>
                   {/* coluna de status de torque */}
                   {/* <TableCell>
@@ -685,7 +685,6 @@ export default function ResultPage() {
                   </TableCell> */}
 
                   <TableCell>
-                    {row.angle}
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -699,6 +698,7 @@ export default function ResultPage() {
                       >
                       {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
+                    {row.angle}
                     </TableCell>
                   {/* <TableCell>
                     <Box
