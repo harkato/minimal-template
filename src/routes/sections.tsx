@@ -34,14 +34,17 @@ const renderFallback = (
 );
 
 export function Router() {
+  const isAuthenticated = true;
+  // !!localStorage.getItem('authToken');
+
   return useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
       ),
       children: [
         { element: <HomePage />, index: true },

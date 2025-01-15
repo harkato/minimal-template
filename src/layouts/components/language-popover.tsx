@@ -21,11 +21,22 @@ export type LanguagePopoverProps = IconButtonProps & {
 
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
   const { t, i18n } = useTranslation();
-  const [locale, setLocale] = useState<string>('en-us');
-  const changeLanguage = useCallback((lng: string) => {
-    i18n.changeLanguage(lng);
-  }, [i18n])
+
+  // Inicializa o estado com o valor do localStorage ou o padrão 'pt-br'
+  const [locale, setLocale] = useState<string>(
+    localStorage.getItem('locale') || 'pt-br'
+  );
+
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+
+  // Callback para mudar o idioma
+  const changeLanguage = useCallback(
+    (lng: string) => {
+      i18n.changeLanguage(lng);
+      localStorage.setItem('locale', lng); // Atualiza o localStorage
+    },
+    [i18n]
+  );
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
@@ -38,14 +49,14 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
   const handleChangeLang = useCallback(
     (newLang: string) => {
       changeLanguage(newLang);
-      setLocale(newLang);
+      setLocale(newLang); // Atualiza o estado
       handleClosePopover();
     },
     [changeLanguage, handleClosePopover]
   );
 
   useEffect(() => {
-    i18n.changeLanguage(locale);
+    i18n.changeLanguage(locale); // Aplica o idioma inicial
   }, [i18n, locale]);
 
   const currentLang = data.find((lang) => lang.value === locale);
