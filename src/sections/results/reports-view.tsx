@@ -326,6 +326,10 @@ export default function ResultPage() {
           <head>
             <title>Resultados</title>
             <style>
+              @page {
+                size: landscape;
+                margin: 20mm;
+              }
               body {
                 font-family: Poppins, sans-serif;
                 margin: 20px;
