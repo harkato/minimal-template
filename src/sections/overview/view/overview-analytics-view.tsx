@@ -178,48 +178,6 @@ export function OverviewAnalyticsView() {
     setOpen(false);
   };
 
-  // function getColor(taxaAtual: number) {
-  //   return taxaAtual >= taxaTop5[1]
-  //     ? "error"
-  //     : taxaAtual >= taxaTop5[0]
-  //       ? "warning"
-  //       : "success"
-  // }
-
-  // function getIcon(taxaAtual: number) {
-  //   if (taxaAtual >= taxaTop5[1]) {
-  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-  //   } if (taxaAtual >= taxaTop5[0]) {
-  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
-  //   }
-  //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
-  // }
-
-  /*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  }; */
-
-  /*   const handleToggleCard = (id: string) => {
-    setFilteredCardData((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((cardId) => cardId !== id)
-        : [...prevSelected, id]
-    );
-  };
-
-  const handleApplySelection = () => {
-    handleMenuClose();
-  }; */
-
-  /*   const handleDeleteCard = (id: string) => {
-    setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
-    // setCardData((prevData) => prevData.filter((card) => card.id !== id));
-  }; */
-
   // Simulando atualizações em tempo real
   useEffect(() => {
     const interval = setInterval(() => {
@@ -320,8 +278,9 @@ export function OverviewAnalyticsView() {
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
+          
         >
-          <Box sx={style}>
+          <Box sx={[style, {borderRadius: '20px'}]}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               <List
                 sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}
@@ -378,13 +337,6 @@ export function OverviewAnalyticsView() {
                         flexDirection: 'column',
                       }}
                     >
-                      {/*                       <div style={{ alignSelf: 'end' }}>
-                        <FormControlLabel
-                          style={{ color: 'blue', textAlign: 'center', }}
-                          control={<Switch checked={ferramentas} onChange={(event) => setFerramentas(event.target.checked)} />}
-                          label=""
-                        />
-                      </div> */}
                       <Box
                         sx={{
                           width: 600,
@@ -470,26 +422,6 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 setPendingValue(newValue);
-                                /*                                 if (reason === 'selectOption') {
-                                  // Primeiro converte para 'unknown', depois para o tipo desejado
-                                  const selectedCards = cardData.filter((card) =>
-                                    (newValue as unknown as { id: number }[]).some(
-                                      (selected) => Number(selected.id) === Number(card.id)  // Garantir que ambos sejam números
-                                    )
-                                  );
-                              
-                                  setFilteredCardData((prev) => [
-                                    ...prev,
-                                    ...selectedCards.filter((card) => !prev.some((c) => c.id === card.id)),
-                                  ]);
-                                } else if (reason === 'removeOption') {
-                                  setFilteredCardData((prev) =>
-                                    prev.filter((card) => !(newValue as unknown as { id: number }[]).some((removed) => removed.id === card.id))
-                                  );
-                                }
-                                
-                                console.log(filteredCardData)
-                                setPendingValue([...newValue]); */
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -565,44 +497,6 @@ export function OverviewAnalyticsView() {
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
-                      {/*                       <div
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          textAlign: 'center',
-                          fontSize: '15px',
-                          marginTop: '20px',
-                        }}
-                      >
-                        Taxa */}
-                      {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
-                        Taxa
-                      </Typography> */}
-                      {/*                         <Slider
-                          getAriaLabel={() => 'Temperature range'}
-                          value={valueTools}
-                          onChange={handleChangeTaxa}
-                          valueLabelDisplay="auto"
-                          getAriaValueText={valuetext}
-                          disabled={!ferramentas}
-                          min={0.0}
-                          step={0.1}
-                          max={1.0}
-                        /> */}
-                      {/*                         <Slider
-                          aria-label="Temperature range"
-                          defaultValue={0.5}
-                          min={0.0}
-                          step={0.1}
-                          marks
-                          max={1.0}
-                          onChange={handleChangeTaxa}
-                          getAriaValueText={valuetext}
-                          valueLabelDisplay="auto"
-                          disabled={!ferramentas}
-
-                        /> */}
-                      {/* </div> */}
                     </ListItemButton>
                   </List>
                 </Collapse>
@@ -713,38 +607,6 @@ export function OverviewAnalyticsView() {
               ],
             }}
           />
-        </Grid> */}
-            {/* ====================================================GRÁFICO DE DISPERSÃO============================ */}
-            {/* <Grid xs={12} md={6} lg={8}>
-          <Card>
-          <h2 style={{ textAlign: 'center' }}>Dispersão</h2>
-          <ScatterChart
-            width={900}
-            height={400} 
-            series={[{ data: [
-              { x: 100, y: 200, id: 1 },
-              { x: 120, y: 100, id: 2 },
-              { x: 170, y: 300, id: 3 },
-              { x: 140, y: 250, id: 4 },
-              { x: 150, y: 400, id: 5 },
-              { x: 110, y: 280, id: 6 },
-              { x: 300, y: 300, id: 7 },
-              { x: 400, y: 500, id: 8 },
-              { x: 200, y: 700, id: 9 },
-              { x: 340, y: 350, id: 10 },
-              { x: 560, y: 500, id: 11 },
-              { x: 230, y: 780, id: 12 },
-              { x: 500, y: 400, id: 13 },
-              { x: 300, y: 500, id: 14 },
-              { x: 240, y: 300, id: 15 },
-              { x: 320, y: 550, id: 16 },
-              { x: 500, y: 400, id: 17 },
-              { x: 420, y: 280, id: 18 },
-          ]}]}
-          grid={{ vertical: true, horizontal: true }}          
-          />
-
-          </Card>
         </Grid> */}
             {/* ==================================NOK BARRA======================================== */}
             {/* <Grid xs={12} md={6} lg={4}>

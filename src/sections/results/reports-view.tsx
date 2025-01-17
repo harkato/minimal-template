@@ -207,7 +207,7 @@ export default function ResultPage() {
     // Por enquanto, só atualiza os dados filtrados
     const updatedData = applyFilters(data, filters, startDate, endDate);
     setData(updatedData);
-  
+
     // No futuro, aqui você pode integrar com uma API para buscar dados do banco
     console.log('Filtros aplicados:', filters, startDate, endDate);
   };
@@ -225,16 +225,16 @@ export default function ResultPage() {
   //   if (tableRef.current) {
   //     // Clona o nó da tabela
   //     const tableClone = tableRef.current.cloneNode(true) as HTMLElement;
-  
+
   //     // Remove as setas (ícones de ordenação) do clone
   //     const sortLabels = tableClone.querySelectorAll('.MuiTableSortLabel-icon');
   //     sortLabels.forEach((icon) => {
   //       icon.remove();
   //     });
-  
+
   //     // Obter o conteúdo atualizado do clone
   //     const printContent = tableClone.innerHTML;
-  
+
   //     // Cria uma nova janela para impressão
   //     const printWindow = window.open('', '_blank');
   //     if (printWindow) {
@@ -272,60 +272,17 @@ export default function ResultPage() {
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
-  
+
     fullTable.innerHTML = `
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Id</th>
-            <th>Ferramenta</th>
-            <th>Job</th>
-            <th>Programa</th>
-            <th>Fuso</th>
-            <th>Status Geral</th>
-            <th>Torque</th>
-            <th>Status Torque</th>
-            <th>Ângulo</th>
-            <th>Status Ângulo</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filteredData
-            .map((row, index) => `
-              <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
-                <td>${row.resultTime}</td>
-                <td>${row.id}</td>
-                <td>${row.tool}</td>
-                <td>${row.job}</td>
-                <td>${row.programName}</td>
-                <td>${row.fuso}</td>
-                <td style="color: white; background-color: ${
-                  row.generalStatus === 'OK' ? '#20878b' : '#f24f4f'
-                };">${row.generalStatus}</td>
-                <td>${row.torque}</td>
-                <td style="color: white; background-color: ${
-                  row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f'
-                };">${row.torqueStatus}</td>
-                <td>${row.angle}</td>
-                <td style="color: white; background-color: ${
-                  row.angleStatus === 'OK' ? '#20878b' : '#f24f4f'
-                };">${row.angleStatus}</td>
-              </tr>
-            `)
-            .join('')}
-        </tbody>
-      </table>
-    `;
-  
-    // Cria a janela de impressão com os dados completos
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
+    <html>
+                <head>
             <title>Resultados</title>
             <style>
+              @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+              @page {
+                size: landscape;
+                margin: 20mm;
+              }
               body {
                 font-family: Poppins, sans-serif;
                 margin: 20px;
@@ -342,16 +299,94 @@ export default function ResultPage() {
               th {
                 background-color: #f2f2f2;
               }
+              .status-icon {
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+              }
+              .status-ok {
+                color: #20878b;
+              }
+              .status-error {
+                color: #f24f4f;
+              }
+              .status-warning {
+                color: #f9a825; /* Cor amarela */
+              }
+              .torque-angle-col {
+                text-align: center; /* Centraliza o conteúdo */
+                width: 60px; /* Define uma largura menor para a coluna */
+              }
             </style>
           </head>
-          <body>${fullTable.innerHTML}</body>
-        </html>
-      `);
+          <body>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Id</th>
+            <th>Ferramenta</th>
+            <th>Job</th>
+            <th>Programa</th>
+            <th>Fuso</th>
+            <th style="width: 100px;">Status Geral</th>
+            <th style="width: 100px;">Torque</th>
+            <th style="width: 100px;">Ângulo</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredData
+            .map(
+              (row, index) => `
+              <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
+                <td>${row.resultTime}</td>
+                <td>${row.id}</td>
+                <td>${row.tool}</td>
+                <td>${row.job}</td>
+                <td>${row.programName}</td>
+                <td>${row.fuso}</td>
+                <td class="status-icon">
+                    <span class="material-icons ${
+                      row.generalStatus === 'OK' ? 'status-ok' : 'status-error'
+                    }">
+                      ${row.generalStatus === 'OK' ? 'check_circle' : 'error'}
+                    </span>
+                    ${row.generalStatus}
+                  </td>
+                <td class="torque-angle-col status-icon">
+                    ${row.torque}
+                    <span class="material-icons ${
+                      row.torqueStatus === 'OK' ? 'status-ok' : 'status-warning'
+                    }">
+                      ${row.torqueStatus === 'OK' ? 'check_circle' : 'arrow_downward'}
+                    </span>
+                  </td>
+                  <td class="torque-angle-col status-icon">
+                    ${row.angle}
+                    <span class="material-icons ${
+                      row.angleStatus === 'OK' ? 'status-ok' : 'status-warning'
+                    }">
+                      ${row.angleStatus === 'OK' ? 'check_circle' : 'arrow_downward'}
+                    </span>
+                  </td>
+              </tr>
+            `
+            )
+            .join('')}
+        </tbody>
+      </table>
+      </body>
+      </html>
+    `;
+
+    // Cria a janela de impressão com os dados completos
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(fullTable.innerHTML);
       printWindow.document.close();
       printWindow.print();
     }
   };
-  
 
   return (
     <>
@@ -442,7 +477,7 @@ export default function ResultPage() {
               id="datetime-local"
               label={t('results.startDate')}
               type="datetime-local"
-              defaultValue= {getCurrentDateTime()}
+              defaultValue={getCurrentDateTime()}
               className={classes.textField}
               InputLabelProps={{
                 shrink: true,
@@ -474,16 +509,15 @@ export default function ResultPage() {
               }}
               sx={{ width: '100%' }}
             />
-
           </LocalizationProvider>
         </Grid>
 
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="contained" onClick={handleResetFilters}>
-          {t('results.clearFilters')}
+            {t('results.clearFilters')}
           </Button>
           <Button variant="contained" onClick={handleSearch}>
-          {t('results.seach')}
+            {t('results.seach')}
           </Button>
         </Grid>
       </Grid>
@@ -602,7 +636,7 @@ export default function ResultPage() {
                     Status Torque
                   </TableSortLabel>
                 </TableCell> */}
-                  
+
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angle'}
@@ -621,7 +655,6 @@ export default function ResultPage() {
                     {t('results.statusAngle')}
                   </TableSortLabel>
                 </TableCell> */}
-                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -696,10 +729,10 @@ export default function ResultPage() {
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
-                      >
+                    >
                       {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
-                    </TableCell>
+                  </TableCell>
                   {/* <TableCell>
                     <Box
                       sx={{
@@ -715,8 +748,6 @@ export default function ResultPage() {
                       {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
                   </TableCell> */}
-
-                  
                 </TableRow>
               ))}
             </TableBody>
