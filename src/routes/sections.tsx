@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { PrivateRoute } from './components/private-route';
 
 // ----------------------------------------------------------------------
 
@@ -34,25 +35,33 @@ const renderFallback = (
 );
 
 export function Router() {
+  const isAuthenticated = true;
+  // !!localStorage.getItem('authToken');
+
   return useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <PrivateRoute isAuthenticated={isAuthenticated}>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </PrivateRoute>
       ),
       children: [
         { element: <HomePage />, index: true },
         { path: 'results', element: <ResultsPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
-        { path: 'menu', element: <Menu />, 
-          children: [ // Subpáginas aninhadas
+        {
+          path: 'menu',
+          element: <Menu />,
+          children: [
+            // Subpáginas aninhadas
             { path: 'result', element: <ResultsPage /> },
             { path: 'users', element: <UserPage /> },
-          ]
+          ],
         },
       ],
     },

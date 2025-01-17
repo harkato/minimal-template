@@ -130,14 +130,14 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 
 export function OverviewAnalyticsView() {
   const { t, i18n } = useTranslation();
-  
-  const { 
-    cardData, 
-    pendingValue, 
-    setPendingValue, 
-    selectedCards, 
+
+  const {
+    cardData,
+    pendingValue,
+    setPendingValue,
+    selectedCards,
     setSelectedCards,
-    handleDeleteCard 
+    handleDeleteCard,
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
@@ -155,11 +155,18 @@ export function OverviewAnalyticsView() {
   const [valueSlider, setValueSlider] = React.useState<number>(10);
   const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
-  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);  
-  const [top5, setTop5] = useState(true);
+  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
+  const [top5, setTop5] = useState(() => {
+    const localData = localStorage.getItem("top5");
+    return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
+  });
   const [ferramentas, setFerramentas] = useState(true);
   const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
+
+  useEffect(() => {
+    localStorage.setItem("top5", JSON.stringify(top5));
+  }, [top5]);
 
   const handleOpen = () => setOpen(true);
 
@@ -188,7 +195,7 @@ export function OverviewAnalyticsView() {
   //   return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
   // }
 
-/*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  /*   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
   };
 
@@ -196,7 +203,7 @@ export function OverviewAnalyticsView() {
     setMenuAnchorEl(null);
   }; */
 
-/*   const handleToggleCard = (id: string) => {
+  /*   const handleToggleCard = (id: string) => {
     setFilteredCardData((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((cardId) => cardId !== id)
@@ -208,7 +215,7 @@ export function OverviewAnalyticsView() {
     handleMenuClose();
   }; */
 
-/*   const handleDeleteCard = (id: string) => {
+  /*   const handleDeleteCard = (id: string) => {
     setFilteredCardData((prevData) => prevData.filter((card) => card.id !== id));
     // setCardData((prevData) => prevData.filter((card) => card.id !== id));
   }; */
@@ -265,7 +272,7 @@ export function OverviewAnalyticsView() {
       setChecked(event.target.checked);
     }; */
 
-/*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
+  /*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
     setTaxaTop5(newValue as number[]);
   }; */
 
@@ -332,13 +339,19 @@ export function OverviewAnalyticsView() {
                       <TextField id="outlined-basic" sx={{ width: '100px' }} label="Max." variant="outlined" />
                     </div> */}
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
-                      {/*                       <div style={{ alignSelf: 'end' }}>
+                      {/* ================================== habilita o top 5                       */}
+                      <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
-                          style={{ color: 'blue', textAlign: 'center', }}
-                          control={<Switch checked={top5} onChange={(event) => setTop5(event.target.checked)} defaultChecked />}
+                          style={{ color: 'blue',   textAlign: 'center' }}
+                          control={
+                            <Switch
+                              checked={top5}
+                              onChange={(event) => setTop5(event.target.checked)}
+                            />
+                          }
                           label=""
                         />
-                      </div> */}
+                      </div>
                       <Slider
                         getAriaLabel={() => 'Temperature range'}
                         value={value}
@@ -399,9 +412,7 @@ export function OverviewAnalyticsView() {
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center' }}>
-                            {t('dashboard.selectTools')}
-                          </span>
+                          <span style={{ alignSelf: 'center' }}>{t('dashboard.selectTools')}</span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
@@ -459,6 +470,26 @@ export function OverviewAnalyticsView() {
                                   return;
                                 }
                                 setPendingValue(newValue);
+                                /*                                 if (reason === 'selectOption') {
+                                  // Primeiro converte para 'unknown', depois para o tipo desejado
+                                  const selectedCards = cardData.filter((card) =>
+                                    (newValue as unknown as { id: number }[]).some(
+                                      (selected) => Number(selected.id) === Number(card.id)  // Garantir que ambos sejam números
+                                    )
+                                  );
+                              
+                                  setFilteredCardData((prev) => [
+                                    ...prev,
+                                    ...selectedCards.filter((card) => !prev.some((c) => c.id === card.id)),
+                                  ]);
+                                } else if (reason === 'removeOption') {
+                                  setFilteredCardData((prev) =>
+                                    prev.filter((card) => !(newValue as unknown as { id: number }[]).some((removed) => removed.id === card.id))
+                                  );
+                                }
+                                
+                                console.log(filteredCardData)
+                                setPendingValue([...newValue]); */
                               }}
                               disableCloseOnSelect
                               renderTags={() => null}
@@ -527,13 +558,51 @@ export function OverviewAnalyticsView() {
                                   ref={params.InputProps.ref}
                                   inputProps={params.inputProps}
                                   autoFocus
-                                  placeholder={t("dashboard.filterTools")}
+                                  placeholder={t('dashboard.filterTools')}
                                 />
                               )}
                             />
                           </div>
                         </ClickAwayListener>
                       </StyledPopper>
+                      {/*                       <div
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontSize: '15px',
+                          marginTop: '20px',
+                        }}
+                      >
+                        Taxa */}
+                      {/*                       <Typography id="non-linear-slider" sx={{ ml: 5}} gutterBottom>
+                        Taxa
+                      </Typography> */}
+                      {/*                         <Slider
+                          getAriaLabel={() => 'Temperature range'}
+                          value={valueTools}
+                          onChange={handleChangeTaxa}
+                          valueLabelDisplay="auto"
+                          getAriaValueText={valuetext}
+                          disabled={!ferramentas}
+                          min={0.0}
+                          step={0.1}
+                          max={1.0}
+                        /> */}
+                      {/*                         <Slider
+                          aria-label="Temperature range"
+                          defaultValue={0.5}
+                          min={0.0}
+                          step={0.1}
+                          marks
+                          max={1.0}
+                          onChange={handleChangeTaxa}
+                          getAriaValueText={valuetext}
+                          valueLabelDisplay="auto"
+                          disabled={!ferramentas}
+
+                        /> */}
+                      {/* </div> */}
                     </ListItemButton>
                   </List>
                 </Collapse>
@@ -600,17 +669,14 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {cardData
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) =>
-                pendingValue.some((pending) => pending.name === data.title)
-              )
+              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
-
                 <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard 
-                  {...data} 
-                    targetAlert = {targetTools[0]}
+                  <AnalyticsDashboardCard
+                    {...data}
+                    targetAlert={targetTools[0]}
                     targetCritical={targetTools[1]}
-                    onDelete={() => handleDeleteCard(data.title)} 
+                    onDelete={() => handleDeleteCard(data.title)}
                   />
                 </Grid>
               ))}
@@ -765,7 +831,7 @@ const labels = [
     color: '#9fc3da29',
     description: '',
   },
-    {
+  {
     id: 7,
     name: 'FAHRWERK2',
     color: '#9fc3da29',
