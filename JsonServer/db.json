@@ -1,0 +1,358 @@
+{
+  "topFive": [
+      {
+        "title": "Novo Coxim do motor",
+        "percent": -2.6,
+        "total": 0.757,
+        "chart": {
+          "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
+          "series": [22, 8, 35, 50, 82, 84, 77, 70]
+        }
+      },
+      {
+        "title": "Amortecedor",
+        "percent": 3.5,
+        "total": 0.89,
+        "chart": {
+          "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
+          "series": [12, 18, 45, 60, 72, 64, 57, 50]
+        }
+      },
+      {
+        "title": "Air Bag LD",
+        "percent": 1.2,
+        "total": 0.95,
+        "chart": {
+          "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
+          "series": [15, 25, 35, 45, 55, 65, 75, 85]
+        }
+      },
+      {
+        "title": "Coluna de direção",
+        "percent": 0.8,
+        "total": 0.73,
+        "chart": {
+          "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
+          "series": [5, 15, 25, 35, 45, 55, 65, 75]
+        }
+      },
+      {
+        "title": "Cinto coluna B",
+        "percent": -1.1,
+        "total": 0.84,
+        "chart": {
+          "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
+          "series": [10, 20, 30, 40, 50, 60, 70, 80]
+        }
+      }
+    ],
+    "tool": [
+      {
+        "id": "1",
+        "title": "MAKITA",
+        "color": "success",
+        "vehicles": 37,
+        "nok": 28,
+        "nokVin": 0.757,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Porta LD Polo", "occurrences": 8 },
+          { "code": "3109 01", "description": "Porta LE Polo", "occurrences": 4 },
+          { "code": "3182 01", "description": "Porta LD Track", "occurrences": 3 },
+          { "code": "6902 01", "description": "Alto falante LD Track", "occurrences": 3 },
+          { "code": "4107 01", "description": "Porta LE Track", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "2",
+        "title": "ZP6",
+        "color": "warning",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "3",
+        "title": "BANCOS",
+        "color": "error",
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Banco LD Novo Polo", "occurrences": 8 },
+          { "code": "3109 01", "description": "Banco Polo Track ", "occurrences": 4 },
+          { "code": "3182 01", "description": "Banco UP", "occurrences": 3 },
+          { "code": "6902 01", "description": "Banco Gol  ", "occurrences": 3 },
+          { "code": "4107 01", "description": "Banco Polo TSI", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "4",
+        "title": "TACTO12",
+        "color": "error",         
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Bomba d'água", "occurrences": 8 },
+          { "code": "3109 01", "description": "Suporte quadro auxiliar LE", "occurrences": 4 },
+          { "code": "3182 01", "description": "Quadro Auxiliar LD", "occurrences": 3 },
+          { "code": "6902 01", "description": "Travessas na carroceria", "occurrences": 3 },
+          { "code": "4107 01", "description": "Suporte bomba de vácuo", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "5",
+        "title": "R2",         
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "6",
+        "title": "FRONTEND",
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "7",
+        "title": "FAHRWERK2",         
+        "color": "success",
+        "vehicles": 37,
+        "nok": 28,
+        "nokVin": 0.757,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Bomba d'água", "occurrences": 8 },
+          { "code": "3109 01", "description": "Suporte quadro auxiliar LE", "occurrences": 4 },
+          { "code": "3182 01", "description": "Quadro Auxiliar LD", "occurrences": 3 },
+          { "code": "6902 01", "description": "Travessas na carroceria", "occurrences": 3 },
+          { "code": "4107 01", "description": "Suporte bomba de vácuo", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "8",
+        "title": "ZP62",
+        "color": "warning",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "9",
+        "title": "BANCOS2",
+        "color": "error",
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Banco Novo Polo", "occurrences": 8 },
+          { "code": "3109 01", "description": "Banco Polo Track ", "occurrences": 4 },
+          { "code": "3182 01", "description": "Banco UP", "occurrences": 3 },
+          { "code": "6902 01", "description": "Banco Gol  ", "occurrences": 3 },
+          { "code": "4107 01", "description": "Banco Polo TSI", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "10",
+        "title": "TACTO11",
+        "color": "error",         
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Bomba d'água", "occurrences": 8 },
+          { "code": "3109 01", "description": "Suporte quadro auxiliar LE", "occurrences": 4 },
+          { "code": "3182 01", "description": "Quadro Auxiliar LD", "occurrences": 3 },
+          { "code": "6902 01", "description": "Travessas na carroceria", "occurrences": 3 },
+          { "code": "4107 01", "description": "Suporte bomba de vácuo", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "11",
+        "title": "R3",         
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "12",
+        "title": "FRONTEND2",
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "13",
+        "title": "FAHRWERK2",         
+        "color": "success",
+        "vehicles": 37,
+        "nok": 28,
+        "nokVin": 0.757,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Bomba d'água", "occurrences": 8 },
+          { "code": "3109 01", "description": "Suporte quadro auxiliar LE", "occurrences": 4 },
+          { "code": "3182 01", "description": "Quadro Auxiliar LD", "occurrences": 3 },
+          { "code": "6902 01", "description": "Travessas na carroceria", "occurrences": 3 },
+          { "code": "4107 01", "description": "Suporte bomba de vácuo", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "14",
+        "title": "ZP63",
+        "color": "warning",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "15",
+        "title": "BANCOS3",
+        "color": "error",
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Banco Novo Polo", "occurrences": 8 },
+          { "code": "3109 01", "description": "Banco Polo Track ", "occurrences": 4 },
+          { "code": "3182 01", "description": "Banco UP", "occurrences": 3 },
+          { "code": "6902 01", "description": "Banco Gol  ", "occurrences": 3 },
+          { "code": "4107 01", "description": "Banco Polo TSI", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "16",
+        "title": "TACTO10",
+        "color": "error",         
+        "vehicles": 28,
+        "nok": 47,
+        "nokVin": 0.679,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2490 01", "description": "Bomba d'água", "occurrences": 8 },
+          { "code": "3109 01", "description": "Suporte quadro auxiliar LE", "occurrences": 4 },
+          { "code": "3182 01", "description": "Quadro Auxiliar LD", "occurrences": 3 },
+          { "code": "6902 01", "description": "Travessas na carroceria", "occurrences": 3 },
+          { "code": "4107 01", "description": "Suporte bomba de vácuo", "occurrences": 3 }
+        ]
+      },
+      {
+        "id": "17",
+        "title": "R1",
+         
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      },
+      {
+        "id": "18",
+        "title": "FRONTEND3",
+        "color": "error",
+        "vehicles": 37,
+        "nok": 21,
+        "nokVin": 0.568,
+        "targetAlert": 0.6,
+        "targetCritical": 0.8,
+        "topIssues": [
+          { "code": "2638 01", "description": "Duto freio no agregado hidráulico", "occurrences": 4 },
+          { "code": "3402 01", "description": "Roda dianteira LD", "occurrences": 3 },
+          { "code": "4237 01", "description": "Dobradiças porta traseira LE", "occurrences": 2 },
+          { "code": "2640 01", "description": "Duto freio agregado hidráulico 740", "occurrences": 2 },
+          { "code": "4208 01", "description": "Batente da tampa dianteira LD", "occurrences": 2 }
+        ]
+      }
+    ]
+}

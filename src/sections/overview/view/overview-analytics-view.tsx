@@ -34,6 +34,9 @@ import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
+import { getTopFiveData, useToolData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { log } from 'console';
+import { useQuery } from '@tanstack/react-query';
 
 const style = {
   position: 'absolute',
@@ -146,36 +149,42 @@ export function OverviewAnalyticsView() {
     setOpen(false);
   };
 
+  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  const { isLoading: isLoadingTopFive, isError: isErrorTopFive, data: top5Data , error: errorTopFive } = useTopFiveData();
+  const dataAPI = getTopFiveData()
+  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+
+  // =======================================Simulando atualizações em tempo real==========================================
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTopFiveData((prevData) => {
+  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
+  //       const updatedCard = prevData[randomIndex];
+  //       // Atualiza apenas o card selecionado
+  //       const updatedData = prevData.map((card, index) =>
+  //         index === randomIndex
+  //           ? {
+  //               ...updatedCard,
+  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+  //               title: updatedCard.title.includes('Novo')
+  //                 ? updatedCard.title.replace('Novo ', '')
+  //                 : `Novo ${updatedCard.title}`, // Alterna o título
+  //             }
+  //           : card
+  //       );
+
+  //       return updatedData;
+  //     });
+  //   }, 20000); // Atualiza a cada 20 segundos
+
+  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
+  // }, []);
+
+  const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
+  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data);
   
-
-  // Simulando atualizações em tempo real
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTopFiveData((prevData) => {
-        const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
-        const updatedCard = prevData[randomIndex];
-        // Atualiza apenas o card selecionado
-        const updatedData = prevData.map((card, index) =>
-          index === randomIndex
-            ? {
-                ...updatedCard,
-                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-                title: updatedCard.title.includes('Novo')
-                  ? updatedCard.title.replace('Novo ', '')
-                  : `Novo ${updatedCard.title}`, // Alterna o título
-              }
-            : card
-        );
-
-        return updatedData;
-      });
-    }, 20000); // Atualiza a cada 20 segundos
-
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-  }, []);
-
-  const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+  
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
@@ -234,8 +243,9 @@ export function OverviewAnalyticsView() {
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
+          
         >
-          <Box sx={style}>
+          <Box sx={[style, {borderRadius: '20px'}]}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               <List
                 sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}
@@ -532,6 +542,74 @@ export function OverviewAnalyticsView() {
           grid={{ vertical: true, horizontal: true }}          
           />
           </Card>
+        </Grid> */}
+            {/* ========================================CARD TORQUE============================== */}
+            {/* <Grid xs={12}>
+          <AnalyticsChartCard id="12" />
+        </Grid> */}
+
+            {/* <Grid xs={12} md={6} lg={12}>
+          <TorqueChart />
+        </Grid> */}
+            {/* ======================================ANGULO/TORQUE X TEMPO ============================ */}
+            {/* <Grid xs={12} md={6} lg={12}>
+          <Card>
+            <CardContent>
+              <AreaChart />
+            </CardContent>
+          </Card>
+        </Grid> */}
+            {/* ==========================================NUMERO DE APERTOS POR ESTAÇÃO===================== */}
+            {/* <Grid xs={12} md={6} lg={12}>
+          <LineChart />
+        </Grid> */}
+            {/* =============================================OK/NOK Última hora================================= */}
+            {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsCurrentVisits
+            title="OK/NOK Última hora"
+            chart={{
+              series: [
+                { label: 'OK', value: 3500 },
+                { label: 'NOK', value: 500 },
+                // { label: 'Europe', value: 1500 },
+                // { label: 'Africa', value: 500 },
+              ],
+            }}
+          />
+        </Grid> */}
+            {/* ==================================NOK BARRA======================================== */}
+            {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsWebsiteVisits
+            title="NOK"
+            subheader="por hora"
+            chart={{
+              categories: ['10h', '11h', '12h', '13h', '14h'],
+              series: [{
+                 name: 'ALTA',
+                 data: [93, 90, 86, 87, 77] 
+              },],
+            }}
+          />
+        </Grid> */}
+
+            {/* ==============================TOP 5 BARRA COLORIDO=============================== */}
+            {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsChartBar            
+          />
+        </Grid> */}
+
+            {/* <Grid xs={12} md={6} lg={4}>
+          <AnalyticsCurrentSubject
+            title="Current subject"
+            chart={{
+              categories: ['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math'],
+              series: [
+                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
+                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
+                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
+              ],
+            }}
+          />
         </Grid> */}
           </Grid>
 
