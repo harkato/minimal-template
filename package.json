@@ -92,5 +92,10 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.2",
     "vite-plugin-checker": "^0.7.2"
+  },
+  "overrides": {
+    "@material-ui/core": {
+      "@types/react": "^18.0.0"
+    }
   }
 }
