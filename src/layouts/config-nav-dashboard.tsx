@@ -29,8 +29,8 @@ export const ConfigNavDashboard = (): { navData: NavItem[] } => {
   },
   {
     title: t('navigation.reports'),
-    path: '/menu',
-    // path: '/results',
+    // path: '/menu',
+    path: '/results',
     icon: icon('ic-reports'),
   },
   // {

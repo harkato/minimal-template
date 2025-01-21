@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useMemo, useEffect } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
@@ -29,6 +29,7 @@ import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
+import { useResultData } from 'src/routes/hooks/useToolData';
 
 type Order = 'asc' | 'desc';
 
@@ -45,20 +46,19 @@ interface DataRow {
   angleStatus: string;
   generalStatus: string;
 }
-
-const initialData = Array.from({ length: 200 }, (_, i) => ({
-  resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-  id: `${i + 1}`,
-  tool: 'MAKITA',
-  job: 1,
-  programName: `PVT${(i % 5) + 1}`,
-  fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
-  torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
-  torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-  angle: parseFloat((Math.random() * 90).toFixed(1)),
-  angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
-  generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
-}));
+// const initialData = Array.from({ length: 200 }, (_, i) => ({
+//   resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
+//   id: `${i + 1}`,
+//   tool: 'STANLEY',
+//   job: 1,
+//   programName: `PVT${(i % 5) + 1}`,
+//   fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
+//   torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
+//   torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
+//   angle: parseFloat((Math.random() * 90).toFixed(1)),
+//   angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
+//   generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
+// }));
 
 const initialFilters = {
   id: '',
@@ -156,13 +156,19 @@ const applyFilters = (
   });
 
 export default function ResultPage() {
-  const [data, setData] = useState(initialData);
+  // const [initialData, setInitialData] = useState<DataRow[]>([]); 
+  // const [data, setData] = useState(initialData);
+  const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
+
+  const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
+  // console.log("dados resutados: ", resultData);
+  
 
   const classes = useStyles();
   const getCurrentDateTime = () => {
@@ -219,6 +225,12 @@ export default function ResultPage() {
   );
 
   const tableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (resultData) {
+      setData(resultData);
+    }
+  }, [resultData]);  
 
   // Função de impressão da tabela atual
   // const handlePrint = () => {

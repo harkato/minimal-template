@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:3001';
 
 const fetchData = async (endpoint: string) => {
   const response = await axios.get(`${API_URL}/${endpoint}`);
-  console.log("response: ", response.data);
+  // console.log("response: ", response.data);
   
   return response.data;
 };
@@ -32,4 +32,12 @@ export async function getTopFiveData() {
     throw new Error('Erro ao buscar os dados');
   }
   return response.data;
+}
+
+export function useResultData() {
+  const query = useQuery({
+    queryFn: () => fetchData('results'), 
+    queryKey: ['results-data'], 
+  });
+  return query;
 }

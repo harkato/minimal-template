@@ -155,7 +155,7 @@ export const initialData = [
     targetAlert: 0.6,
     targetCritical: 0.8,
     topIssues: [
-      { code: '2490 01', description: "Banco Novo Polo", occurrences: 8 },
+      { code: '2490 01', description: "Banco Fusca", occurrences: 8 },
       { code: '3109 01', description: 'Banco Polo Track ', occurrences: 4 },
       { code: '3182 01', description: 'Banco UP', occurrences: 3 },
       { code: '6902 01', description: 'Banco Gol  ', occurrences: 3 },

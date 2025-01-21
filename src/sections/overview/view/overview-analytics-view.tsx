@@ -119,7 +119,7 @@ export function OverviewAnalyticsView() {
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
-  //const [top5Data, setTop5Data] = useState(useTopFiveData);
+  // const [top5Data, setTop5Data] = useState(useTopFiveData);
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
@@ -153,7 +153,7 @@ export function OverviewAnalyticsView() {
   const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   const { data, isLoading, isError, error } = useTopFiveData();
   const dataAPI = getTopFiveData()
-  //const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
 
   // =======================================Simulando atualizações em tempo real==========================================
   // useEffect(() => {
@@ -187,14 +187,14 @@ export function OverviewAnalyticsView() {
     a.title.localeCompare(b.title)
   );
 
-  console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
+  // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
 
 
   /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
   console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
 
 
-  //const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+  // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
 
 
