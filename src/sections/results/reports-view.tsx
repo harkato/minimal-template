@@ -29,6 +29,7 @@ import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
+import { initialData2 } from './initial-data';
 
 type Order = 'asc' | 'desc';
 
@@ -41,6 +42,20 @@ interface DataRow {
   fuso: number;
   torque: number;
   torqueStatus: string;
+  angle: number;
+  angleStatus: string;
+  generalStatus: string;
+}
+
+interface JsonData {
+  dateTime: string;
+  identifier: string | null;
+  toolName: string;
+  jobNumber: number;
+  programName: string;
+  spindleNumber: number;
+  torque: number;
+  torqueStatus: number;
   angle: number;
   angleStatus: string;
   generalStatus: string;
@@ -68,6 +83,11 @@ const initialFilters = {
   startDate: '',
   endDate: '',
 };
+
+const initialDataJson = initialData2.map((data) => {
+  console.log(data.angle);
+  return data;
+})
 
 // Função para converter dados em CSV
 const convertToCSV = (rows: DataRow[]) => {
@@ -157,6 +177,7 @@ const applyFilters = (
 
 export default function ResultPage() {
   const [data, setData] = useState(initialData);
+  const [newData, setNewData] = useState(initialData2);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
   const [filters, setFilters] = useState(initialFilters);
