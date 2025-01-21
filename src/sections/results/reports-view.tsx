@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useMemo, useEffect } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
@@ -171,6 +171,7 @@ export default function ResultPage() {
     return isoString;
   };
 
+
   const filteredData = useMemo(
     () => applyFilters(data, filters, startDate, endDate),
     [data, filters, startDate, endDate]
@@ -210,7 +211,27 @@ export default function ResultPage() {
 
     // No futuro, aqui você pode integrar com uma API para buscar dados do banco
     console.log('Filtros aplicados:', filters, startDate, endDate);
+
+    // Testando request do backend Java
+    // getData();
   };
+
+  // Função para buscar dados de teste vindos do backend Java
+
+/*   async function getData() {
+    const url = "http://localhost:8080/api/jobs";
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+  
+      const json = await response.json();
+      console.log(json);
+    } catch (error) {
+      console.error(error.message);
+    }
+  } */
 
   const table = useTable();
   const paginatedData = filteredData.slice(
