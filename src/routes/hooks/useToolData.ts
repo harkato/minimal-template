@@ -20,21 +20,16 @@ export function useToolData() {
 }
 
 export function useTopFiveData() {
-    const query = useQuery({
-      // queryFn: () => fetchData(), 
-      queryFn: () => getTopFiveData(), 
-      queryKey: ['topfive_data'] 
-    });
-    // console.log ('useTopFiveData: ', query.data)
-    return query;
+  return useQuery({
+    queryFn: () => getTopFiveData(),
+    queryKey: ['topfive_data'], 
+  });
 }
 
 export async function getTopFiveData() {
-  const url = 'http://localhost:3001/topFive'
-  const response = await fetch(url)
-  const task = await response.json()
-  if(!response.ok){
-    throw new Error(task.error)
+  const response = await axios.get(`${API_URL}/topFive`);
+  if (response.status !== 200) {
+    throw new Error('Erro ao buscar os dados');
   }
-  return task
+  return response.data;
 }

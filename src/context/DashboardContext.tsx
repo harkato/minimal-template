@@ -26,11 +26,15 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   const [cardData, setCardData] = useState(toolData);
-  // const [cardData, setCardData] = useState(initialData);
+ 
+  //const [cardData, setCardData] = useState(initialData);
   const [pendingValue, setPendingValue] = useState<LabelType[]>(
     () => JSON.parse(localStorage.getItem("pendingValue") || '[]')
   );
-  const [selectedCards, setSelectedCards] = useState<string[]>(cardData.map((card: { id: any; }) => card.id));
+
+  const [selectedCards, setSelectedCards] = useState<string[]>(
+    cardData?.map((card: { id: any; }) => card.id)
+  );
 
   const handleDeleteCard = (id: string) => {
     setPendingValue((prevPending) => prevPending.filter((item) => item.name !== id));

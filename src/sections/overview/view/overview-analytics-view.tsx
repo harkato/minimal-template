@@ -115,10 +115,11 @@ export function OverviewAnalyticsView() {
     setPendingValue,
     selectedCards,
     setSelectedCards,
-    handleDeleteCard 
+    handleDeleteCard
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
+  //const [top5Data, setTop5Data] = useState(useTopFiveData);
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
@@ -150,9 +151,9 @@ export function OverviewAnalyticsView() {
   };
 
   const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
-  const { isLoading: isLoadingTopFive, isError: isErrorTopFive, data: top5Data , error: errorTopFive } = useTopFiveData();
+  const { data, isLoading, isError, error } = useTopFiveData();
   const dataAPI = getTopFiveData()
-  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+  //const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
 
   // =======================================Simulando atualizações em tempo real==========================================
   // useEffect(() => {
@@ -181,10 +182,21 @@ export function OverviewAnalyticsView() {
   //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   // }, []);
 
-  const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
-  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data);
-  
-  
+  // Garante que `data` está definido antes de usar
+  const sortedTopFiveData = [...(data || [])].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  );
+
+  console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
+
+
+  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
+  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
+
+
+  //const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+
+
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
@@ -243,9 +255,9 @@ export function OverviewAnalyticsView() {
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
-          
+
         >
-          <Box sx={[style, {borderRadius: '20px'}]}>
+          <Box sx={[style, { borderRadius: '20px' }]}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               <List
                 sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}
@@ -260,9 +272,9 @@ export function OverviewAnalyticsView() {
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       {/* ================================== habilita o top 5                       */}
-                       <div style={{ alignSelf: 'end' }}>
+                      <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
-                          style={{ color: 'blue',   textAlign: 'center' }}
+                          style={{ color: 'blue', textAlign: 'center' }}
                           control={
                             <Switch
                               checked={top5}
@@ -298,7 +310,7 @@ export function OverviewAnalyticsView() {
                         flexDirection: 'column',
                       }}
                     >
-                      
+
                       <Box
                         sx={{
                           width: 600,
@@ -483,11 +495,11 @@ export function OverviewAnalyticsView() {
                 />
               </Grid>
             ))}
-            
+
           </Grid>
         </div>
       )}
-      
+
       {/* ======================================CARDS APERTADEIRAS============================ */}
       {ferramentas && (
         <div id="ferramentas">
@@ -498,7 +510,7 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {cardData
+            {(cardData || [])
               .filter((data) => selectedCards.includes(data.id))
               .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
@@ -511,7 +523,7 @@ export function OverviewAnalyticsView() {
                   />
                 </Grid>
               ))}
-            
+
             {/* ====================================================GRÁFICO DE DISPERSÃO - ok ============================ */}
             {/* <Grid xs={12} md={6} lg={8}>
           <Card>
@@ -614,12 +626,12 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           {/* ================================GRAFICO DE AREA - OK ================================ */}
-      {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
+          {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
           <Card>
           <AreaChartNew />
           </Card>
         </Grid> */}
-        
+
         </div>
       )}
     </DashboardContent>

@@ -6,8 +6,9 @@ const router = jsonServer.router('db.json');
 const app = jsonServer.create();
 
 app.use(middleware);
-app.use(jsonServer.bodyParser);
 app.use(router);
+
+app.use(jsonServer.bodyParser);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
