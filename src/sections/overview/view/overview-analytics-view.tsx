@@ -34,9 +34,10 @@ import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import { getTopFiveData, useToolData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { getTopFiveData, useToolData, useToolListData, useTopFiveData } from 'src/routes/hooks/useToolData';
 import { log } from 'console';
 import { useQuery } from '@tanstack/react-query';
+import { Pending } from '@mui/icons-material';
 
 const style = {
   position: 'absolute',
@@ -150,9 +151,22 @@ export function OverviewAnalyticsView() {
     setOpen(false);
   };
 
-  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
-  const { data, isLoading, isError, error } = useTopFiveData();
-  const dataAPI = getTopFiveData()
+  const { isLoading: isLoadingToolList, isError: isErrorToolList, data: toolListData, error: errorToolList } = useToolListData();
+  const [selectLabels, setLabels] = useState<LabelType[]>([]);
+
+  useEffect(() => {
+      if (toolListData) {
+        setLabels(toolListData);
+        // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
+      }
+    }, [toolListData]);
+    // console.log("pendingValue: ", pendingValue, "\n pending", Pending);
+    
+
+  // const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  // const { data, isLoading, isError, error } = useTopFiveData();
+  const { isLoading: isLoadingTopFive, isError: isErrorTopFive, data: TopFiveData, error: errorTopFive } = useTopFiveData();
+  // const dataAPI = getTopFiveData()
   // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
 
   // =======================================Simulando atualizações em tempo real==========================================
@@ -183,7 +197,7 @@ export function OverviewAnalyticsView() {
   // }, []);
 
   // Garante que `data` está definido antes de usar
-  const sortedTopFiveData = [...(data || [])].sort((a, b) =>
+  const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 
@@ -447,12 +461,12 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
-                              options={[...labels].sort((a, b) => {
+                              options={[...selectLabels].sort((a, b) => {
                                 // Display the selected labels first.
                                 let ai = valueLabel.indexOf(a);
-                                ai = ai === -1 ? valueLabel.length + labels.indexOf(a) : ai;
+                                ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
                                 let bi = valueLabel.indexOf(b);
-                                bi = bi === -1 ? valueLabel.length + labels.indexOf(b) : bi;
+                                bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
                                 return ai - bi;
                               })}
                               getOptionLabel={(option) => option.name}
@@ -645,113 +659,113 @@ interface LabelType {
 }
 
 // From https://github.com/abdonrd/github-labels
-const labels = [
-  {
-    id: 1,
-    name: 'MAKITA',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 2,
-    name: 'ZP6',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 3,
-    name: 'BANCOS',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 4,
-    name: 'TACTO12',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 5,
-    name: 'R2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 6,
-    name: 'FRONTEND',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 7,
-    name: 'FAHRWERK2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 8,
-    name: 'ZP62',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 9,
-    name: 'BANCOS2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 10,
-    name: 'TACTO11',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 11,
-    name: 'R3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 12,
-    name: 'FRONTEND2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 13,
-    name: 'FAHRWERK3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 14,
-    name: 'ZP63',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 15,
-    name: 'BANCOS3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 16,
-    name: 'TACTO10',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 17,
-    name: 'R1',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 18,
-    name: 'FRONTEND3',
-    color: '#9fc3da29',
-    description: '',
-  },
-];
+// const labels = [
+//   {
+//     id: 1,
+//     name: 'MAKITA',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 2,
+//     name: 'ZP6',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 3,
+//     name: 'BANCOS',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 4,
+//     name: 'TACTO12',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 5,
+//     name: 'R2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 6,
+//     name: 'FRONTEND',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 7,
+//     name: 'FAHRWERK2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 8,
+//     name: 'ZP62',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 9,
+//     name: 'BANCOS2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 10,
+//     name: 'TACTO11',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 11,
+//     name: 'R3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 12,
+//     name: 'FRONTEND2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 13,
+//     name: 'FAHRWERK3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 14,
+//     name: 'ZP63',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 15,
+//     name: 'BANCOS3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 16,
+//     name: 'TACTO10',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 17,
+//     name: 'R1',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 18,
+//     name: 'FRONTEND3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+// ];

@@ -10,6 +10,13 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
+export function useToolListData() {
+  const query = useQuery({
+    queryFn: () => fetchData('toolList'), 
+    queryKey: ['toolList-data'], 
+  });
+  return query;
+}
 
 export function useToolData() {
   const query = useQuery({

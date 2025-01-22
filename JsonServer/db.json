@@ -49,7 +49,7 @@
     "tool": [
       {
         "id": "1",
-        "title": "MAKITA",
+        "title": "DOOR LESS",
         "color": "success",
         "vehicles": 37,
         "nok": 28,
@@ -2955,6 +2955,116 @@
         "torqueStatus": "NOK",
         "angle": 12.3,
         "angleStatus": "NOK"
+      }
+    ],
+    "toolList": [
+      {
+        "id": "1",
+        "name": "DOOR LESS",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "2",
+        "name": "ZP6",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "3",
+        "name": "BANCOS",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "4",
+        "name": "TACTO12",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "5",
+        "name": "R2",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "6",
+        "name": "FRONTEND",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "7",
+        "name": "FAHRWERK2",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "8",
+        "name": "ZP62",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "9",
+        "name": "BANCOS2",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "10",
+        "name": "TACTO11",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "11",
+        "name": "R3",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "12",
+        "name": "FRONTEND2",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "13",
+        "name": "FAHRWERK2",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "14",
+        "name": "ZP63",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "15",
+        "name": "BANCOS3",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "16",
+        "name": "TACTO10",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "17",
+        "name": "R1",
+        "color": "#9fc3da29",
+        "description": ""
+      },
+      {
+        "id": "18",
+        "name": "FRONTEND3",
+        "color": "#9fc3da29",
+        "description": ""
       }
     ]
 }
