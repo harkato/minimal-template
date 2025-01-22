@@ -49,6 +49,7 @@
     "axios": "^1.7.9",
     "datatables.net-dt": "^2.1.8",
     "datatables.net-react": "^1.0.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "highcharts": "11.4.8",
     "highcharts-react-official": "3.2.1",

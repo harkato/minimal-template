@@ -3,6 +3,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { format } from 'date-fns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
   Box,
@@ -34,9 +35,9 @@ import { useResultData } from 'src/routes/hooks/useToolData';
 type Order = 'asc' | 'desc';
 
 interface DataRow {
-  resultTime: string;
-  id: string;
-  tool: string;
+  dateTime: string;
+  tid: string;
+  toolName: string;
   job: number;
   programName: string;
   fuso: number;
@@ -46,19 +47,6 @@ interface DataRow {
   angleStatus: string;
   generalStatus: string;
 }
-// const initialData = Array.from({ length: 200 }, (_, i) => ({
-//   resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-//   id: `${i + 1}`,
-//   tool: 'STANLEY',
-//   job: 1,
-//   programName: `PVT${(i % 5) + 1}`,
-//   fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
-//   torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
-//   torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-//   angle: parseFloat((Math.random() * 90).toFixed(1)),
-//   angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
-//   generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
-// }));
 
 const initialFilters = {
   id: '',
@@ -86,7 +74,7 @@ const convertToCSV = (rows: DataRow[]) => {
   ];
   const csvRows = rows.map(
     (row) =>
-      `${row.resultTime},${row.id},${row.tool},${row.job},${row.programName},${row.fuso},${row.generalStatus},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus}`
+      `${row.dateTime},${row.tid},${row.toolName},${row.job},${row.programName},${row.fuso},${row.generalStatus},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus}`
   );
   return [headers.join(','), ...csvRows].join('\n');
 };
@@ -134,14 +122,14 @@ const applyFilters = (
   endDate: Dayjs | null
 ) =>
   data.filter((row) => {
-    const isIdMatch = filters.id ? row.id.includes(filters.id) : true;
-    const isToolMatch = filters.tool ? row.tool === filters.tool : true;
+    const isIdMatch = filters.id ? row.tid.includes(filters.id) : true;
+    const isToolMatch = filters.tool ? row.toolName === filters.tool : true;
     const isProgramNameMatch = filters.programName
       ? row.programName.includes(filters.programName)
       : true;
     const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
 
-    const resultDate = dayjs(row.resultTime);
+    const resultDate = dayjs(row.dateTime);
     const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
     const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
 
@@ -155,20 +143,29 @@ const applyFilters = (
     );
   });
 
+const transformDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return format(date, 'dd/MM/yyyy HH:mm');
+};
+
 export default function ResultPage() {
-  // const [initialData, setInitialData] = useState<DataRow[]>([]); 
+  // const [initialData, setInitialData] = useState<DataRow[]>([]);
   // const [data, setData] = useState(initialData);
   const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
+  const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
 
-  const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
+  const {
+    isLoading: isLoadingResult,
+    isError: isErrorResult,
+    data: resultData,
+    error: errorResult,
+  } = useResultData();
   // console.log("dados resutados: ", resultData);
-  
 
   const classes = useStyles();
   const getCurrentDateTime = () => {
@@ -228,59 +225,22 @@ export default function ResultPage() {
 
   useEffect(() => {
     if (resultData) {
-      setData(resultData);
+      const transformedData = resultData.map((item: any) => ({
+        dateTime: transformDate(item.dateTime),
+        tid: item.tid,
+        toolName: item.toolDTO.toolName || 'Unknown Tool', // Extrai de toolDTO
+        job: item.jobNumber || 0,
+        programName: item.toolProgramDTO.programName || 'No Program',
+        fuso: item.spindleNumber || 0,
+        torque: item.torque || 0,
+        torqueStatus: item.torqueStatus === 1 ? 'OK' : 'NOK',
+        angle: item.angle || 0,
+        angleStatus: item.angleStatus === 0 ? 'OK' : 'NOK',
+        generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK',
+      }));
+      setData(transformedData);
     }
-  }, [resultData]);  
-
-  // Função de impressão da tabela atual
-  // const handlePrint = () => {
-  //   if (tableRef.current) {
-  //     // Clona o nó da tabela
-  //     const tableClone = tableRef.current.cloneNode(true) as HTMLElement;
-
-  //     // Remove as setas (ícones de ordenação) do clone
-  //     const sortLabels = tableClone.querySelectorAll('.MuiTableSortLabel-icon');
-  //     sortLabels.forEach((icon) => {
-  //       icon.remove();
-  //     });
-
-  //     // Obter o conteúdo atualizado do clone
-  //     const printContent = tableClone.innerHTML;
-
-  //     // Cria uma nova janela para impressão
-  //     const printWindow = window.open('', '_blank');
-  //     if (printWindow) {
-  //       printWindow.document.write(`
-  //         <html>
-  //           <head>
-  //             <title>Resultados</title>
-  //             <style>
-  //               body {
-  //                 font-family: Arial, sans-serif;
-  //                 margin: 20px;
-  //               }
-  //               table {
-  //                 width: 100%;
-  //                 border-collapse: collapse;
-  //               }
-  //               th, td {
-  //                 border: 1px solid black;
-  //                 padding: 8px;
-  //                 text-align: left;
-  //               }
-  //               th {
-  //                 background-color: #f2f2f2;
-  //               }
-  //             </style>
-  //           </head>
-  //           <body>${printContent}</body>
-  //         </html>
-  //       `);
-  //       printWindow.document.close();
-  //       printWindow.print();
-  //     }
-  //   }
-  // };
+  }, [resultData]);
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
@@ -351,9 +311,9 @@ export default function ResultPage() {
             .map(
               (row, index) => `
               <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
-                <td>${row.resultTime}</td>
-                <td>${row.id}</td>
-                <td>${row.tool}</td>
+                <td>${row.dateTime}</td>
+                <td>${row.tid}</td>
+                <td>${row.toolName}</td>
                 <td>${row.job}</td>
                 <td>${row.programName}</td>
                 <td>${row.fuso}</td>
@@ -559,13 +519,13 @@ export default function ResultPage() {
         </Toolbar>
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
-            <TableHead >
+            <TableHead>
               <TableRow>
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'resultTime'}
-                    direction={orderBy === 'resultTime' ? order : 'asc'}
-                    onClick={() => handleRequestSort('resultTime')}
+                    active={orderBy === 'dateTime'}
+                    direction={orderBy === 'dateTime' ? order : 'asc'}
+                    onClick={() => handleRequestSort('dateTime')}
                     sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.date')}
@@ -573,9 +533,9 @@ export default function ResultPage() {
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'id'}
-                    direction={orderBy === 'id' ? order : 'asc'}
-                    onClick={() => handleRequestSort('id')}
+                    active={orderBy === 'tid'}
+                    direction={orderBy === 'tid' ? order : 'asc'}
+                    onClick={() => handleRequestSort('tid')}
                     sx={{ display: 'flex', justifyContent: 'right' }}
                   >
                     Id
@@ -584,9 +544,9 @@ export default function ResultPage() {
 
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'tool'}
-                    direction={orderBy === 'tool' ? order : 'asc'}
-                    onClick={() => handleRequestSort('tool')}
+                    active={orderBy === 'toolName'}
+                    direction={orderBy === 'toolName' ? order : 'asc'}
+                    onClick={() => handleRequestSort('toolName')}
                     sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.tools')}
@@ -646,7 +606,7 @@ export default function ResultPage() {
                   >
                     Torque
                   </TableSortLabel>
-                </TableCell>                
+                </TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angle'}
@@ -662,16 +622,16 @@ export default function ResultPage() {
             <TableBody>
               {paginatedData.map((row, index) => (
                 <TableRow
-                  key={row.id}
+                  key={row.tid}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell sx={{ textAlign: 'center' }} >{row.resultTime}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.id}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.tool}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.job}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.programName}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.fuso}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >
+                  <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{row.programName}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{row.fuso}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -686,7 +646,7 @@ export default function ResultPage() {
                       {row.generalStatus}
                     </Box>
                   </TableCell>
-                  <TableCell >
+                  <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -696,13 +656,13 @@ export default function ResultPage() {
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
-                      >
+                    >
                       {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
-                      {row.torque}
+                    {row.torque}
                   </TableCell>
-                  
-                  <TableCell >
+
+                  <TableCell>
                     <Box
                       sx={{
                         display: 'inline-block',
