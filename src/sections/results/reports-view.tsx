@@ -69,11 +69,6 @@ const initialFilters = {
   endDate: '',
 };
 
-const initialDataJson = initialData2.map((data) => {
-  console.log(data.angle);
-  return data;
-})
-
 // Função para converter dados em CSV
 const convertToCSV = (rows: DataRow[]) => {
   const headers = [
