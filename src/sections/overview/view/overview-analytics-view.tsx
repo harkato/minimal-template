@@ -3,14 +3,10 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
   Autocomplete,
-  AutocompleteClasses,
   AutocompleteCloseReason,
   Box,
   Button,
   Card,
-  CardContent,
-  CardHeader,
-  Checkbox,
   ClickAwayListener,
   Collapse,
   FormControlLabel,
@@ -18,48 +14,30 @@ import {
   List,
   ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Modal,
   Popper,
   Slider,
   styled,
-  useTheme,
   Switch,
-  TextField,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  autocompleteClasses,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-
 import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
-import LineChart from 'src/components/chart/linechart';
 import { DashboardContent } from 'src/layouts/dashboard';
-import TorqueChart from 'src/components/chart/torquechart';
-import AreaChart from 'src/components/chart/areachart';
 import { useTranslation } from 'react-i18next';
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { BarLabel } from '@mui/x-charts';
-
 import { AreaChartNew } from 'src/components/chart/AreaChartNew';
-import { AnalyticsCurrentVisits } from '../analytics-current-visits';
-import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
-import { AnalyticsCurrentSubject } from '../analytics-current-subject';
-import { AnalyticsChartBar } from '../analytics-chart-bar';
-import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
-import { AnalyticsChartCard } from '../analytics-chart-card';
-import { initialData } from './initial-data';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
+import { getTopFiveData, useToolData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { log } from 'console';
+import { useQuery } from '@tanstack/react-query';
 
-// ----------------------------------------------------------------------
 const style = {
   position: 'absolute',
   alignContent: 'center',
@@ -137,23 +115,24 @@ export function OverviewAnalyticsView() {
     setPendingValue,
     selectedCards,
     setSelectedCards,
-    handleDeleteCard,
+    handleDeleteCard
   } = useDashboard();
 
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
+  // const [top5Data, setTop5Data] = useState(useTopFiveData);
 
   /* LEONARDO */
   const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
-  const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
+  // const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
-  const [open2, setOpen2] = React.useState(false);
+  // const [open2, setOpen2] = React.useState(false);
   const [openListTop5, setOpenListTop5] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
-  const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
-  const [valueSlider, setValueSlider] = React.useState<number>(10);
-  const [checked, setChecked] = React.useState(true);
+  // const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
+  // const [valueSlider, setValueSlider] = React.useState<number>(10);
+  // const [checked, setChecked] = React.useState(true);
   const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
   const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
   const [top5, setTop5] = useState(() => {
@@ -161,61 +140,67 @@ export function OverviewAnalyticsView() {
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
   const [ferramentas, setFerramentas] = useState(true);
-  const [filterIds, setFilterIds] = useState([]);
+  // const [filterIds, setFilterIds] = useState([]);
   const theme = useTheme();
-
-  useEffect(() => {
-    localStorage.setItem("top5", JSON.stringify(top5));
-  }, [top5]);
-
   const handleOpen = () => setOpen(true);
-
   const handleClose = () => {
     // Fecha o componente relacionado ao rótulo
     handleCloseLabel();
-
     // Fecha o modal
     setOpen(false);
   };
 
-  // Simulando atualizações em tempo real
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTopFiveData((prevData) => {
-        const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
-        const updatedCard = prevData[randomIndex];
+  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  const { data, isLoading, isError, error } = useTopFiveData();
+  const dataAPI = getTopFiveData()
+  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
 
-        // Atualiza apenas o card selecionado
-        const updatedData = prevData.map((card, index) =>
-          index === randomIndex
-            ? {
-                ...updatedCard,
-                total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-                percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-                title: updatedCard.title.includes('Novo')
-                  ? updatedCard.title.replace('Novo ', '')
-                  : `Novo ${updatedCard.title}`, // Alterna o título
-              }
-            : card
-        );
+  // =======================================Simulando atualizações em tempo real==========================================
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTopFiveData((prevData) => {
+  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
+  //       const updatedCard = prevData[randomIndex];
+  //       // Atualiza apenas o card selecionado
+  //       const updatedData = prevData.map((card, index) =>
+  //         index === randomIndex
+  //           ? {
+  //               ...updatedCard,
+  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+  //               title: updatedCard.title.includes('Novo')
+  //                 ? updatedCard.title.replace('Novo ', '')
+  //                 : `Novo ${updatedCard.title}`, // Alterna o título
+  //             }
+  //           : card
+  //       );
 
-        return updatedData;
-      });
-    }, 20000); // Atualiza a cada 20 segundos
+  //       return updatedData;
+  //     });
+  //   }, 20000); // Atualiza a cada 20 segundos
 
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-  }, []);
+  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
+  // }, []);
 
-  const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+  // Garante que `data` está definido antes de usar
+  const sortedTopFiveData = [...(data || [])].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  );
+
+  // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
+
+
+  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
+  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
+
+
+  // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+
+
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
     setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
-  };
-
-  const handleChangeTaxa = (event: Event, newValue: number | number[]) => {
-    setValueTools(newValue as number[]); // Atualiza o estado do slider da apertadeira
-    setTargetTools(newValue as number[]); // Atualiza o estado da apertadeira
   };
 
   const handleClickTop5 = () => {
@@ -252,14 +237,6 @@ export function OverviewAnalyticsView() {
 
   const isLargeScreen = window.innerWidth > 768;
 
-  // function getColorApertadeira(taxaAtual: number){
-  //   return taxaAtual >= taxaApertadeira[1]
-  //   ? "#f24f4f"
-  //   : taxaAtual >= taxaApertadeira[0]
-  //   ? "#ffd666"
-  //   : "#20878b"
-  // }
-
   return (
     <DashboardContent maxWidth="xl">
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
@@ -278,9 +255,9 @@ export function OverviewAnalyticsView() {
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
-          
+
         >
-          <Box sx={[style, {borderRadius: '20px'}]}>
+          <Box sx={[style, { borderRadius: '20px' }]}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               <List
                 sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}
@@ -293,15 +270,11 @@ export function OverviewAnalyticsView() {
                 </ListItemButton>
                 <Collapse in={openListTop5} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {/*                     <div style={{ justifySelf: 'center' }}>
-                      <TextField id="outlined-basic" sx={{ width: '100px' }} label="Mín." variant="outlined" />
-                      <TextField id="outlined-basic" sx={{ width: '100px' }} label="Max." variant="outlined" />
-                    </div> */}
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       {/* ================================== habilita o top 5                       */}
                       <div style={{ alignSelf: 'end' }}>
                         <FormControlLabel
-                          style={{ color: 'blue',   textAlign: 'center' }}
+                          style={{ color: 'blue', textAlign: 'center' }}
                           control={
                             <Switch
                               checked={top5}
@@ -337,6 +310,7 @@ export function OverviewAnalyticsView() {
                         flexDirection: 'column',
                       }}
                     >
+
                       <Box
                         sx={{
                           width: 600,
@@ -358,13 +332,14 @@ export function OverviewAnalyticsView() {
                             color: 'black',
                             marginBottom: '10px',
                             '@media (max-width: 768px)': {
-                              // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                              alignSelf: 'center', // Ocupa 90% da largura da tela
+                              alignSelf: 'center',
                             },
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center' }}>{t('dashboard.selectTools')}</span>
+                          <span style={{ alignSelf: 'center' }}>
+                            {t('dashboard.selectTools')}
+                          </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
@@ -425,9 +400,7 @@ export function OverviewAnalyticsView() {
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
                               renderOption={(props, option, { selected }) => {
-                                /* eslint-disable react/prop-types */
                                 const { key, ...optionProps } = props;
-                                /* eslint-disable react/prop-types */
                                 return (
                                   <li key={key} {...optionProps}>
                                     <Box
@@ -522,32 +495,10 @@ export function OverviewAnalyticsView() {
                 />
               </Grid>
             ))}
+
           </Grid>
         </div>
       )}
-
-      {/* ================================GRAFICO DE AREA================================ */}
-      {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
-          <Card>
-          <AreaChartNew />
-          </Card>
-        </Grid> */}
-
-      {/* ================================NOK POR TURNO================================== */}
-      {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsConversionRates
-            title="NOK POR TURNO"
-            subheader="última semana"
-            chart={{
-              categories: ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
-              series: [
-                { name: '1º TURNO', data: [44, 55, 41, 64, 22, 0] },
-                { name: '2º TURNO', data: [53, 32, 33, 52, 13, 0] },
-                { name: '3º TURNO', data: [15, 22, 33, 25, 31, 0] },
-              ],
-            }}
-          />
-        </Grid> */}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
       {ferramentas && (
@@ -559,7 +510,7 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {cardData
+            {(cardData || [])
               .filter((data) => selectedCards.includes(data.id))
               .filter((data) => pendingValue.some((pending) => pending.name === data.title))
               .map((data) => (
@@ -572,6 +523,38 @@ export function OverviewAnalyticsView() {
                   />
                 </Grid>
               ))}
+
+            {/* ====================================================GRÁFICO DE DISPERSÃO - ok ============================ */}
+            {/* <Grid xs={12} md={6} lg={8}>
+          <Card>
+          <h2 style={{ textAlign: 'center' }}>Dispersão</h2>
+          <ScatterChart
+            width={900}
+            height={400} 
+            series={[{ data: [
+              { x: 100, y: 200, id: 1 },
+              { x: 120, y: 100, id: 2 },
+              { x: 170, y: 300, id: 3 },
+              { x: 140, y: 250, id: 4 },
+              { x: 150, y: 400, id: 5 },
+              { x: 110, y: 280, id: 6 },
+              { x: 300, y: 300, id: 7 },
+              { x: 400, y: 500, id: 8 },
+              { x: 200, y: 700, id: 9 },
+              { x: 340, y: 350, id: 10 },
+              { x: 560, y: 500, id: 11 },
+              { x: 230, y: 780, id: 12 },
+              { x: 500, y: 400, id: 13 },
+              { x: 300, y: 500, id: 14 },
+              { x: 240, y: 300, id: 15 },
+              { x: 320, y: 550, id: 16 },
+              { x: 500, y: 400, id: 17 },
+              { x: 420, y: 280, id: 18 },
+          ]}]}
+          grid={{ vertical: true, horizontal: true }}          
+          />
+          </Card>
+        </Grid> */}
             {/* ========================================CARD TORQUE============================== */}
             {/* <Grid xs={12}>
           <AnalyticsChartCard id="12" />
@@ -641,6 +624,14 @@ export function OverviewAnalyticsView() {
           />
         </Grid> */}
           </Grid>
+
+          {/* ================================GRAFICO DE AREA - OK ================================ */}
+          {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
+          <Card>
+          <AreaChartNew />
+          </Card>
+        </Grid> */}
+
         </div>
       )}
     </DashboardContent>

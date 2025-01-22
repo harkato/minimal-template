@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useMemo, useEffect } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
@@ -29,7 +29,7 @@ import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { initialData2 } from './initial-data';
+import { useResultData } from 'src/routes/hooks/useToolData';
 
 type Order = 'asc' | 'desc';
 
@@ -46,34 +46,19 @@ interface DataRow {
   angleStatus: string;
   generalStatus: string;
 }
-
-interface JsonData {
-  dateTime: string;
-  identifier: string | null;
-  toolName: string;
-  jobNumber: number;
-  programName: string;
-  spindleNumber: number;
-  torque: number;
-  torqueStatus: number;
-  angle: number;
-  angleStatus: string;
-  generalStatus: string;
-}
-
-const initialData = Array.from({ length: 200 }, (_, i) => ({
-  resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-  id: `${i + 1}`,
-  tool: 'MAKITA',
-  job: 1,
-  programName: `PVT${(i % 5) + 1}`,
-  fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
-  torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
-  torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-  angle: parseFloat((Math.random() * 90).toFixed(1)),
-  angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
-  generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
-}));
+// const initialData = Array.from({ length: 200 }, (_, i) => ({
+//   resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
+//   id: `${i + 1}`,
+//   tool: 'STANLEY',
+//   job: 1,
+//   programName: `PVT${(i % 5) + 1}`,
+//   fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
+//   torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
+//   torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
+//   angle: parseFloat((Math.random() * 90).toFixed(1)),
+//   angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
+//   generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
+// }));
 
 const initialFilters = {
   id: '',
@@ -176,14 +161,19 @@ const applyFilters = (
   });
 
 export default function ResultPage() {
-  const [data, setData] = useState(initialData);
-  const [newData, setNewData] = useState(initialData2);
+  // const [initialData, setInitialData] = useState<DataRow[]>([]); 
+  // const [data, setData] = useState(initialData);
+  const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
+
+  const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
+  // console.log("dados resutados: ", resultData);
+  
 
   const classes = useStyles();
   const getCurrentDateTime = () => {
@@ -240,6 +230,12 @@ export default function ResultPage() {
   );
 
   const tableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (resultData) {
+      setData(resultData);
+    }
+  }, [resultData]);  
 
   // Função de impressão da tabela atual
   // const handlePrint = () => {
@@ -370,7 +366,7 @@ export default function ResultPage() {
                     <span class="material-icons ${
                       row.generalStatus === 'OK' ? 'status-ok' : 'status-error'
                     }">
-                      ${row.generalStatus === 'OK' ? 'check_circle' : 'error'}
+                      ${row.generalStatus === 'OK' ? 'check_circle' : 'cancel'}
                     </span>
                     ${row.generalStatus}
                   </td>
@@ -568,13 +564,14 @@ export default function ResultPage() {
         </Toolbar>
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
-            <TableHead>
+            <TableHead >
               <TableRow>
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'resultTime'}
                     direction={orderBy === 'resultTime' ? order : 'asc'}
                     onClick={() => handleRequestSort('resultTime')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.date')}
                   </TableSortLabel>
@@ -584,6 +581,7 @@ export default function ResultPage() {
                     active={orderBy === 'id'}
                     direction={orderBy === 'id' ? order : 'asc'}
                     onClick={() => handleRequestSort('id')}
+                    sx={{ display: 'flex', justifyContent: 'right' }}
                   >
                     Id
                   </TableSortLabel>
@@ -594,6 +592,7 @@ export default function ResultPage() {
                     active={orderBy === 'tool'}
                     direction={orderBy === 'tool' ? order : 'asc'}
                     onClick={() => handleRequestSort('tool')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.tools')}
                   </TableSortLabel>
@@ -604,6 +603,7 @@ export default function ResultPage() {
                     active={orderBy === 'job'}
                     direction={orderBy === 'job' ? order : 'asc'}
                     onClick={() => handleRequestSort('job')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.job')}
                   </TableSortLabel>
@@ -614,6 +614,7 @@ export default function ResultPage() {
                     active={orderBy === 'programName'}
                     direction={orderBy === 'programName' ? order : 'asc'}
                     onClick={() => handleRequestSort('programName')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.programs')}
                   </TableSortLabel>
@@ -624,6 +625,7 @@ export default function ResultPage() {
                     active={orderBy === 'fuso'}
                     direction={orderBy === 'fuso' ? order : 'asc'}
                     onClick={() => handleRequestSort('fuso')}
+                    sx={{ display: 'flex', justifyContent: 'right' }}
                   >
                     {t('results.spindle')}
                   </TableSortLabel>
@@ -634,6 +636,7 @@ export default function ResultPage() {
                     active={orderBy === 'generalStatus'}
                     direction={orderBy === 'generalStatus' ? order : 'asc'}
                     onClick={() => handleRequestSort('generalStatus')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.generalStatus')}
                   </TableSortLabel>
@@ -644,38 +647,21 @@ export default function ResultPage() {
                     active={orderBy === 'torque'}
                     direction={orderBy === 'torque' ? order : 'asc'}
                     onClick={() => handleRequestSort('torque')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     Torque
                   </TableSortLabel>
-                </TableCell>
-                {/* <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'torqueStatus'}
-                    direction={orderBy === 'torqueStatus' ? order : 'asc'}
-                    onClick={() => handleRequestSort('torqueStatus')}
-                  >
-                    Status Torque
-                  </TableSortLabel>
-                </TableCell> */}
-
+                </TableCell>                
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'angle'}
                     direction={orderBy === 'angle' ? order : 'asc'}
                     onClick={() => handleRequestSort('angle')}
+                    sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.angle')}
                   </TableSortLabel>
                 </TableCell>
-                {/* <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'angleStatus'}
-                    direction={orderBy === 'angleStatus' ? order : 'asc'}
-                    onClick={() => handleRequestSort('angleStatus')}
-                  >
-                    {t('results.statusAngle')}
-                  </TableSortLabel>
-                </TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -684,13 +670,13 @@ export default function ResultPage() {
                   key={row.id}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell>{row.resultTime}</TableCell>
-                  <TableCell>{row.id}</TableCell>
-                  <TableCell>{row.tool}</TableCell>
-                  <TableCell>{row.job}</TableCell>
-                  <TableCell>{row.programName}</TableCell>
-                  <TableCell>{row.fuso}</TableCell>
-                  <TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.resultTime}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.id}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.tool}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.job}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.programName}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.fuso}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >
                     <Box
                       sx={{
                         display: 'inline-block',
@@ -705,70 +691,37 @@ export default function ResultPage() {
                       {row.generalStatus}
                     </Box>
                   </TableCell>
-                  <TableCell>
-                    {row.torque}
+                  <TableCell >
                     <Box
                       sx={{
                         display: 'inline-block',
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
-                    >
+                      >
                       {getStatusIcon(row.torqueStatus, row.torque)}
                     </Box>
+                      {row.torque}
                   </TableCell>
-                  {/* coluna de status de torque */}
-                  {/* <TableCell>
+                  
+                  <TableCell >
                     <Box
                       sx={{
                         display: 'inline-block',
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        // backgroundColor: row.torqueStatus === 'OK' ? '#20878b' : '#f24f4f',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
                     >
-                      {getStatusIcon(row.torqueStatus, row.torque)}
+                      {getStatusIcon(row.angleStatus, row.angle)}
                     </Box>
-                  </TableCell> */}
-
-                  <TableCell>
                     {row.angle}
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {getStatusIcon(row.angleStatus, row.angle)}
-                    </Box>
                   </TableCell>
-                  {/* <TableCell>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        // backgroundColor: row.angleStatus === 'OK' ? '#20878b' : '#f24f4f',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {getStatusIcon(row.angleStatus, row.angle)}
-                    </Box>
-                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>
