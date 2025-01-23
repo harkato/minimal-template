@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
@@ -29,14 +29,10 @@ import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
-import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
 import { getTopFiveData, useToolData, useTopFiveData } from 'src/routes/hooks/useToolData';
-import { log } from 'console';
-import { useQuery } from '@tanstack/react-query';
 
 const style = {
   position: 'absolute',
@@ -107,36 +103,33 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 }));
 
 export function OverviewAnalyticsView() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     cardData,
     pendingValue,
     setPendingValue,
     selectedCards,
-    setSelectedCards,
     handleDeleteCard
-  } = useDashboard();
+  } = useDashboard(); // Usa o context do Dashboard
 
-  const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
-  // const [top5Data, setTop5Data] = useState(useTopFiveData);
+  // pode excluir const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
+  // const [TopFiveData, setTopFiveData] = useState(useTopFiveData);
 
   /* LEONARDO */
-  const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
-  // const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
+  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
-  // const [open2, setOpen2] = React.useState(false);
-  const [openListTop5, setOpenListTop5] = React.useState(false);
+  const [openListTopFive, setOpenListTopFive] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
   // const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
   // const [valueSlider, setValueSlider] = React.useState<number>(10);
   // const [checked, setChecked] = React.useState(true);
-  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
+  const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
   const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
-  const [top5, setTop5] = useState(() => {
-    const localData = localStorage.getItem("top5");
+  const [TopFive, setTopFive] = useState(() => {
+    const localData = localStorage.getItem("TopFive");
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
   const [ferramentas, setFerramentas] = useState(true);
@@ -153,7 +146,7 @@ export function OverviewAnalyticsView() {
   const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   const { data, isLoading, isError, error } = useTopFiveData();
   const dataAPI = getTopFiveData()
-  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+  // const {} = useQuery(['dadosdoTopFive'], () => getTopFiveData())
 
   // =======================================Simulando atualizações em tempo real==========================================
   // useEffect(() => {
@@ -190,8 +183,8 @@ export function OverviewAnalyticsView() {
   // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
 
 
-  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
-  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
+  /* const sortedTopFiveData = [...TopFiveData].sort((a, b) => a.title.localeCompare(b.title));
+  console.log("topFiveData: " , topFiveData, '\n API: ', TopFiveData); */
 
 
   // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
@@ -199,12 +192,12 @@ export function OverviewAnalyticsView() {
 
 
   const handleChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue as number[]); // Atualiza o estado do slider
-    setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
+    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
+    setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
   };
 
-  const handleClickTop5 = () => {
-    setOpenListTop5(!openListTop5);
+  const handleClickTopFive = () => {
+    setOpenListTopFive(!openListTopFive);
   };
 
   const handleClickAperto = () => {
@@ -216,7 +209,7 @@ export function OverviewAnalyticsView() {
     }; */
 
   /*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
-    setTaxaTop5(newValue as number[]);
+    setTaxaTopFive(newValue as number[]);
   }; */
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -264,11 +257,11 @@ export function OverviewAnalyticsView() {
                 component="nav"
                 aria-labelledby="nested-list-subheader"
               >
-                <ListItemButton onClick={handleClickTop5}>
+                <ListItemButton onClick={handleClickTopFive}>
                   <ListItemText primary="TOP 5" />
-                  {openListTop5 ? <ExpandLess /> : <ExpandMore />}
+                  {openListTopFive ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openListTop5} timeout="auto" unmountOnExit>
+                <Collapse in={openListTopFive} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       {/* ================================== habilita o top 5                       */}
@@ -277,8 +270,8 @@ export function OverviewAnalyticsView() {
                           style={{ color: 'blue', textAlign: 'center' }}
                           control={
                             <Switch
-                              checked={top5}
-                              onChange={(event) => setTop5(event.target.checked)}
+                              checked={TopFive}
+                              onChange={(event) => setTopFive(event.target.checked)}
                             />
                           }
                           label=""
@@ -286,11 +279,11 @@ export function OverviewAnalyticsView() {
                       </div>
                       <Slider
                         getAriaLabel={() => 'Temperature range'}
-                        value={value}
+                        value={valueSliderTopFive}
                         onChange={handleChange}
                         valueLabelDisplay="auto"
                         getAriaValueText={valuetext}
-                        disabled={!top5}
+                        disabled={!TopFive}
                         min={0.0}
                         step={0.1}
                         max={1.0}
@@ -478,8 +471,8 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      {top5 && (
-        <div id="top5">
+      {TopFive && (
+        <div id="TopFive">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
@@ -491,7 +484,7 @@ export function OverviewAnalyticsView() {
                   title={item.title}
                   total={item.total}
                   chart={item.chart}
-                  criticality={taxaTop5}
+                  criticality={taxaTopFive}
                 />
               </Grid>
             ))}
