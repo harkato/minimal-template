@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { Props } from 'src/sections/overview/analytics-dashboard-card';
 import { initialData } from 'src/sections/overview/view/initial-data';
+import { useToolData } from 'src/routes/hooks/useToolData';
 
 // Define o tipo do valor do contexto
 export interface DashboardContextProps {
@@ -23,11 +24,27 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 
 // Provedor do contexto
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cardData, setCardData] = useState(initialData);
+  // const [cardData, setCardData] = useState(initialData);
+
+  // const [selectedCards, setSelectedCards] = useState<string[]>(
+  //   cardData?.map((card: { id: any; }) => card.id)
+  // );
+
+  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  const [cardData, setCardData] = useState([]);
+  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (toolData) {
+      setCardData(toolData);
+      setSelectedCards(toolData.map((card: { id: any; }) => card.id));
+    }
+  }, [toolData]);
+  // ===============================================================
+
   const [pendingValue, setPendingValue] = useState<LabelType[]>(
     () => JSON.parse(localStorage.getItem("pendingValue") || '[]')
   );
-  const [selectedCards, setSelectedCards] = useState<string[]>(cardData.map((card) => card.id));
 
   const handleDeleteCard = (id: string) => {
     setPendingValue((prevPending) => prevPending.filter((item) => item.name !== id));
