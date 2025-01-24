@@ -116,34 +116,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const applyFilters = (
-  data: DataRow[],
-  filters: typeof initialFilters,
-  startDate: Dayjs | null,
-  endDate: Dayjs | null
-) =>
-  data.filter((row) => {
-    const isIdMatch = filters.id ? row.tid.includes(filters.id) : true;
-    const isToolMatch = filters.tool ? row.toolName === filters.tool : true;
-    const isProgramNameMatch = filters.programName
-      ? row.programName.includes(filters.programName)
-      : true;
-    const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
-
-    const resultDate = dayjs(row.dateTime);
-    const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
-    const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
-
-    return (
-      isIdMatch &&
-      isToolMatch &&
-      isProgramNameMatch &&
-      isStatusMatch &&
-      isStartDateMatch &&
-      isEndDateMatch
-    );
-  });
-
 const transformDate = (dateString: string): string => {
   const date = new Date(dateString);
   return format(date, 'dd/MM/yyyy HH:mm');
@@ -190,10 +162,6 @@ export default function ResultPage() {
     return isoString;
   };
 
-  const filteredData = useMemo(
-    () => applyFilters(data, filters, startDate, endDate),
-    [data, filters, startDate, endDate]
-  );
   // Função para ordenar os dados
   const handleRequestSort = (property: keyof DataRow) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -223,16 +191,11 @@ export default function ResultPage() {
   };
 
   const handleSearch = () => {
-    // Por enquanto, só atualiza os dados filtrados
-    const updatedData = applyFilters(data, filters, startDate, endDate);
-    setData(updatedData);
-
-    // No futuro, aqui você pode integrar com uma API para buscar dados do banco
     console.log('Filtros aplicados:', filters, startDate, endDate);
   };
 
   const table = useTable();
-  const paginatedData = filteredData.slice(
+  const paginatedData = data.slice(
     table.page * table.rowsPerPage,
     table.page * table.rowsPerPage + table.rowsPerPage
   );
@@ -323,7 +286,7 @@ export default function ResultPage() {
           </tr>
         </thead>
         <tbody>
-          ${filteredData
+          ${data
             .map(
               (row, index) => `
               <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
@@ -522,7 +485,7 @@ export default function ResultPage() {
         >
           <div>
             <Tooltip title={t('results.saveExport')}>
-              <IconButton onClick={() => downloadCSV(filteredData)}>
+              <IconButton onClick={() => downloadCSV(data)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
@@ -701,7 +664,7 @@ export default function ResultPage() {
         <TablePagination
           component="div"
           page={table.page}
-          count={filteredData.length}
+          count={data.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
