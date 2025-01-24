@@ -2,7 +2,6 @@
   "topFive": [
     {
       "title": "Novo Coxim do motor",
-      "percent": -2.6,
       "total": 0.757,
       "chart": {
         "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
@@ -11,7 +10,6 @@
     },
     {
       "title": "Amortecedor",
-      "percent": 3.5,
       "total": 0.89,
       "chart": {
         "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
@@ -20,7 +18,6 @@
     },
     {
       "title": "Air Bag LD",
-      "percent": 1.2,
       "total": 0.95,
       "chart": {
         "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
@@ -29,7 +26,6 @@
     },
     {
       "title": "Coluna de direção",
-      "percent": 0.8,
       "total": 0.73,
       "chart": {
         "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],
@@ -38,7 +34,6 @@
     },
     {
       "title": "Cinto coluna B",
-      "percent": -1.1,
       "total": 0.84,
       "chart": {
         "categories": ["9h", "10h", "11h", "12", "13h", "14h", "15h", "16h"],

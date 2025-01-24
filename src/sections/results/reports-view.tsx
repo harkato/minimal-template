@@ -31,6 +31,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import { useResultData } from 'src/routes/hooks/useToolData';
+import { use } from 'i18next';
 
 type Order = 'asc' | 'desc';
 
@@ -159,13 +160,28 @@ export default function ResultPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
 
+  const params = {
+    finalDateTime: '2020-06-25T00:00:00',
+    initialDateTime: '2020-06-20T00:00:00',
+    page: 1,
+    pageSize: 50,
+  };
+
   const {
     isLoading: isLoadingResult,
     isError: isErrorResult,
     data: resultData,
     error: errorResult,
-  } = useResultData();
-  // console.log("dados resutados: ", resultData);
+  } = useResultData(params);
+
+  // const [filters2, setFilters2] = useState({
+  //   initialDateTime = '2020-06-20T00%3A00%3A00',
+  //   finalDateTime = '2020-06-23T00%3A00%3A00',
+  //   page: 1,
+  //   pageSize: 10,
+  // });
+
+  console.log('dados resutados: ', data);
 
   const classes = useStyles();
   const getCurrentDateTime = () => {

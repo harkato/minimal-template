@@ -24,20 +24,25 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 
 // Provedor do contexto
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  const {
+    isLoading: isLoadingTools,
+    isError: isErrorTools,
+    data: toolData,
+    error: errorTools,
+  } = useToolData();
   const [cardData, setCardData] = useState([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
   useEffect(() => {
     if (toolData) {
       setCardData(toolData);
-      setSelectedCards(toolData.map((card: { id: any; }) => card.id));
+      setSelectedCards(toolData.map((card: { id: any }) => card.id));
     }
   }, [toolData]);
   // ===============================================================
 
-  const [pendingValue, setPendingValue] = useState<LabelType[]>(
-    () => JSON.parse(localStorage.getItem("pendingValue") || '[]')
+  const [pendingValue, setPendingValue] = useState<LabelType[]>(() =>
+    JSON.parse(localStorage.getItem('pendingValue') || '[]')
   );
 
   const handleDeleteCard = (id: string) => {
@@ -58,9 +63,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }),
     [cardData, pendingValue, selectedCards] // Dependências que afetam o valor do contexto
   );
-  
+
   useEffect(() => {
-    localStorage.setItem("pendingValue", JSON.stringify(pendingValue));
+    localStorage.setItem('pendingValue', JSON.stringify(pendingValue));
   }, [pendingValue]);
 
   return <DashboardContext.Provider value={contextValue}>{children}</DashboardContext.Provider>;
