@@ -24,12 +24,6 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 
 // Provedor do contexto
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // const [cardData, setCardData] = useState(initialData);
-
-  // const [selectedCards, setSelectedCards] = useState<string[]>(
-  //   cardData?.map((card: { id: any; }) => card.id)
-  // );
-
   const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   const [cardData, setCardData] = useState([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);

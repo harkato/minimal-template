@@ -21,17 +21,9 @@ export function useToolData() {
 
 export function useTopFiveData() {
   return useQuery({
-    queryFn: () => getTopFiveData(),
+    queryFn: () => fetchData('topFive'),
     queryKey: ['topfive_data'], 
   });
-}
-
-export async function getTopFiveData() {
-  const response = await axios.get(`${API_URL}/topFive`);
-  if (response.status !== 200) {
-    throw new Error('Erro ao buscar os dados');
-  }
-  return response.data;
 }
 
 export function useResultData() {

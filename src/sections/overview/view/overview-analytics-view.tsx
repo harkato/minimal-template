@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
@@ -6,7 +6,6 @@ import {
   AutocompleteCloseReason,
   Box,
   Button,
-  Card,
   ClickAwayListener,
   Collapse,
   FormControlLabel,
@@ -29,198 +28,66 @@ import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
-import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { initialDataTopFive } from './initial-data-top-five';
-import { getTopFiveData, useToolData, useTopFiveData } from 'src/routes/hooks/useToolData';
-import { log } from 'console';
-import { useQuery } from '@tanstack/react-query';
-
-const style = {
-  position: 'absolute',
-  alignContent: 'center',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-
-  '@media (max-width: 768px)': {
-    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-    width: '90%', // Ocupa 90% da largura da tela
-  },
-};
-
-function valuetext(value: number) {
-  return `${value}°C`;
-}
-
-const StyledPopper = styled(Popper)(({ theme }) => ({
-  border: `1px solid ${'#e1e4e8'}`,
-  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
-  color: '#24292e',
-  backgroundColor: '#fff',
-  borderRadius: 6,
-  width: 300,
-  zIndex: theme.zIndex.modal,
-  fontSize: 13,
-  ...theme.applyStyles('dark', {
-    border: `1px solid ${'#30363d'}`,
-    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
-    color: '#c9d1d9',
-    backgroundColor: '#1c2128',
-  }),
-}));
-
-const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: 10,
-  width: '100%',
-  borderBottom: `1px solid ${'#30363d'}`,
-  '& input': {
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    border: `1px solid ${'#30363d'}`,
-    padding: 8,
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
-    fontSize: 14,
-    '&:focus': {
-      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
-      borderColor: '#0366d6',
-      ...theme.applyStyles('dark', {
-        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
-        borderColor: '#388bfd',
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#0d1117',
-      border: `1px solid ${'#eaecef'}`,
-    }),
-  },
-  ...theme.applyStyles('dark', {
-    borderBottom: `1px solid ${'#eaecef'}`,
-  }),
-}));
+import { useTopFiveData } from 'src/routes/hooks/useToolData';
 
 export function OverviewAnalyticsView() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isLargeScreen = window.innerWidth > 768;
 
-  const {
-    cardData,
-    pendingValue,
-    setPendingValue,
-    selectedCards,
-    setSelectedCards,
-    handleDeleteCard
-  } = useDashboard();
+  // Usa o context do Dashboard
+  const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
+    useDashboard();
 
-  const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
-  // const [top5Data, setTop5Data] = useState(useTopFiveData);
+  const { data, isLoading, isError, error } = useTopFiveData();
 
-  /* LEONARDO */
-  const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
-  // const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
-  const [open, setOpen] = React.useState(false);
-  // const [open2, setOpen2] = React.useState(false);
-  const [openListTop5, setOpenListTop5] = React.useState(false);
+  // Ordena o TOP 5 por ordem alfabética
+  const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
+
+  // MENU DE SELEÇÃO DE CARDS
+  const [openModal, setOpenModal] = React.useState(false);
+  const [openListTopFive, setOpenListTopFive] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
-  // const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
-  // const [valueSlider, setValueSlider] = React.useState<number>(10);
-  // const [checked, setChecked] = React.useState(true);
-  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
-  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
-  const [top5, setTop5] = useState(() => {
-    const localData = localStorage.getItem("top5");
+  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]); // verificar o uso
+  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]);
+  const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
+  const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
+  const openLabels = Boolean(anchorEl);
+  const id = openLabels ? 'github-label' : undefined;
+
+  // MOSTRA TOP 5 E FERRAMENTAS
+  const [topFive, setTopFive] = useState(() => {
+    const localData = localStorage.getItem('topFive');
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
-  const [ferramentas, setFerramentas] = useState(true);
-  // const [filterIds, setFilterIds] = useState([]);
-  const theme = useTheme();
-  const handleOpen = () => setOpen(true);
+  const [tools, setTools] = useState(true);
+
+  // Abre o menu
+  const handleOpen = () => setOpenModal(true);
   const handleClose = () => {
     // Fecha o componente relacionado ao rótulo
     handleCloseLabel();
     // Fecha o modal
-    setOpen(false);
+    setOpenModal(false);
   };
-
-  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
-  const { data, isLoading, isError, error } = useTopFiveData();
-  const dataAPI = getTopFiveData()
-  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
-
-  // =======================================Simulando atualizações em tempo real==========================================
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTopFiveData((prevData) => {
-  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
-  //       const updatedCard = prevData[randomIndex];
-  //       // Atualiza apenas o card selecionado
-  //       const updatedData = prevData.map((card, index) =>
-  //         index === randomIndex
-  //           ? {
-  //               ...updatedCard,
-  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-  //               title: updatedCard.title.includes('Novo')
-  //                 ? updatedCard.title.replace('Novo ', '')
-  //                 : `Novo ${updatedCard.title}`, // Alterna o título
-  //             }
-  //           : card
-  //       );
-
-  //       return updatedData;
-  //     });
-  //   }, 20000); // Atualiza a cada 20 segundos
-
-  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-  // }, []);
-
-  // Garante que `data` está definido antes de usar
-  const sortedTopFiveData = [...(data || [])].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
-
-  // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
-
-
-  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
-  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
-
-
-  // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
-
-
 
   const handleChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue as number[]); // Atualiza o estado do slider
-    setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
+    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
+    setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
   };
 
-  const handleClickTop5 = () => {
-    setOpenListTop5(!openListTop5);
+  const handleClickTopFive = () => {
+    setOpenListTopFive(!openListTopFive);
   };
 
   const handleClickAperto = () => {
     setOpenListAperto(!openListAperto);
   };
 
-  /*   const handleChangeSwitch = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setChecked(event.target.checked);
-    }; */
-
-  /*   const handleChangeSwitch = (event: Event, newValue: number | number[]) => {
-    setTaxaTop5(newValue as number[]);
-  }; */
-
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
@@ -231,11 +98,6 @@ export function OverviewAnalyticsView() {
     }
     setAnchorEl(null);
   };
-
-  const openLabels = Boolean(anchorEl);
-  const id = openLabels ? 'github-label' : undefined;
-
-  const isLargeScreen = window.innerWidth > 768;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -251,11 +113,10 @@ export function OverviewAnalyticsView() {
         </Button>
 
         <Modal
-          open={open}
+          open={openModal}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
-
         >
           <Box sx={[style, { borderRadius: '20px' }]}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -264,11 +125,11 @@ export function OverviewAnalyticsView() {
                 component="nav"
                 aria-labelledby="nested-list-subheader"
               >
-                <ListItemButton onClick={handleClickTop5}>
+                <ListItemButton onClick={handleClickTopFive}>
                   <ListItemText primary="TOP 5" />
-                  {openListTop5 ? <ExpandLess /> : <ExpandMore />}
+                  {openListTopFive ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openListTop5} timeout="auto" unmountOnExit>
+                <Collapse in={openListTopFive} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       {/* ================================== habilita o top 5                       */}
@@ -277,8 +138,8 @@ export function OverviewAnalyticsView() {
                           style={{ color: 'blue', textAlign: 'center' }}
                           control={
                             <Switch
-                              checked={top5}
-                              onChange={(event) => setTop5(event.target.checked)}
+                              checked={topFive}
+                              onChange={(event) => setTopFive(event.target.checked)}
                             />
                           }
                           label=""
@@ -286,11 +147,11 @@ export function OverviewAnalyticsView() {
                       </div>
                       <Slider
                         getAriaLabel={() => 'Temperature range'}
-                        value={value}
+                        value={valueSliderTopFive}
                         onChange={handleChange}
                         valueLabelDisplay="auto"
                         getAriaValueText={valuetext}
-                        disabled={!top5}
+                        disabled={!topFive}
                         min={0.0}
                         step={0.1}
                         max={1.0}
@@ -310,7 +171,6 @@ export function OverviewAnalyticsView() {
                         flexDirection: 'column',
                       }}
                     >
-
                       <Box
                         sx={{
                           width: 600,
@@ -337,9 +197,7 @@ export function OverviewAnalyticsView() {
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center' }}>
-                            {t('dashboard.selectTools')}
-                          </span>
+                          <span style={{ alignSelf: 'center' }}>{t('dashboard.selectTools')}</span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
@@ -480,8 +338,8 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      {top5 && (
-        <div id="top5">
+      {topFive && (
+        <div id="TopFive">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
@@ -493,17 +351,16 @@ export function OverviewAnalyticsView() {
                   title={item.title}
                   total={item.total}
                   chart={item.chart}
-                  criticality={taxaTop5}
+                  criticality={taxaTopFive}
                 />
               </Grid>
             ))}
-
           </Grid>
         </div>
       )}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      {ferramentas && (
+      {tools && (
         <div id="ferramentas">
           <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
             <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
@@ -519,8 +376,8 @@ export function OverviewAnalyticsView() {
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard
                     {...data}
-                    targetAlert={targetTools[0]}
-                    targetCritical={targetTools[1]}
+                    targetAlert={toolLimits[0]}
+                    targetCritical={toolLimits[1]}
                     onDelete={() => handleDeleteCard(data.title)}
                   />
                 </Grid>
@@ -633,7 +490,6 @@ export function OverviewAnalyticsView() {
           <AreaChartNew />
           </Card>
         </Grid> */}
-
         </div>
       )}
     </DashboardContent>
@@ -645,6 +501,74 @@ interface LabelType {
   color: string;
   description?: string;
 }
+
+const style = {
+  position: 'absolute',
+  alignContent: 'center',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+
+  '@media (max-width: 768px)': {
+    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+    width: '90%', // Ocupa 90% da largura da tela
+  },
+};
+
+function valuetext(value: number) {
+  return `${value}°C`;
+}
+
+const StyledPopper = styled(Popper)(({ theme }) => ({
+  border: `1px solid ${'#e1e4e8'}`,
+  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
+  color: '#24292e',
+  backgroundColor: '#fff',
+  borderRadius: 6,
+  width: 300,
+  zIndex: theme.zIndex.modal,
+  fontSize: 13,
+  ...theme.applyStyles('dark', {
+    border: `1px solid ${'#30363d'}`,
+    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
+    color: '#c9d1d9',
+    backgroundColor: '#1c2128',
+  }),
+}));
+
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  padding: 10,
+  width: '100%',
+  borderBottom: `1px solid ${'#30363d'}`,
+  '& input': {
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    border: `1px solid ${'#30363d'}`,
+    padding: 8,
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    fontSize: 14,
+    '&:focus': {
+      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
+      borderColor: '#0366d6',
+      ...theme.applyStyles('dark', {
+        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
+        borderColor: '#388bfd',
+      }),
+    },
+    ...theme.applyStyles('dark', {
+      backgroundColor: '#0d1117',
+      border: `1px solid ${'#eaecef'}`,
+    }),
+  },
+  ...theme.applyStyles('dark', {
+    borderBottom: `1px solid ${'#eaecef'}`,
+  }),
+}));
 
 // From https://github.com/abdonrd/github-labels
 const labels = [
