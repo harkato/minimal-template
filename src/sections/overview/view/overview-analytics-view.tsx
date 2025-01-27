@@ -34,7 +34,7 @@ import { AreaChartNew } from 'src/components/chart/AreaChartNew';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import { getTopFiveData, useToolData, useToolListData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { useToolData, useToolListData, useTopFiveData } from 'src/routes/hooks/useToolData';
 import { log } from 'console';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
@@ -151,6 +151,7 @@ export function OverviewAnalyticsView() {
     setOpen(false);
   };
 
+  const isOptionEqualToValue = (option: LabelType, value: LabelType) => option.id === value.id;
   const { isLoading: isLoadingToolList, isError: isErrorToolList, data: toolListData, error: errorToolList } = useToolListData();
   const [selectLabels, setLabels] = useState<LabelType[]>([]);
 
@@ -461,6 +462,7 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
+                              isOptionEqualToValue={isOptionEqualToValue}
                               options={[...selectLabels].sort((a, b) => {
                                 // Display the selected labels first.
                                 let ai = valueLabel.indexOf(a);
@@ -653,6 +655,7 @@ export function OverviewAnalyticsView() {
 }
 
 interface LabelType {
+  id: string;
   name: string;
   color: string;
   description?: string;

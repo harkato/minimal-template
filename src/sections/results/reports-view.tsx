@@ -27,9 +27,11 @@ import {
 import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import { useResultData } from 'src/routes/hooks/useToolData';
+import { useNavigate } from 'react-router-dom';
 
 type Order = 'asc' | 'desc';
 
@@ -166,6 +168,10 @@ export default function ResultPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
 
+  const navigate = useNavigate();
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
   const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
   // console.log("dados resutados: ", resultData);
   
@@ -665,7 +671,22 @@ export default function ResultPage() {
                   key={row.id}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell sx={{ textAlign: 'center' }} >{row.resultTime}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >
+                  <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                      onClick={() => handleNavigation('/detail')}
+                    >
+                      <AddBoxOutlinedIcon sx={{ color: '#20878b' }} />
+                    </Box>
+                    {row.resultTime}
+                  </TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.id}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.tool}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.job}</TableCell>

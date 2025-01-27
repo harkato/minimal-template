@@ -1,26 +1,73 @@
 import { useState } from 'react';
-
-// material-ui
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-
-// project import
-// import MainCard from 'components/MainCard';
 import IncomeAreaChart from 'src/components/chart/IncomeAreaChart';
+import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| DEFAULT - CHART AREA ||============================== //
+// Função para converter dados em CSV
+const convertToCSV = (grip) => {
+  const headers = [
+    'Tempo',
+    'Torque',
+    'Angulo',
+  ];
+  const csvRows = grip.map(
+    (row) =>
+      `${row.Time},${row.Torque},${row.Angle}`
+  );
+  return [headers.join(','), ...csvRows].join('\n');
+};
 
-export  function AreaChartNew() {
+// Função para baixar o arquivo CSV
+const downloadCSV = (grip) => {
+  const csvData = convertToCSV(grip);
+  const blob = new Blob([csvData], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Trace.csv';
+  link.click();
+
+  URL.revokeObjectURL(url); // Limpa o objeto URL
+};
+
+export  function AreaChartNew({ grip }) {
   const [slot, setSlot] = useState('TORQUE');
+  const navigate = useNavigate(); // Inicializa o useNavigate
+
+  const handleGoBack = () => {
+    navigate(-1); // Navega para a página anterior no histórico
+  };
 
   return (
     <>
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
-          {/* <Typography variant="h5" align="center">Torque Ângulo Tempo</Typography> */}
+          {/* Botão para voltar a pagina */}
+          <Button
+              size="small"
+              onClick={() => handleGoBack()}
+            >
+              <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <ArrowBackOutlinedIcon color='primary' />
+                    </Box>              
+            </Button>
         </Grid>
         <Grid item>
           <Stack direction="row" alignItems="center" margin= '20px 20px 0px 0px' spacing={5}>
@@ -47,13 +94,30 @@ export  function AreaChartNew() {
               variant={slot === 'TORQUE X ÂNGULO' ? 'outlined' : 'text'}
             >
               TORQUE X ÂNGULO
+            </Button>            
+            <Button
+              size="small"
+              onClick={() => downloadCSV(grip)}
+            >
+              <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <VerticalAlignBottomOutlinedIcon color='primary' />
+                    </Box>              
             </Button>
           </Stack>
         </Grid>
       </Grid>
       {/* <MainCard content={false} sx={{ mt: 1.5 }}> */}
         <Box sx={{ pt: 1, pr: 2 }}>
-          <IncomeAreaChart slot={slot} />
+          <IncomeAreaChart slot={slot} grip={grip} />
         </Box>
       {/* </MainCard> */}
     </>

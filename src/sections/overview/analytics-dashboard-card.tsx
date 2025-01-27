@@ -57,8 +57,11 @@ export function AnalyticsDashboardCard({
   };
   const open = Boolean(anchorEl);
   const idPopover = open ? 'simple-popover' : undefined;
-  const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
-  const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
+  // const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
+  // const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
+  const [newTargetAlert, setNewTargetAlert] = useState(parseFloat(localStorage.getItem('targetAlert') ?? targetAlert.toString()));
+  const [newTargetCritical, setNewTargetCritical] = useState(parseFloat(localStorage.getItem('targetCritical') ?? targetCritical.toString()));
+  
   const newColor = getColor()
   const handleSliderClick = (event: { stopPropagation: () => void; }) => {
     event.stopPropagation(); // Impede a propagação do evento
@@ -67,9 +70,13 @@ export function AnalyticsDashboardCard({
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
       setNewTargetCritical(newValue[1]);
+      localStorage.setItem('targetAlert', newValue[0].toString());
+      localStorage.setItem('targetCritical', newValue[1].toString());
     }else{
       setNewTargetAlert(newValue);
       setNewTargetCritical(newValue);
+      localStorage.setItem('targetAlert', newValue.toString());
+      localStorage.setItem('targetCritical', newValue.toString());
     }
   };
   function getColor(): string {
@@ -141,7 +148,8 @@ export function AnalyticsDashboardCard({
                   {t('dashboard.criticalityRate')}
                 </Typography>
                   <Slider
-                    defaultValue={[newTargetAlert, newTargetCritical]}
+                    // defaultValue={[newTargetAlert, newTargetCritical]}
+                    value={[newTargetAlert, newTargetCritical]} // Use 'value' em vez de 'defaultValue'
                     aria-labelledby="continuous-slider"
                     valueLabelDisplay="auto"
                     min={0.0}
