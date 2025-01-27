@@ -414,15 +414,6 @@ export default function ResultPage() {
 
         {/* Data */}
         <Grid item xs={5} sm={5} md={3}>
-          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DatePicker
-              name="startDate"
-              label="Início"
-              value={startDate}
-              onChange={(newDate) => setStartDate(newDate)}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider> */}
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <TextField
               id="datetime-local"
@@ -439,15 +430,6 @@ export default function ResultPage() {
         </Grid>
 
         <Grid item xs={5} sm={5} md={3}>
-          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DatePicker
-              name="endDate"
-              label="Fim"
-              value={endDate}
-              onChange={(newDate) => setEndDate(newDate)}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider> */}
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <TextField
               id="datetime-local"
