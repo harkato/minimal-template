@@ -31,7 +31,6 @@ import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import { useResultData } from 'src/routes/hooks/useToolData';
-import { use } from 'i18next';
 
 type Order = 'asc' | 'desc';
 
@@ -50,12 +49,14 @@ interface DataRow {
 }
 
 const initialFilters = {
-  id: '',
-  tool: '',
-  programName: '',
-  status: '',
-  startDate: '',
-  endDate: '',
+  identifier: '',
+  // toolList: '',
+  // programList: '',
+  generalStatus: '',
+  initialDateTime: '',
+  finalDateTime: '',
+  page: 1,
+  pageSize: 50,
 };
 
 // Função para converter dados em CSV
@@ -122,15 +123,13 @@ const transformDate = (dateString: string): string => {
 };
 
 export default function ResultPage() {
-  // const [initialData, setInitialData] = useState<DataRow[]>([]);
-  // const [data, setData] = useState(initialData);
+  const { t } = useTranslation();
   const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState(initialFilters);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const { t, i18n } = useTranslation();
 
   const params = {
     finalDateTime: '2020-06-25T00:00:00',
@@ -144,7 +143,8 @@ export default function ResultPage() {
     isError: isErrorResult,
     data: resultData,
     error: errorResult,
-  } = useResultData(params);
+    refetch,
+  } = useResultData(filters);
 
   // const [filters2, setFilters2] = useState({
   //   initialDateTime = '2020-06-20T00%3A00%3A00',
@@ -184,14 +184,25 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+
+    setFilters({ ...filters, [name]: formattedDate });
+  };
+
+  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    // const status = () => (value === 'OK' ? 'OK' : 'NOK');
+    setFilters({ ...filters, generalStatus: value });
+  };
+
   const handleResetFilters = () => {
     setFilters(initialFilters);
-    setStartDate(null);
-    setEndDate(null);
   };
 
   const handleSearch = () => {
-    console.log('Filtros aplicados:', filters, startDate, endDate);
+    refetch();
   };
 
   const table = useTable();
@@ -206,7 +217,7 @@ export default function ResultPage() {
     if (resultData) {
       const transformedData = resultData.map((item: any) => ({
         dateTime: transformDate(item.dateTime),
-        tid: item.tid,
+        tid: item.identifier,
         toolName: item.toolDTO.toolName || 'Unknown Tool', // Extrai de toolDTO
         job: item.jobNumber || 0,
         programName: item.toolProgramDTO.programName || 'No Program',
@@ -214,9 +225,10 @@ export default function ResultPage() {
         torque: item.torque || 0,
         torqueStatus: item.torqueStatus === 1 ? 'OK' : 'NOK',
         angle: item.angle || 0,
-        angleStatus: item.angleStatus === 0 ? 'OK' : 'NOK',
-        generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK',
+        angleStatus: item.angleStatus === 1 ? 'OK' : 'NOK',
+        generalStatus: item.generalStatus === 1 ? 'OK' : 'NOK',
       }));
+
       setData(transformedData);
     }
   }, [resultData]);
@@ -339,6 +351,8 @@ export default function ResultPage() {
     }
   };
 
+  // TABELA
+
   return (
     <>
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
@@ -355,9 +369,9 @@ export default function ResultPage() {
         <Grid item xs={12} sm={6} md={6}>
           <TextField
             label={t('results.identifier')}
-            name="id"
+            name="identifier"
             variant="outlined"
-            value={filters.id}
+            value={filters.identifier}
             onChange={handleFilterChange}
             fullWidth
           />
@@ -370,7 +384,7 @@ export default function ResultPage() {
             label={t('results.tools')}
             name="tool"
             variant="outlined"
-            value={filters.tool}
+            // value={filters.toolList}
             onChange={handleFilterChange}
             fullWidth
           >
@@ -385,9 +399,9 @@ export default function ResultPage() {
           <TextField
             select
             label={t('results.programs')}
-            name="programName"
+            name="programList"
             variant="outlined"
-            value={filters.programName}
+            // value={filters.programList}
             onChange={handleFilterChange}
             fullWidth
           >
@@ -402,8 +416,8 @@ export default function ResultPage() {
             label="Status"
             name="status"
             variant="outlined"
-            value={filters.status}
-            onChange={handleFilterChange}
+            value={filters.generalStatus}
+            onChange={handleStatusChange}
             fullWidth
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
@@ -419,8 +433,10 @@ export default function ResultPage() {
               id="datetime-local"
               label={t('results.startDate')}
               type="datetime-local"
-              defaultValue={getCurrentDateTime()}
+              defaultValue=""
+              name="initialDateTime"
               className={classes.textField}
+              onChange={handleDateChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -435,8 +451,10 @@ export default function ResultPage() {
               id="datetime-local"
               label={t('results.endDate')}
               type="datetime-local"
-              defaultValue={getCurrentDateTime()}
+              defaultValue=""
+              name="finalDateTime"
               className={classes.textField}
+              onChange={handleDateChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -583,7 +601,7 @@ export default function ResultPage() {
             <TableBody>
               {paginatedData.map((row, index) => (
                 <TableRow
-                  key={row.tid}
+                  key={index}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
                   <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell>

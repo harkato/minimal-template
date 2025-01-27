@@ -36,6 +36,7 @@ export function useResultData(filters: any) {
   const query = useQuery({
     queryFn: () => fetchDataQuarkus('results/report', filters),
     queryKey: ['results-data'],
+    enabled: false,
   });
   return query;
 }
