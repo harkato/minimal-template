@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:3001';
 const QUARKUS_URL = 'http://localhost:8080';
 
 const fetchData = async (endpoint: string) => {
-  const response = await axios.get(`${API_URL}/${endpoint}`);
+  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`);
   // console.log("response: ", response.data);
 
   return response.data;
@@ -17,10 +17,10 @@ const fetchDataQuarkus = async (endpoint: string, filters: URLSearchParams) => {
   return response.data;
 };
 
-export function useToolData() {
+export function useFetchToolsData() {
   const query = useQuery({
-    queryFn: () => fetchData('tool'),
-    queryKey: ['tool-data'],
+    queryFn: () => fetchData('tools'),
+    queryKey: ['tools'],
   });
   return query;
 }

@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import { useFetchToolsData } from 'src/routes/hooks/useToolData';
 import { Props } from 'src/sections/overview/analytics-dashboard-card';
 import { initialData } from 'src/sections/overview/view/initial-data';
-import { useToolData } from 'src/routes/hooks/useToolData';
-
 // Define o tipo do valor do contexto
 export interface DashboardContextProps {
   cardData: Array<Props>;
@@ -29,7 +28,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     isError: isErrorTools,
     data: toolData,
     error: errorTools,
-  } = useToolData();
+  } = useFetchToolsData();
   const [cardData, setCardData] = useState([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
 

@@ -24,13 +24,14 @@ import {
   Toolbar,
   Tooltip,
   IconButton,
+  toolbarClasses,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useResultData } from 'src/routes/hooks/useToolData';
+import { useResultData, useFetchToolsData } from 'src/routes/hooks/useToolData';
 
 type Order = 'asc' | 'desc';
 
@@ -50,7 +51,7 @@ interface DataRow {
 
 const initialFilters = {
   identifier: '',
-  // toolList: '',
+  toolList: '',
   // programList: '',
   generalStatus: '',
   initialDateTime: '',
@@ -80,7 +81,6 @@ const convertToCSV = (rows: DataRow[]) => {
   );
   return [headers.join(','), ...csvRows].join('\n');
 };
-
 // Função para baixar o arquivo CSV
 const downloadCSV = (rows: DataRow[]) => {
   const csvData = convertToCSV(rows);
@@ -125,12 +125,14 @@ const transformDate = (dateString: string): string => {
 export default function ResultPage() {
   const { t } = useTranslation();
   const [data, setData] = useState<DataRow[]>([]);
+  const [toolsData, setToolsData] = useState(['']);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState(initialFilters);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
+  // teste
   const params = {
     finalDateTime: '2020-06-25T00:00:00',
     initialDateTime: '2020-06-20T00:00:00',
@@ -146,21 +148,19 @@ export default function ResultPage() {
     refetch,
   } = useResultData(filters);
 
-  // const [filters2, setFilters2] = useState({
-  //   initialDateTime = '2020-06-20T00%3A00%3A00',
-  //   finalDateTime = '2020-06-23T00%3A00%3A00',
-  //   page: 1,
-  //   pageSize: 10,
-  // });
-
-  console.log('dados resutados: ', data);
+  const {
+    isLoading: isLoadingTools,
+    isError: isErrorTools,
+    data: fetchToolsData,
+    error: toolsError,
+  } = useFetchToolsData();
 
   const classes = useStyles();
-  const getCurrentDateTime = () => {
-    const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
-    const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
-    return isoString;
-  };
+  // const getCurrentDateTime = () => {
+  //   const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
+  //   const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
+  //   return isoString;
+  // };
 
   // Função para ordenar os dados
   const handleRequestSort = (property: keyof DataRow) => {
@@ -231,7 +231,10 @@ export default function ResultPage() {
 
       setData(transformedData);
     }
-  }, [resultData]);
+    if (fetchToolsData) {
+      setToolsData(fetchToolsData);
+    }
+  }, [resultData, fetchToolsData]);
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
@@ -384,13 +387,16 @@ export default function ResultPage() {
             label={t('results.tools')}
             name="tool"
             variant="outlined"
-            // value={filters.toolList}
+            value={filters.toolList}
             onChange={handleFilterChange}
             fullWidth
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
-            <MenuItem value="STANLEY">STANLEY</MenuItem>
-            <MenuItem value="MAKITA">MAKITA</MenuItem>
+            {toolsData.map((tool: any, index: number) => (
+              <MenuItem key={index} value={tool.toolName}>
+                {tool.toolName}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
 
