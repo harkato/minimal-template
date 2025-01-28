@@ -253,11 +253,11 @@
       },
       {
         "id": "13",
-        "title": "FAHRWERK",         
+        "title": "FAHRWERK2",         
         "color": "success",
         "vehicles": 37,
         "nok": 28,
-        "nokVin": 0.757,
+        "nokVin": 0.557,
         "targetAlert": 0.6,
         "targetCritical": 0.8,
         "topIssues": [
@@ -3032,7 +3032,7 @@
       },
       {
         "id": "13",
-        "name": "FAHRWERK",
+        "name": "FAHRWERK2",
         "color": "#9fc3da29",
         "description": ""
       },
@@ -3074,6 +3074,7 @@
     "tool": "*tool",
 		"programNumber" : 501,
     "programName" : "TAREFA 1",
+    "programId" : 1,
 		"id" : "P137967",
 		"idAdic1" : "*idAdic1",
 		"idAdic2" : "*idAdic2",

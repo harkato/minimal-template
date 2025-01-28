@@ -58,7 +58,7 @@ const style = {
 };
 
 function valuetext(value: number) {
-  return `${value}°C`;
+  return `${value}`;
 }
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
@@ -118,12 +118,15 @@ export function OverviewAnalyticsView() {
     setSelectedCards,
     handleDeleteCard
   } = useDashboard();
-
+  
   const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
   // const [top5Data, setTop5Data] = useState(useTopFiveData);
 
   /* LEONARDO */
-  const [value, setValue] = React.useState<number[]>([0.0, 1.0]);
+  const [value, setValue] = React.useState<number[]>(() => {
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.0, 1.0];     
+  });
   // const [valueTools, setValueTools] = React.useState<number[]>([0.0, 1.0]);
   const [open, setOpen] = React.useState(false);
   // const [open2, setOpen2] = React.useState(false);
@@ -134,7 +137,10 @@ export function OverviewAnalyticsView() {
   // const [popperPosition, setPopperPosition] = useState(null); // Armazena posição
   // const [valueSlider, setValueSlider] = React.useState<number>(10);
   // const [checked, setChecked] = React.useState(true);
-  const [taxaTop5, setTaxaTop5] = React.useState<number[]>([0.6, 0.8]);
+  const [taxaTop5, setTaxaTop5] = React.useState<number[]>(() => {
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];     
+  });
   const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
   const [top5, setTop5] = useState(() => {
     const localData = localStorage.getItem("top5");
@@ -211,11 +217,17 @@ export function OverviewAnalyticsView() {
 
   // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
+  useEffect(() => {
+    // Sempre que o valor do slider mudar, salva no localStorage
+    localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTop5));
+}, [taxaTop5]);
+
 
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]); // Atualiza o estado do slider
     setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
+    localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTop5));
   };
 
   const handleClickTop5 = () => {
@@ -251,6 +263,7 @@ export function OverviewAnalyticsView() {
   const id = openLabels ? 'github-label' : undefined;
 
   const isLargeScreen = window.innerWidth > 768;
+  
 
   return (
     <DashboardContent maxWidth="xl">
@@ -300,7 +313,7 @@ export function OverviewAnalyticsView() {
                         />
                       </div>
                       <Slider
-                        getAriaLabel={() => 'Temperature range'}
+                        getAriaLabel={() => 'Criticidade'}
                         value={value}
                         onChange={handleChange}
                         valueLabelDisplay="auto"
@@ -359,7 +372,7 @@ export function OverviewAnalyticsView() {
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
                             <Box
-                              key={label.name}
+                              key={label.id}
                               sx={{
                                 mb: '20px',
                                 height: 20,
@@ -374,6 +387,7 @@ export function OverviewAnalyticsView() {
                                 color: theme.palette.getContrastText(label.color),
                               }}
                             >
+                              {/* lista tool selecionada */}
                               {label.name}
                             </Box>
                           ))}
@@ -448,6 +462,7 @@ export function OverviewAnalyticsView() {
                                         },
                                       })}
                                     >
+                                      {/* scroll tool */}
                                       {option.name}
                                       <br />
                                       <span>{option.description}</span>
@@ -471,7 +486,7 @@ export function OverviewAnalyticsView() {
                                 bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
                                 return ai - bi;
                               })}
-                              getOptionLabel={(option) => option.name}
+                              getOptionLabel={(option) => option.id}
                               renderInput={(params) => (
                                 <StyledInput
                                   ref={params.InputProps.ref}
@@ -528,14 +543,14 @@ export function OverviewAnalyticsView() {
           <Grid container spacing={5}>
             {(cardData || [])
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
+              .filter((data) => pendingValue.some((pending) => pending.id === data.id))
               .map((data) => (
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard
                     {...data}
                     targetAlert={targetTools[0]}
                     targetCritical={targetTools[1]}
-                    onDelete={() => handleDeleteCard(data.title)}
+                    onDelete={() => handleDeleteCard(data.id)}
                   />
                 </Grid>
               ))}

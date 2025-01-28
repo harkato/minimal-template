@@ -48,7 +48,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
 
   const handleDeleteCard = (id: string) => {
-    setPendingValue((prevPending) => prevPending.filter((item) => item.name !== id));
+    setPendingValue((prevPending) => prevPending.filter((item) => item.id !== id));
     setSelectedCards((prevSelected) => prevSelected.filter((cardId) => cardId !== id));
   };
 

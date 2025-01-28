@@ -59,8 +59,8 @@ export function AnalyticsDashboardCard({
   const idPopover = open ? 'simple-popover' : undefined;
   // const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
   // const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
-  const [newTargetAlert, setNewTargetAlert] = useState(parseFloat(localStorage.getItem('targetAlert') ?? targetAlert.toString()));
-  const [newTargetCritical, setNewTargetCritical] = useState(parseFloat(localStorage.getItem('targetCritical') ?? targetCritical.toString()));
+  const [newTargetAlert, setNewTargetAlert] = useState(parseFloat(localStorage.getItem(`targetAlert${id}`) ?? targetAlert.toString()));
+const [newTargetCritical, setNewTargetCritical] = useState(parseFloat(localStorage.getItem(`targetCritical${id}`) ?? targetCritical.toString()));
   
   const newColor = getColor()
   const handleSliderClick = (event: { stopPropagation: () => void; }) => {
@@ -70,13 +70,13 @@ export function AnalyticsDashboardCard({
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
       setNewTargetCritical(newValue[1]);
-      localStorage.setItem('targetAlert', newValue[0].toString());
-      localStorage.setItem('targetCritical', newValue[1].toString());
+      localStorage.setItem(`targetAlert${id}`, newValue[0].toString());
+      localStorage.setItem(`targetCritical${id}`, newValue[1].toString());
     }else{
       setNewTargetAlert(newValue);
       setNewTargetCritical(newValue);
-      localStorage.setItem('targetAlert', newValue.toString());
-      localStorage.setItem('targetCritical', newValue.toString());
+      localStorage.setItem(`targetAlert${id}`, newValue.toString());
+      localStorage.setItem(`targetCritical${id}`, newValue.toString());
     }
   };
   function getColor(): string {
