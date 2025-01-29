@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
 const QUARKUS_URL = 'http://localhost:8080';
+const DATA_RESOURCE = 'http://localhost:8080/msh/spc/v1';
 
 const fetchData = async (endpoint: string) => {
   const response = await axios.get(`${QUARKUS_URL}/${endpoint}`);
@@ -12,10 +12,16 @@ const fetchData = async (endpoint: string) => {
 };
 
 const fetchDataQuarkus = async (endpoint: string, filters: URLSearchParams) => {
-  const params = new URLSearchParams(filters);
-  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, { params });
+  const cleanParams = Object.fromEntries(
+    Object.entries(filters).filter(
+      ([_, value]) => value !== '' && value !== null && value !== undefined
+    )
+  );
+  const response = await axios.get(`${DATA_RESOURCE}/${endpoint}`, { params: cleanParams });
   return response.data;
 };
+
+// LISTA DE FERRAMENTAS
 
 export function useFetchToolsData() {
   const query = useQuery({
@@ -34,7 +40,7 @@ export function useTopFiveData() {
 
 export function useResultData(filters: any) {
   const query = useQuery({
-    queryFn: () => fetchDataQuarkus('results/report', filters),
+    queryFn: () => fetchDataQuarkus('results', filters),
     queryKey: ['results-data'],
     enabled: false,
   });

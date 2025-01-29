@@ -25,6 +25,11 @@ import {
   Tooltip,
   IconButton,
   toolbarClasses,
+  FormControl,
+  InputLabel,
+  Select,
+  Chip,
+  SelectChangeEvent,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -49,13 +54,24 @@ interface DataRow {
   generalStatus: string;
 }
 
+interface Filters {
+  identifier: string;
+  toolList: string[];
+  programList: string[];
+  generalStatus: string;
+  initialDateTime: string;
+  finalDateTime: string;
+  page: number;
+  pageSize: number;
+}
+
 const initialFilters = {
   identifier: '',
-  toolList: '',
-  // programList: '',
+  toolList: [],
+  programList: [],
   generalStatus: '',
-  initialDateTime: '',
   finalDateTime: '',
+  initialDateTime: '',
   page: 1,
   pageSize: 50,
 };
@@ -128,9 +144,7 @@ export default function ResultPage() {
   const [toolsData, setToolsData] = useState(['']);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
-  const [filters, setFilters] = useState(initialFilters);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [filters, setFilters] = useState<Filters>(initialFilters);
 
   // teste
   const params = {
@@ -184,6 +198,14 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
+  const handleListChange = (event: SelectChangeEvent<string[]>) => {
+    setFilters({
+      ...filters,
+      toolList: event.target.value as string[],
+    });
+    console.log(`Lista atualizada: ${filters.toolList}`);
+  };
+
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
@@ -196,6 +218,11 @@ export default function ResultPage() {
     // const status = () => (value === 'OK' ? 'OK' : 'NOK');
     setFilters({ ...filters, generalStatus: value });
   };
+
+  // const handleMaxResultsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = event.target.value;
+  //   setFilters({ ...filters, pageSize: Number.parseInt(value, 10) });
+  // };
 
   const handleResetFilters = () => {
     setFilters(initialFilters);
@@ -230,6 +257,7 @@ export default function ResultPage() {
       }));
 
       setData(transformedData);
+      console.log('Resultados: ', resultData);
     }
     if (fetchToolsData) {
       setToolsData(fetchToolsData);
@@ -382,22 +410,33 @@ export default function ResultPage() {
 
         {/* Ferramentas */}
         <Grid item xs={12} sm={6} md={6}>
-          <TextField
-            select
-            label={t('results.tools')}
-            name="tool"
-            variant="outlined"
-            value={filters.toolList}
-            onChange={handleFilterChange}
-            fullWidth
-          >
-            <MenuItem value="">{t('results.all')}</MenuItem>
-            {toolsData.map((tool: any, index: number) => (
-              <MenuItem key={index} value={tool.toolName}>
-                {tool.toolName}
-              </MenuItem>
-            ))}
-          </TextField>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>{t('results.tools')}</InputLabel>
+            <Select
+              multiple
+              displayEmpty
+              value={filters.toolList || []}
+              onChange={handleListChange}
+              renderValue={(selected) =>
+                selected.length === 0 ? (
+                  <em />
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </div>
+                )
+              }
+            >
+              <MenuItem value="Todos">{t('results.all')}</MenuItem>
+              {toolsData.map((tool: any, index: number) => (
+                <MenuItem key={index} value={tool.toolName}>
+                  {tool.toolName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         {/* Programas */}
@@ -427,8 +466,8 @@ export default function ResultPage() {
             fullWidth
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
-            <MenuItem value="OK">OK</MenuItem>
-            <MenuItem value="NOK">NOK</MenuItem>
+            <MenuItem value="1">OK</MenuItem>
+            <MenuItem value="0">NOK</MenuItem>
           </TextField>
         </Grid>
 
@@ -467,6 +506,25 @@ export default function ResultPage() {
               sx={{ width: '100%' }}
             />
           </LocalizationProvider>
+        </Grid>
+
+        {/* Número de resultados */}
+
+        <Grid item xs={12} sm={6} md={6}>
+          <TextField
+            select
+            label="Número de resultados"
+            name="pageSize"
+            variant="outlined"
+            value={filters.pageSize}
+            onChange={handleFilterChange}
+            fullWidth
+          >
+            <MenuItem value={25}>25</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+            <MenuItem value={200}>200</MenuItem>
+          </TextField>
         </Grid>
 
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
@@ -675,6 +733,7 @@ export default function ResultPage() {
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
+          slotProps={{ actions: { nextButton: { onClick: handlePrintAllPages } } }}
         />
       </TableContainer>
     </>
