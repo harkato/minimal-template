@@ -41,7 +41,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setSelectedCards(toolData.map((card: { id: any; }) => card.id));
     }
   }, [toolData]);
-  // ===============================================================
 
   const [pendingValue, setPendingValue] = useState<LabelType[]>(
     () => JSON.parse(localStorage.getItem("pendingValue") || '[]')

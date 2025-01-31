@@ -1,46 +1,23 @@
-import  {  useState, useRef, useMemo, useEffect } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import  {  useState, useRef, useEffect } from 'react';
 import 'dayjs/locale/en-gb';
 import {
-  Box,
-  Button,
-  TextField,
-  MenuItem,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Grid,
-  TablePagination,
-  Toolbar,
-  Tooltip,
-  IconButton,
   Card,
-  useTheme,
-  Avatar,
   List,
-  ListItemAvatar,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
   Stack,
 } from '@mui/material';
-import { Iconify } from 'src/components/iconify';
-import { ArrowUpward, ArrowDownward, MessageOutlined } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useDetailData, useResultData } from 'src/routes/hooks/useToolData';
-import { number } from 'prop-types';
-import { LineChart } from '@mui/x-charts/LineChart';
+import { useDetailData } from 'src/routes/hooks/useToolData';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
-// import { CartesianGrid, XAxis, YAxis, Legend} from '@mui/x-charts;
 
-
+// Define o tipo do valor
 interface DataDetail {
   resultTime: string;
   idTool: number;
@@ -68,12 +45,6 @@ interface DataDetail {
   grip: {Time: number; Torque: number; Angle: number }[];
 }
 
-interface GripData {
-  Time: number;
-  Torque: number;
-  Angle: number;
-}
-
 function getStatusIcon(status: string, i: number) {
   return status === 'OK' ? (
     <CheckIcon sx={{ color: '#20878b' }} />
@@ -99,10 +70,8 @@ const useStyles = makeStyles((theme) => ({
 export default function DetailsPage() {
   const [data, setData] = useState<DataDetail| null>(null);
   const { t, i18n } = useTranslation();
+  // Recebe os dados da API
   const { isLoading: isLoadingDetail, isError: isErrorDetail, data: detailData, error: errorDetail } = useDetailData();
-  if(detailData){
-    // console.log("Dados grip:", detailData[0].grip); 
-  }
   const classes = useStyles();
   const tableRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -122,15 +91,8 @@ export default function DetailsPage() {
   }
 
   return (
-    <>
-      {/* <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
-        {t('Detalhes do resultado')}
-      </Typography> */}
-      
-      {/* Renderiza os dados */}
-      {/* <Typography>Data: {data.resultTime}</Typography> */}
-            {/* ... outros dados */}
-
+    <>     
+      {/* Renderiza os dados */}      
       <Grid container spacing={2} sx={{ mt: 2 }}> {/* Container principal com espaçamento */}
       <Grid item xs={12} md={9}> {/* Grid para o gráfico (ocupa 8 colunas em telas médias e maiores, 12 em telas menores) */}
         <Card>
@@ -225,17 +187,6 @@ export default function DetailsPage() {
                 </Stack>
               </ListItemSecondaryAction>
             </ListItem>
-              {/* <ListItem divider>
-              <ListItemText primary={<Typography variant="subtitle1">Staus Geral</Typography>} />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                  {getStatusIcon(data.generalStatus,2)}
-                  {data.generalStatus} 
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>             */}
             <ListItem divider>
               <ListItemText 
               primary={
@@ -248,7 +199,7 @@ export default function DetailsPage() {
               />
               <ListItemSecondaryAction>
                 <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" color="secondary" noWrap>
+                <Typography variant="subtitle1" color="primary" noWrap>
                 {getStatusIcon(data.statusTorque,2)}
                   {data.torque}
                   </Typography>
@@ -273,7 +224,7 @@ export default function DetailsPage() {
               />
               <ListItemSecondaryAction>
                 <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" color="secondary" noWrap>
+                <Typography variant="subtitle1" color="primary" noWrap>
                 {getStatusIcon(data.statusAngle,2)}
                   {data.angle}
                   </Typography>
@@ -293,5 +244,3 @@ export default function DetailsPage() {
   </>
 );
 }
-
-// codigo funcionando +-

@@ -9,9 +9,34 @@ const areaChartOptions = {
       type: 'area',
       toolbar: {
         tools: {
-            download: false,
+            // download: false,
             pan: false,
-            reset: false            
+            // reset: false    
+            customIcons: [{
+                icon: '<img src="/assets/icons/glass/print.png">',
+                index: 4,
+                colors: "#6E8192",
+                title: 'Print',
+                class: 'print-icon',
+                /* eslint-disable */
+                click: function() {
+                    window.print();
+                }
+                /* eslint-enable */
+                },
+                // {
+                //     icon: '<img src="/assets/icons/glass/download.png">',
+                //     index: 4,
+                //     colors: "#6E8192",
+                //     title: 'download',
+                //     class: 'download-icon',
+                //     /* eslint-disable */
+                //     click: function() {
+                //         window.print();
+                //     }
+                //     /* eslint-enable */
+                // }
+            ]        
           },
       }
   },
@@ -24,7 +49,35 @@ const areaChartOptions = {
   },
   grid: {
       strokeDashArray: 0
-  }
+  },
+};
+
+// Função para converter dados em CSV
+const convertToCSV = (grip) => {
+  const headers = [
+    'Tempo',
+    'Torque',
+    'Angulo',
+  ];
+  const csvRows = grip.map(
+    (row) =>
+      `${row.Time},${row.Torque},${row.Angle}`
+  );
+  return [headers.join(','), ...csvRows].join('\n');
+};
+
+// Função para baixar o arquivo CSV
+const downloadCSV = (grip) => {
+  const csvData = convertToCSV(grip);
+  const blob = new Blob([csvData], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Trace.csv';
+  link.click();
+
+  URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
 export default function IncomeAreaChart({ slot, grip }) {
@@ -42,11 +95,7 @@ export default function IncomeAreaChart({ slot, grip }) {
       const times = grip.map(item => item.Time);
       const torques = grip.map(item => item.Torque);
       const angles = grip.map(item => item.Angle);  
-    //   const minTime = slot === 'TORQUE X ÂNGULO' ? Math.min(...angles) :  Math.min(...times);
-    // const maxTime = slot === 'TORQUE X ÂNGULO' ? Math.max(...angles) :  Math.max(...times);
-    // console.log(`minimo: ${minTime}, máximo: ${maxTime}`);
-    
-
+      
       setOptions((prevState) => ({
           ...prevState,
           colors: [theme.palette.primary.main, theme.palette.primary[700]],
@@ -80,9 +129,28 @@ export default function IncomeAreaChart({ slot, grip }) {
           },
           grid: {
               borderColor: line
+          },
+          /* eslint-disable */
+          tooltip: {
+            custom: function({ series, seriesIndex, dataPointIndex, w }) {
+              const yAxisLabel = slot === 'ÂNGULO' ? 'ÂNGULO' : 'TORQUE'
+              const xAxisLabel = slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' : 'TEMPO'
+              const eixoX = slot === 'TORQUE X ÂNGULO' ? angles : times  
+              const suffixY = slot === 'ÂNGULO' ? 'º' : 'Nm '
+              const suffixX = slot === 'TORQUE X ÂNGULO' ? 'º' : 'ms '   
+              return ( 
+                '<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color:#01548F">' + slot + '</div>' + // Título (slot)
+                // Label e valor do eixo Y  
+                  '<span class="apexcharts-tooltip-text">' + yAxisLabel + ': ' + series[seriesIndex][dataPointIndex] + suffixY +'</span>' + 
+                // Label e valor do eixo X
+                  '<span class="apexcharts-tooltip-text">' + xAxisLabel + ': ' + eixoX[dataPointIndex] + suffixX + '</span>' + 
+                '</div>'
+              );
+            }
           }
+          /* eslint-enable */
       }));
-
+      
       setSeries([
           {
               name: slot,

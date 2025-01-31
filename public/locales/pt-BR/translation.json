@@ -69,8 +69,8 @@
       "event": "Evento",
       "programDetail": "Detalhes do programa",
       "tightening": "Aperto",
-      "jobResult": "Resultado por Trabalho",
-      "topNOKJob": "Top NOK por trabalho"
+      "jobResult": "Resultado por Job",
+      "topNOKJob": "Top NOK por Job"
     },
     
     "results": {
@@ -84,7 +84,7 @@
       "clearFilters": "Limpar Filtros",
       "seach": "Pesquisar",
       "date": "Data",
-      "job": "Trabalho",
+      "job": "Job",
       "spindle": "Fuso",
       "generalStatus": "Status Geral",
       "angle": "Ângulo",

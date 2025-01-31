@@ -30,7 +30,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useResultData } from 'src/routes/hooks/useToolData';
+import { useResultData, useResultPaginate, resultPgLength } from 'src/routes/hooks/useToolData';
 import { useNavigate } from 'react-router-dom';
 
 type Order = 'asc' | 'desc';
@@ -173,9 +173,46 @@ export default function ResultPage() {
     navigate(path);
   };
   const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
-  // console.log("dados resutados: ", resultData);
-  
+  // ==========================================================
+  const [pages, setPages] = useState(0); // numero da pagina atual
+  const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
+  const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
 
+  const { 
+    isLoading: isLoadingResultPg, 
+    isError: isErrorResultPg, 
+    data: resultPgData, 
+    error: errorResultPg 
+  } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
+
+  useEffect(() => {
+    async function fetchTotalCount() {
+      const count = await resultPgLength(); // Chama a função que busca o número de itens
+      setTotalCount(parseInt(count, 10));
+    }
+    fetchTotalCount();
+  }, []);
+
+  useEffect(() => { // atualiza os dados da tabela
+    if (resultPgData) {
+      setData(resultPgData);
+    }
+  }, [resultPgData]);
+
+  // Atualiza o estado page e chama useResultPg para carregar os novos dados.
+  const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+    setPages(newPage);
+  };
+
+  //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
+  const handleChangeRowsPerPage = (event: { target: { value: string; }; }) => {
+    setRowsPerPages(parseInt(event.target.value, 10));
+    setPages(0); // Resetar para a primeira página ao mudar rowsPerPage 
+    console.log('data:', data);
+    
+  };
+  
+  // =============================================================
   const classes = useStyles();
   const getCurrentDateTime = () => {
     const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
@@ -231,12 +268,12 @@ export default function ResultPage() {
   );
 
   const tableRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (resultData) {
-      setData(resultData);
-    }
-  }, [resultData]);  
+// ===========================================dados da API antiga=========================================
+  // useEffect(() => {
+  //   if (resultData) {
+  //     setData(resultData);
+  //   }
+  // }, [resultData]);  
 
   // Função de impressão da tabela atual
   // const handlePrint = () => {
@@ -671,7 +708,7 @@ export default function ResultPage() {
                   key={row.id}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell sx={{ textAlign: 'center' }} >
+                  <TableCell sx={{ textAlign: 'left' }} >
                   <Box
                       sx={{
                         display: 'inline-block',
@@ -683,7 +720,7 @@ export default function ResultPage() {
                       }}
                       onClick={() => handleNavigation('/detail')}
                     >
-                      <AddBoxOutlinedIcon sx={{ color: '#20878b' }} />
+                      <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
                     </Box>
                     {row.resultTime}
                   </TableCell>
@@ -743,7 +780,7 @@ export default function ResultPage() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination
+        {/* <TablePagination
           component="div"
           page={table.page}
           count={filteredData.length}
@@ -751,6 +788,15 @@ export default function ResultPage() {
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
+        /> */}
+        <TablePagination
+          component="div"
+          page={pages}
+          count={totalCount}
+          rowsPerPage={rowsPerPages}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
     </>
@@ -760,7 +806,7 @@ export default function ResultPage() {
 export function useTable() {
   const [page, setPage] = useState(0);
   const [orderBy, setOrderBy] = useState('name');
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [selected, setSelected] = useState<string[]>([]);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 

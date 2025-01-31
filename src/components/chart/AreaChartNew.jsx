@@ -2,41 +2,41 @@ import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import IncomeAreaChart from 'src/components/chart/IncomeAreaChart';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import { useNavigate } from 'react-router-dom';
+import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 
-// ==============================|| DEFAULT - CHART AREA ||============================== //
 // Função para converter dados em CSV
-const convertToCSV = (grip) => {
-  const headers = [
-    'Tempo',
-    'Torque',
-    'Angulo',
-  ];
-  const csvRows = grip.map(
-    (row) =>
-      `${row.Time},${row.Torque},${row.Angle}`
-  );
-  return [headers.join(','), ...csvRows].join('\n');
-};
+// const convertToCSV = (grip) => {
+//   const headers = [
+//     'Tempo',
+//     'Torque',
+//     'Angulo',
+//   ];
+//   const csvRows = grip.map(
+//     (row) =>
+//       `${row.Time},${row.Torque},${row.Angle}`
+//   );
+//   return [headers.join(','), ...csvRows].join('\n');
+// };
 
-// Função para baixar o arquivo CSV
-const downloadCSV = (grip) => {
-  const csvData = convertToCSV(grip);
-  const blob = new Blob([csvData], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
+// // Função para baixar o arquivo CSV
+// const downloadCSV = (grip) => {
+//   const csvData = convertToCSV(grip);
+//   const blob = new Blob([csvData], { type: 'text/csv' });
+//   const url = URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'Trace.csv';
-  link.click();
+//   const link = document.createElement('a');
+//   link.href = url;
+//   link.download = 'Trace.csv';
+//   link.click();
 
-  URL.revokeObjectURL(url); // Limpa o objeto URL
-};
+//   URL.revokeObjectURL(url); // Limpa o objeto URL
+// };
+const botaoImprimir = document.getElementById('imprimir');
 
 export  function AreaChartNew({ grip }) {
   const [slot, setSlot] = useState('TORQUE');
@@ -95,9 +95,9 @@ export  function AreaChartNew({ grip }) {
             >
               TORQUE X ÂNGULO
             </Button>            
-            <Button
+            {/* <Button
               size="small"
-              onClick={() => downloadCSV(grip)}
+              onClick={() => window.print()}
             >
               <Box
                       sx={{
@@ -109,17 +109,16 @@ export  function AreaChartNew({ grip }) {
                         fontWeight: 'bold',
                       }}
                     >
-                      <VerticalAlignBottomOutlinedIcon color='primary' />
+                      <LocalPrintshopOutlinedIcon color='primary' />
                     </Box>              
-            </Button>
+            </Button> */}
           </Stack>
         </Grid>
       </Grid>
-      {/* <MainCard content={false} sx={{ mt: 1.5 }}> */}
         <Box sx={{ pt: 1, pr: 2 }}>
+          {/* função que gera o gráfico */}
           <IncomeAreaChart slot={slot} grip={grip} />
         </Box>
-      {/* </MainCard> */}
     </>
   );
 }
