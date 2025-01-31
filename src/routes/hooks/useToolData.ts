@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import qs from 'qs';
 
-const QUARKUS_URL = 'http://localhost:8080';
-const DATA_RESOURCE = 'http://localhost:8080/msh/spc/v1';
+const QUARKUS_URL = 'http://localhost:8080/msh/spc/v1';
+const API_URL = 'http://localhost:8080/msh/spc/v1';
 
 const fetchData = async (endpoint: string) => {
   const response = await axios.get(`${QUARKUS_URL}/${endpoint}`);
@@ -17,7 +18,9 @@ const fetchDataQuarkus = async (endpoint: string, filters: URLSearchParams) => {
       ([_, value]) => value !== '' && value !== null && value !== undefined
     )
   );
-  const response = await axios.get(`${DATA_RESOURCE}/${endpoint}`, { params: cleanParams });
+  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, {
+    params: cleanParams,
+  });
   return response.data;
 };
 
@@ -45,4 +48,34 @@ export function useResultData(filters: any) {
     enabled: false,
   });
   return query;
+}
+
+export function useResultPaginate(page: number, limit: number) {
+  // faz a requisição por paginação
+  const query = useQuery({
+    queryFn: () => fetchData(`results?page=${page + 1}&pageSize=${limit}`),
+    queryKey: ['resultsPg-data', page, limit],
+  });
+  return query;
+}
+
+axios.get('http://localhost:8080/msh/spc/v1/tools').then((res) => {
+  console.log(res.headers); // Verificar se "x-total-count" está presente
+});
+
+export async function resultPgLength() {
+  // retorna o total de itens
+  try {
+    const response = await axios.get(`${API_URL}/results`, {
+      params: { _limit: 0, StartPoint: 0 },
+      responseType: 'text', // Adiciona o responseType para texto
+    });
+    if (response.status !== 200) {
+      throw new Error('Erro ao buscar os dados');
+    }
+    return response.headers['x-total-count'];
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    throw error;
+  }
 }

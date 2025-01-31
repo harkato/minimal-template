@@ -36,7 +36,12 @@ import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useResultData, useFetchToolsData } from 'src/routes/hooks/useToolData';
+import {
+  useResultData,
+  useFetchToolsData,
+  useResultPaginate,
+  resultPgLength,
+} from 'src/routes/hooks/useToolData';
 
 type Order = 'asc' | 'desc';
 
@@ -54,9 +59,14 @@ interface DataRow {
   generalStatus: string;
 }
 
+type Tool = {
+  toolId: number;
+  revision: number;
+};
+
 interface Filters {
   identifier: string;
-  toolList: string[];
+  // toolList: string;
   programList: string[];
   generalStatus: string;
   initialDateTime: string;
@@ -67,7 +77,10 @@ interface Filters {
 
 const initialFilters = {
   identifier: '',
-  toolList: [],
+  // toolList: JSON.stringify([
+  //   { id: 12, revision: 1 },
+  //   { id: 34, revision: 2 },
+  // ]),
   programList: [],
   generalStatus: '',
   finalDateTime: '',
@@ -145,6 +158,16 @@ export default function ResultPage() {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [pages, setPages] = useState(0); // numero da pagina atual
+  const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
+  const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
+  const {
+    isLoading: isLoadingResultPg,
+    isError: isErrorResultPg,
+    data: resultPgData,
+    error: errorResultPg,
+    // refetch,
+  } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
 
   // teste
   const params = {
@@ -198,13 +221,13 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleListChange = (event: SelectChangeEvent<string[]>) => {
-    setFilters({
-      ...filters,
-      toolList: event.target.value as string[],
-    });
-    console.log(`Lista atualizada: ${filters.toolList}`);
-  };
+  // const handleListChange = (event: SelectChangeEvent<Tool>) => {
+  //   setFilters({
+  //     ...filters,
+  //     toolList: event.target.value,
+  //   });
+  //   console.log(`Lista atualizada: ${filters.toolList}`);
+  // };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -241,8 +264,24 @@ export default function ResultPage() {
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (resultData) {
-      const transformedData = resultData.map((item: any) => ({
+    if (fetchToolsData) {
+      setToolsData(fetchToolsData);
+    }
+  }, [fetchToolsData]);
+
+  useEffect(() => {
+    async function fetchTotalCount() {
+      const count = await resultPgLength(); // Chama a função que busca o número de itens
+      setTotalCount(parseInt(count, 10));
+    }
+    fetchTotalCount();
+    console.log(totalCount);
+  }, [resultPgData, totalCount]);
+
+  useEffect(() => {
+    // atualiza os dados da tabela
+    if (resultPgData) {
+      const transformedData = resultPgData.map((item: any) => ({
         dateTime: transformDate(item.dateTime),
         tid: item.identifier,
         toolName: item.toolDTO.toolName || 'Unknown Tool', // Extrai de toolDTO
@@ -255,14 +294,19 @@ export default function ResultPage() {
         angleStatus: item.angleStatus === 1 ? 'OK' : 'NOK',
         generalStatus: item.generalStatus === 1 ? 'OK' : 'NOK',
       }));
-
       setData(transformedData);
-      console.log('Resultados: ', resultData);
     }
-    if (fetchToolsData) {
-      setToolsData(fetchToolsData);
-    }
-  }, [resultData, fetchToolsData]);
+  }, [resultPgData]);
+  // Atualiza o estado page e chama useResultPg para carregar os novos dados.
+  const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+    setPages(newPage);
+  };
+  //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
+  const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
+    setRowsPerPages(parseInt(event.target.value, 10));
+    setPages(0); // Resetar para a primeira página ao mudar rowsPerPage
+    // console.log('data:', data);
+  };
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
@@ -409,7 +453,7 @@ export default function ResultPage() {
         </Grid>
 
         {/* Ferramentas */}
-        <Grid item xs={12} sm={6} md={6}>
+        {/* <Grid item xs={12} sm={6} md={6}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>{t('results.tools')}</InputLabel>
             <Select
@@ -431,13 +475,13 @@ export default function ResultPage() {
             >
               <MenuItem value="Todos">{t('results.all')}</MenuItem>
               {toolsData.map((tool: any, index: number) => (
-                <MenuItem key={index} value={tool.toolName}>
+                <MenuItem key={index} value={tool.toolId}>
                   {tool.toolName}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Grid>
+        </Grid> */}
 
         {/* Programas */}
         <Grid item xs={12} sm={6} md={6}>
@@ -727,13 +771,12 @@ export default function ResultPage() {
         </div>
         <TablePagination
           component="div"
-          page={table.page}
-          count={data.length}
-          rowsPerPage={table.rowsPerPage}
-          onPageChange={table.onChangePage}
+          page={pages}
+          count={totalCount}
+          rowsPerPage={rowsPerPages}
+          onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
-          slotProps={{ actions: { nextButton: { onClick: handlePrintAllPages } } }}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
     </>
