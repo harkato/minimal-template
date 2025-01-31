@@ -32,8 +32,9 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Cancel } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import {
@@ -53,20 +54,22 @@ interface DataRow {
   programName: string;
   fuso: number;
   torque: number;
-  torqueStatus: string;
+  torqueStatus: number;
   angle: number;
-  angleStatus: string;
+  angleStatus: number;
   generalStatus: string;
 }
 
-type Tool = {
-  toolId: number;
-  revision: number;
-};
+enum Status {
+  OK = 0,
+  NOK = 1,
+  LOW = 2,
+  HIGH = 3,
+}
 
 interface Filters {
   identifier: string;
-  // toolList: string;
+  toolList: any;
   programList: string[];
   generalStatus: string;
   initialDateTime: string;
@@ -77,10 +80,7 @@ interface Filters {
 
 const initialFilters = {
   identifier: '',
-  // toolList: JSON.stringify([
-  //   { id: 12, revision: 1 },
-  //   { id: 34, revision: 2 },
-  // ]),
+  toolList: [''],
   programList: [],
   generalStatus: '',
   finalDateTime: '',
@@ -124,15 +124,27 @@ const downloadCSV = (rows: DataRow[]) => {
   URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
-function getStatusIcon(status: string, i: number) {
-  return status === 'OK' ? (
-    <CheckIcon sx={{ color: '#20878b' }} />
-  ) : i % 2 === 0 ? (
-    <ArrowUpward sx={{ color: '#f24f4f' }} />
-  ) : (
-    <ArrowDownward sx={{ color: '#FFB300' }} />
-  );
-}
+const getStatusIcon = (status: Status) => {
+  switch (status) {
+    case Status.OK:
+      return <CheckIcon sx={{ color: '#20878b' }} />;
+    case Status.NOK:
+      return <CancelIcon sx={{ color: '20878b' }} />;
+    case Status.LOW:
+      return <ArrowDownward sx={{ color: '#FFB300' }} />;
+    case Status.HIGH:
+      return <ArrowUpward sx={{ color: '#f24f4f' }} />;
+    default:
+      return null;
+  }
+};
+//     <CheckIcon sx={{ color: '#20878b' }} />
+//   ) : i % 2 === 0 ? (
+//     <ArrowUpward sx={{ color: '#f24f4f' }} />
+//   ) : (
+//     <ArrowDownward sx={{ color: '#FFB300' }} />
+//   );
+// }
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -158,6 +170,7 @@ export default function ResultPage() {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [pages, setPages] = useState(0); // numero da pagina atual
   const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
@@ -221,13 +234,27 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
-  // const handleListChange = (event: SelectChangeEvent<Tool>) => {
-  //   setFilters({
-  //     ...filters,
-  //     toolList: event.target.value,
-  //   });
-  //   console.log(`Lista atualizada: ${filters.toolList}`);
-  // };
+  const handleListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedTools(selectedValues);
+  };
+
+  // Atualiza `filters` quando `selectedTools` mudar
+  useEffect(() => {
+    const toolsWithRevisions = toolsData
+      .filter((tool: any) => selectedTools.includes(tool.toolName))
+      .map((tool: any) => ({
+        id: tool.toolId,
+        revision: tool.revision,
+      }));
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      toolList: JSON.stringify(toolsWithRevisions), // Agora contém os objetos { id, revision }
+    }));
+  }, [toolsData, selectedTools]); // Atualiza sempre que `selectedTools` mudar
+
+  // Verifica se os dados estão corretos
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -249,6 +276,7 @@ export default function ResultPage() {
 
   const handleResetFilters = () => {
     setFilters(initialFilters);
+    setSelectedTools([]);
   };
 
   const handleSearch = () => {
@@ -284,17 +312,18 @@ export default function ResultPage() {
       const transformedData = resultPgData.map((item: any) => ({
         dateTime: transformDate(item.dateTime),
         tid: item.identifier,
-        toolName: item.toolDTO.toolName || 'Unknown Tool', // Extrai de toolDTO
-        job: item.jobNumber || 0,
-        programName: item.toolProgramDTO.programName || 'No Program',
-        fuso: item.spindleNumber || 0,
-        torque: item.torque || 0,
-        torqueStatus: item.torqueStatus === 1 ? 'OK' : 'NOK',
-        angle: item.angle || 0,
-        angleStatus: item.angleStatus === 1 ? 'OK' : 'NOK',
+        toolName: item.toolDTO.toolName || '', // Extrai de toolDTO
+        job: item.jobNumber || '',
+        programName: item.toolProgramDTO.programName || '',
+        fuso: item.spindleNumber || '',
+        torque: item.torque || '',
+        torqueStatus: item.torqueStatus,
+        angle: item.angle || '',
+        angleStatus: item.angleStatus,
         generalStatus: item.generalStatus === 1 ? 'OK' : 'NOK',
       }));
       setData(transformedData);
+      console.log(transformedData);
     }
   }, [resultPgData]);
   // Atualiza o estado page e chama useResultPg para carregar os novos dados.
@@ -394,17 +423,17 @@ export default function ResultPage() {
                 <td class="torque-angle-col status-icon">
                     ${row.torque}
                     <span class="material-icons ${
-                      row.torqueStatus === 'OK' ? 'status-ok' : 'status-warning'
+                      row.torqueStatus === 1 ? 'status-ok' : 'status-warning'
                     }">
-                      ${row.torqueStatus === 'OK' ? 'check_circle' : 'arrow_downward'}
+                      ${row.torqueStatus === 1 ? 'check_circle' : 'arrow_downward'}
                     </span>
                   </td>
                   <td class="torque-angle-col status-icon">
                     ${row.angle}
                     <span class="material-icons ${
-                      row.angleStatus === 'OK' ? 'status-ok' : 'status-warning'
+                      row.angleStatus === 1 ? 'status-ok' : 'status-warning'
                     }">
-                      ${row.angleStatus === 'OK' ? 'check_circle' : 'arrow_downward'}
+                      ${row.angleStatus === 1 ? 'check_circle' : 'arrow_downward'}
                     </span>
                   </td>
               </tr>
@@ -453,13 +482,13 @@ export default function ResultPage() {
         </Grid>
 
         {/* Ferramentas */}
-        {/* <Grid item xs={12} sm={6} md={6}>
+        <Grid item xs={12} sm={6} md={6}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>{t('results.tools')}</InputLabel>
             <Select
               multiple
               displayEmpty
-              value={filters.toolList || []}
+              value={selectedTools || []}
               onChange={handleListChange}
               renderValue={(selected) =>
                 selected.length === 0 ? (
@@ -475,13 +504,13 @@ export default function ResultPage() {
             >
               <MenuItem value="Todos">{t('results.all')}</MenuItem>
               {toolsData.map((tool: any, index: number) => (
-                <MenuItem key={index} value={tool.toolId}>
+                <MenuItem key={index} value={tool.toolName}>
                   {tool.toolName}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Grid> */}
+        </Grid>
 
         {/* Programas */}
         <Grid item xs={12} sm={6} md={6}>
@@ -744,7 +773,7 @@ export default function ResultPage() {
                         fontWeight: 'bold',
                       }}
                     >
-                      {getStatusIcon(row.torqueStatus, row.torque)}
+                      {getStatusIcon(row.torqueStatus)}
                     </Box>
                     {row.torque}
                   </TableCell>
@@ -760,7 +789,7 @@ export default function ResultPage() {
                         fontWeight: 'bold',
                       }}
                     >
-                      {getStatusIcon(row.angleStatus, row.angle)}
+                      {getStatusIcon(row.angleStatus)}
                     </Box>
                     {row.angle}
                   </TableCell>
