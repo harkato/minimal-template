@@ -42,6 +42,7 @@ import {
   useResultPaginate,
   resultPgLength,
   fetchDataQuarkus,
+  fetchProgramsData,
 } from 'src/routes/hooks/useToolData';
 import { useQuery } from '@tanstack/react-query';
 
@@ -71,7 +72,7 @@ enum Status {
 interface Filters {
   identifier: string;
   toolList: any;
-  programList: string[];
+  programList: any;
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
@@ -168,10 +169,12 @@ export default function ResultPage() {
   const { t } = useTranslation();
   const [data, setData] = useState<DataRow[]>([]);
   const [toolsData, setToolsData] = useState(['']);
+  const [programsData, setProgramsData] = useState(['']);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [page, setPage] = useState(1); // numero da pagina atual
   // const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
@@ -202,14 +205,19 @@ export default function ResultPage() {
     queryFn: () => fetchDataQuarkus('results', filters, page),
   });
 
-  const hasNext = resultData?.length === 10;
-
   const {
     isLoading: isLoadingTools,
     isError: isErrorTools,
     data: fetchToolsData,
     error: toolsError,
   } = useFetchToolsData();
+
+  const { data: queryProgramsData } = useQuery({
+    queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
+    queryKey: ['programs', JSON.stringify(filters)],
+  });
+
+  console.log(filters.toolList);
 
   const classes = useStyles();
   // const getCurrentDateTime = () => {
@@ -240,11 +248,15 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleListChange = (event: SelectChangeEvent<string[]>) => {
+  const handleToolListChange = (event: SelectChangeEvent<string[]>) => {
     const selectedValues = event.target.value as string[];
     setSelectedTools(selectedValues);
   };
 
+  const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedPrograms(selectedValues);
+  };
   // Atualiza `filters` quando `selectedTools` mudar
   useEffect(() => {
     const toolsWithRevisions = toolsData
@@ -260,8 +272,16 @@ export default function ResultPage() {
     }));
   }, [toolsData, selectedTools]); // Atualiza sempre que `selectedTools` mudar
 
-  // Verifica se os dados estão corretos
+  useEffect(() => {
+    const programNumbers = programsData
+      .filter((program: any) => selectedPrograms.includes(program.programName))
+      .map((program: any) => program.programNumber);
 
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      programList: programNumbers,
+    }));
+  }, [programsData, selectedPrograms]);
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
@@ -302,7 +322,10 @@ export default function ResultPage() {
     if (fetchToolsData) {
       setToolsData(fetchToolsData);
     }
-  }, [fetchToolsData]);
+    if (queryProgramsData) {
+      setProgramsData(queryProgramsData);
+    }
+  }, [fetchToolsData, queryProgramsData]);
 
   // useEffect(() => {
   //   async function fetchTotalCount() {
@@ -496,7 +519,7 @@ export default function ResultPage() {
               multiple
               displayEmpty
               value={selectedTools || []}
-              onChange={handleListChange}
+              onChange={handleToolListChange}
               renderValue={(selected) =>
                 selected.length === 0 ? (
                   <em />
@@ -521,18 +544,33 @@ export default function ResultPage() {
 
         {/* Programas */}
         <Grid item xs={12} sm={6} md={6}>
-          <TextField
-            select
-            label={t('results.programs')}
-            name="programList"
-            variant="outlined"
-            // value={filters.programList}
-            onChange={handleFilterChange}
-            fullWidth
-          >
-            <MenuItem value="">{t('results.all')}</MenuItem>
-            <MenuItem value="101-M001/task 1">PVT1</MenuItem>
-          </TextField>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>{t('results.programs')}</InputLabel>
+            <Select
+              multiple
+              displayEmpty
+              value={selectedPrograms || []}
+              onChange={handleProgramListChange}
+              renderValue={(selected) =>
+                selected.length === 0 ? (
+                  <em />
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </div>
+                )
+              }
+            >
+              <MenuItem value="Todos">{t('results.all')}</MenuItem>
+              {programsData.map((program: any, index: number) => (
+                <MenuItem key={index} value={program.programName}>
+                  {program.programName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6} md={6}>

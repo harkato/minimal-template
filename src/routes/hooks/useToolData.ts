@@ -25,6 +25,14 @@ export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: nu
   return response.data;
 };
 
+export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
+  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, {
+    params: { toolList },
+    paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
+  });
+  return response.data;
+};
+
 // LISTA DE FERRAMENTAS
 
 export function useFetchToolsData() {
@@ -42,16 +50,6 @@ export function useTopFiveData() {
   });
 }
 
-// export function useResultData(filters: any) {
-//   const query = useQuery({
-//     queryFn: () => fetchDataQuarkus('results', filters),
-//     queryKey: ['results-data'],
-//     placeholderData: keepPreviousData,
-//     enabled: false,
-//   });
-//   return query;
-// }
-
 export function useResultPaginate(page: number, limit: number) {
   // faz a requisição por paginação
   const query = useQuery({
@@ -60,10 +58,6 @@ export function useResultPaginate(page: number, limit: number) {
   });
   return query;
 }
-
-axios.get('http://localhost:8080/msh/spc/v1/tools').then((res) => {
-  console.log(res.headers); // Verificar se "x-total-count" está presente
-});
 
 export async function resultPgLength() {
   // retorna o total de itens
@@ -82,7 +76,12 @@ export async function resultPgLength() {
   }
 }
 
-export const fetchTestPg = async (page: number) => {
-  const { data } = await axios.get(`${API_URL}/results?page=${page}&pageSize=20`);
-  return data;
-};
+// export function useResultData(filters: any) {
+//   const query = useQuery({
+//     queryFn: () => fetchDataQuarkus('results', filters),
+//     queryKey: ['results-data'],
+//     placeholderData: keepPreviousData,
+//     enabled: false,
+//   });
+//   return query;
+// }
