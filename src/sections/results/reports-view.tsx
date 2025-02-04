@@ -38,11 +38,12 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import {
-  useResultData,
   useFetchToolsData,
   useResultPaginate,
   resultPgLength,
+  fetchDataQuarkus,
 } from 'src/routes/hooks/useToolData';
+import { useQuery } from '@tanstack/react-query';
 
 type Order = 'asc' | 'desc';
 
@@ -74,18 +75,18 @@ interface Filters {
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
-  page: number;
+  // page: number;
   pageSize: number;
 }
 
 const initialFilters = {
   identifier: '',
-  toolList: [''],
+  toolList: '',
   programList: [],
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
-  page: 1,
+  // page: 1,
   pageSize: 50,
 };
 
@@ -171,16 +172,16 @@ export default function ResultPage() {
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
-  const [pages, setPages] = useState(0); // numero da pagina atual
-  const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
+  const [page, setPage] = useState(1); // numero da pagina atual
+  // const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
-  const {
-    isLoading: isLoadingResultPg,
-    isError: isErrorResultPg,
-    data: resultPgData,
-    error: errorResultPg,
-    // refetch,
-  } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
+  // const {
+  //   isLoading: isLoadingResultPg,
+  //   isError: isErrorResultPg,
+  //   data: resultPgData,
+  //   error: errorResultPg,
+  //   // refetch,
+  // } = useResultPaginate(page, rowsPerPages); // recebe os dados paginados da API
 
   // teste
   const params = {
@@ -191,12 +192,17 @@ export default function ResultPage() {
   };
 
   const {
-    isLoading: isLoadingResult,
+    isPlaceholderData,
     isError: isErrorResult,
     data: resultData,
     error: errorResult,
     refetch,
-  } = useResultData(filters);
+  } = useQuery({
+    queryKey: ['results', page],
+    queryFn: () => fetchDataQuarkus('results', filters, page),
+  });
+
+  const hasNext = resultData?.length === 10;
 
   const {
     isLoading: isLoadingTools,
@@ -250,7 +256,7 @@ export default function ResultPage() {
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      toolList: JSON.stringify(toolsWithRevisions), // Agora contém os objetos { id, revision }
+      toolList: toolsWithRevisions, // Agora contém os objetos { id, revision }
     }));
   }, [toolsData, selectedTools]); // Atualiza sempre que `selectedTools` mudar
 
@@ -281,6 +287,7 @@ export default function ResultPage() {
 
   const handleSearch = () => {
     refetch();
+    setPage(1);
   };
 
   const table = useTable();
@@ -297,19 +304,19 @@ export default function ResultPage() {
     }
   }, [fetchToolsData]);
 
-  useEffect(() => {
-    async function fetchTotalCount() {
-      const count = await resultPgLength(); // Chama a função que busca o número de itens
-      setTotalCount(parseInt(count, 10));
-    }
-    fetchTotalCount();
-    console.log(totalCount);
-  }, [resultPgData, totalCount]);
+  // useEffect(() => {
+  //   async function fetchTotalCount() {
+  //     const count = await resultPgLength(); // Chama a função que busca o número de itens
+  //     setTotalCount(parseInt(count, 10));
+  //   }
+  //   fetchTotalCount();
+  //   console.log(totalCount);
+  // }, [resultPgData, totalCount]);
 
   useEffect(() => {
     // atualiza os dados da tabela
-    if (resultPgData) {
-      const transformedData = resultPgData.map((item: any) => ({
+    if (resultData) {
+      const transformedData = resultData.map((item: any) => ({
         dateTime: transformDate(item.dateTime),
         tid: item.identifier,
         toolName: item.toolDTO.toolName || '', // Extrai de toolDTO
@@ -325,17 +332,17 @@ export default function ResultPage() {
       setData(transformedData);
       console.log(transformedData);
     }
-  }, [resultPgData]);
+  }, [resultData]);
   // Atualiza o estado page e chama useResultPg para carregar os novos dados.
   const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
-    setPages(newPage);
+    setPage(newPage);
   };
   //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
-  const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
-    setRowsPerPages(parseInt(event.target.value, 10));
-    setPages(0); // Resetar para a primeira página ao mudar rowsPerPage
-    // console.log('data:', data);
-  };
+  // const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
+  //   setRowsPerPages(parseInt(event.target.value, 10));
+  //   setPage(0); // Resetar para a primeira página ao mudar rowsPerPage
+  //   // console.log('data:', data);
+  // };
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
@@ -798,15 +805,26 @@ export default function ResultPage() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination
+        {/* <TablePagination
           component="div"
-          page={pages}
-          count={totalCount}
-          rowsPerPage={rowsPerPages}
+          page={table.page}
+          count={data.length}
+          rowsPerPage={table.rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25, 50]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+          onRowsPerPageChange={table.onChangeRowsPerPage}
+        /> */}
+        <Button
+          type="button"
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          Anterior
+        </Button>
+        <span> Página {page} </span>
+        <Button type="button" onClick={() => setPage((prev) => prev + 1)} disabled={!data?.length}>
+          Próxima
+        </Button>
       </TableContainer>
     </>
   );

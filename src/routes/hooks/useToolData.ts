@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import qs from 'qs';
 
@@ -12,14 +12,15 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
-const fetchDataQuarkus = async (endpoint: string, filters: URLSearchParams) => {
+export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: number) => {
+  const page = pages;
   const cleanParams = Object.fromEntries(
     Object.entries(filters).filter(
       ([_, value]) => value !== '' && value !== null && value !== undefined
     )
   );
   const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, {
-    params: cleanParams,
+    params: { ...cleanParams, page },
   });
   return response.data;
 };
@@ -41,14 +42,15 @@ export function useTopFiveData() {
   });
 }
 
-export function useResultData(filters: any) {
-  const query = useQuery({
-    queryFn: () => fetchDataQuarkus('results', filters),
-    queryKey: ['results-data'],
-    enabled: false,
-  });
-  return query;
-}
+// export function useResultData(filters: any) {
+//   const query = useQuery({
+//     queryFn: () => fetchDataQuarkus('results', filters),
+//     queryKey: ['results-data'],
+//     placeholderData: keepPreviousData,
+//     enabled: false,
+//   });
+//   return query;
+// }
 
 export function useResultPaginate(page: number, limit: number) {
   // faz a requisição por paginação
@@ -79,3 +81,8 @@ export async function resultPgLength() {
     throw error;
   }
 }
+
+export const fetchTestPg = async (page: number) => {
+  const { data } = await axios.get(`${API_URL}/results?page=${page}&pageSize=20`);
+  return data;
+};
