@@ -13,13 +13,17 @@ const fetchData = async (endpoint: string) => {
 };
 
 export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: number) => {
+  const { programList, ...otherFilters } = filters;
   const page = pages;
   const cleanParams = Object.fromEntries(
-    Object.entries(filters).filter(
+    Object.entries(otherFilters).filter(
       ([_, value]) => value !== '' && value !== null && value !== undefined
     )
   );
-  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, {
+  const programListQuery = programList
+    ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
+    : '';
+  const response = await axios.get(`${QUARKUS_URL}/${endpoint}?${programListQuery}`, {
     params: { ...cleanParams, page },
   });
   return response.data;

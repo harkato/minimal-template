@@ -45,6 +45,7 @@ import {
   fetchProgramsData,
 } from 'src/routes/hooks/useToolData';
 import { useQuery } from '@tanstack/react-query';
+import FiltersMenu from './components/filter-menu';
 
 type Order = 'asc' | 'desc';
 
@@ -83,7 +84,7 @@ interface Filters {
 const initialFilters = {
   identifier: '',
   toolList: '',
-  programList: [],
+  programList: '',
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
@@ -186,13 +187,9 @@ export default function ResultPage() {
   //   // refetch,
   // } = useResultPaginate(page, rowsPerPages); // recebe os dados paginados da API
 
-  // teste
-  const params = {
-    finalDateTime: '2020-06-25T00:00:00',
-    initialDateTime: '2020-06-20T00:00:00',
-    page: 1,
-    pageSize: 50,
-  };
+  useEffect(() => {
+    console.log('Program list:', filters.programList);
+  }, [filters]);
 
   const {
     isPlaceholderData,
@@ -216,8 +213,6 @@ export default function ResultPage() {
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
   });
-
-  console.log(filters.toolList);
 
   const classes = useStyles();
   // const getCurrentDateTime = () => {
@@ -275,7 +270,7 @@ export default function ResultPage() {
   useEffect(() => {
     const programNumbers = programsData
       .filter((program: any) => selectedPrograms.includes(program.programName))
-      .map((program: any) => program.programNumber);
+      .map((program: any) => program.programId);
 
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -353,7 +348,6 @@ export default function ResultPage() {
         generalStatus: item.generalStatus === 1 ? 'OK' : 'NOK',
       }));
       setData(transformedData);
-      console.log(transformedData);
     }
   }, [resultData]);
   // Atualiza o estado page e chama useResultPg para carregar os novos dados.
@@ -494,166 +488,20 @@ export default function ResultPage() {
       </Typography>
 
       {/* Menu de Filtros */}
-      <Grid
-        container
-        spacing={2}
-        sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
-      >
-        {/* ID */}
-        <Grid item xs={12} sm={6} md={6}>
-          <TextField
-            label={t('results.identifier')}
-            name="identifier"
-            variant="outlined"
-            value={filters.identifier}
-            onChange={handleFilterChange}
-            fullWidth
-          />
-        </Grid>
-
-        {/* Ferramentas */}
-        <Grid item xs={12} sm={6} md={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>{t('results.tools')}</InputLabel>
-            <Select
-              multiple
-              displayEmpty
-              value={selectedTools || []}
-              onChange={handleToolListChange}
-              renderValue={(selected) =>
-                selected.length === 0 ? (
-                  <em />
-                ) : (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                    {(selected as string[]).map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </div>
-                )
-              }
-            >
-              <MenuItem value="Todos">{t('results.all')}</MenuItem>
-              {toolsData.map((tool: any, index: number) => (
-                <MenuItem key={index} value={tool.toolName}>
-                  {tool.toolName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* Programas */}
-        <Grid item xs={12} sm={6} md={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>{t('results.programs')}</InputLabel>
-            <Select
-              multiple
-              displayEmpty
-              value={selectedPrograms || []}
-              onChange={handleProgramListChange}
-              renderValue={(selected) =>
-                selected.length === 0 ? (
-                  <em />
-                ) : (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                    {(selected as string[]).map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </div>
-                )
-              }
-            >
-              <MenuItem value="Todos">{t('results.all')}</MenuItem>
-              {programsData.map((program: any, index: number) => (
-                <MenuItem key={index} value={program.programName}>
-                  {program.programName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={6}>
-          <TextField
-            select
-            label="Status"
-            name="status"
-            variant="outlined"
-            value={filters.generalStatus}
-            onChange={handleStatusChange}
-            fullWidth
-          >
-            <MenuItem value="">{t('results.all')}</MenuItem>
-            <MenuItem value="1">OK</MenuItem>
-            <MenuItem value="0">NOK</MenuItem>
-          </TextField>
-        </Grid>
-
-        {/* Data */}
-        <Grid item xs={5} sm={5} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <TextField
-              id="datetime-local"
-              label={t('results.startDate')}
-              type="datetime-local"
-              defaultValue=""
-              name="initialDateTime"
-              className={classes.textField}
-              onChange={handleDateChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider>
-        </Grid>
-
-        <Grid item xs={5} sm={5} md={3}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <TextField
-              id="datetime-local"
-              label={t('results.endDate')}
-              type="datetime-local"
-              defaultValue=""
-              name="finalDateTime"
-              className={classes.textField}
-              onChange={handleDateChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider>
-        </Grid>
-
-        {/* Número de resultados */}
-
-        <Grid item xs={12} sm={6} md={6}>
-          <TextField
-            select
-            label="Número de resultados"
-            name="pageSize"
-            variant="outlined"
-            value={filters.pageSize}
-            onChange={handleFilterChange}
-            fullWidth
-          >
-            <MenuItem value={25}>25</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-            <MenuItem value={100}>100</MenuItem>
-            <MenuItem value={200}>200</MenuItem>
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="contained" onClick={handleResetFilters}>
-            {t('results.clearFilters')}
-          </Button>
-          <Button variant="contained" onClick={handleSearch}>
-            {t('results.seach')}
-          </Button>
-        </Grid>
-      </Grid>
+      <FiltersMenu
+        filters={filters}
+        selectedTools={selectedTools}
+        selectedPrograms={selectedPrograms}
+        toolsData={toolsData}
+        programsData={programsData}
+        handleFilterChange={handleFilterChange}
+        handleToolListChange={handleToolListChange}
+        handleProgramListChange={handleProgramListChange}
+        handleStatusChange={handleStatusChange}
+        handleDateChange={handleDateChange}
+        handleResetFilters={handleResetFilters}
+        handleSearch={handleSearch}
+      />
 
       {/* Tabela de Dados */}
       <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
