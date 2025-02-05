@@ -30,7 +30,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useResultData, useResultPaginate, resultPgLength } from 'src/routes/hooks/useToolData';
+import { useResultData, useResultPaginate, resultPgLength, useResultPaginateNew, useResultAmount } from 'src/routes/hooks/useToolData';
 import { useNavigate } from 'react-router-dom';
 
 type Order = 'asc' | 'desc';
@@ -44,23 +44,94 @@ interface DataRow {
   fuso: number;
   torque: number;
   torqueStatus: string;
+  torqueHigh: number,
+  torqueLow: number,
   angle: number;
   angleStatus: string;
+  angleHigh: number,
+  angleLow: number,
   generalStatus: string;
 }
-// const initialData = Array.from({ length: 200 }, (_, i) => ({
-//   resultTime: `${String((i % 31) + 1).padStart(2, '0')}/01/2024 ${String((8 + (i % 12)) % 24).padStart(2, '0')}:00`, // Datas variando por dia e hora
-//   id: `${i + 1}`,
-//   tool: 'STANLEY',
-//   job: 1,
-//   programName: `PVT${(i % 5) + 1}`,
-//   fuso: Math.round(Math.random() * 4 + 1), // Fuso aleatório entre 1 e 5
-//   torque: parseFloat((Math.random() * 25).toFixed(1)), // Torque aleatório entre 0 e 25 com uma casa decimal
-//   torqueStatus: i % 3 === 0 ? 'OK' : 'NOK', // Alterna entre 'OK' e 'NOK'
-//   angle: parseFloat((Math.random() * 90).toFixed(1)),
-//   angleStatus: i % 3 === 0 ? 'OK' : 'NOK',
-//   generalStatus: i % 3 === 0 ? 'OK' : 'NOK',
-// }));
+
+interface ResultPgData {
+  tid: number;
+  angle: number;
+  identifier: string;
+  addIdentifier2: string;
+  addIdentifier3: string;
+  addIdentifier1: string;
+  angleHighLimit: number;
+  angleLowLimit: number;
+  angleStatus: number;
+  angleTarget: number;
+  boltId: number;
+  boltRevision: number;
+  cycleNumber: number;
+  dateTime: string;
+  flags: number;
+  generalStatus: number;
+  jobCount: number;
+  jobNumber: number;
+  jobSize: number;
+  opId: number;
+  opRevision: number;
+  programId: number | null;
+  programNumber: number | null;
+  spindleCount: number;
+  spindleNumber: number;
+  stationCode: number;
+  stationState: number;
+  toolAdr: string;
+  toolDTO: {
+    toolId: number;
+    revision: number;
+    toolName: string;
+    toolAlias: string;
+    insertId: number;
+    ip: string;
+    mac: string;
+    deviceNumber: number;
+    protocolID: number;
+    stationCode: number;
+    modelID: number;
+    servoSerialNumber: string;
+    toolSerialNumber: string;
+    spindles: number;
+    stationID: number | null;
+    userID: number | null;
+    insertDate: string;
+    configStr: string;
+    toolGroup: number;
+    state: number;
+  };
+  toolProgramDTO: {
+    programId: number;
+    revision: number;
+    toolId: number;
+    insertDate: string;
+    programNumber: number;
+    programName: string;
+    spindleNumber: number;
+    strategy: number;
+    torqueHighLimit: number;
+    torqueLowLimit: number;
+    torqueTarget: number;
+    angleHighLimit: number;
+    angleLowLimit: number;
+    angleTarget: number;
+    userId: number;
+    state: number;
+  };
+  toolResultId: number;
+  toolRevision: number | null;
+  toolSerialNumber: string;
+  torque: number;
+  torqueHighLimit: number;
+  torqueLowLimit: number;
+  torqueStatus: number;
+  torqueTarget: number;
+  userId: number;
+}
 
 const initialFilters = {
   id: '',
@@ -107,13 +178,13 @@ const downloadCSV = (rows: DataRow[]) => {
   URL.revokeObjectURL(url); // Limpa o objeto URL
 };
 
-function getStatusIcon(status: string, i: number) {
-  return status === 'OK' ? (
-    <CheckIcon sx={{ color: '#20878b' }} />
-  ) : i % 2 === 0 ? (
+function getStatusIcon(i: number, high: number, low: number) {
+  return i >= high ? (
     <ArrowUpward sx={{ color: '#f24f4f' }} />
-  ) : (
+  ) : i <= low ? (
     <ArrowDownward sx={{ color: '#FFB300' }} />
+  ) : (
+    <CheckIcon sx={{ color: '#20878b' }} />
   );
 }
 
@@ -158,7 +229,7 @@ const applyFilters = (
   });
 
 export default function ResultPage() {
-  // const [initialData, setInitialData] = useState<DataRow[]>([]); 
+  // const [filterData, setFilterData] = useState<DataRow[]>([]); 
   // const [data, setData] = useState(initialData);
   const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
@@ -167,6 +238,7 @@ export default function ResultPage() {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
+  // const [filterData, setFilterData] = useState<DataRow[]>([]);
 
   const navigate = useNavigate();
   const handleNavigation = (path: string) => {
@@ -175,29 +247,85 @@ export default function ResultPage() {
   const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
   // ==========================================================
   const [pages, setPages] = useState(0); // numero da pagina atual
-  const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
+  const [rowsPerPages, setRowsPerPages] = useState(100); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
 
+  // const { 
+  //   isLoading: isLoadingResultPg, 
+  //   isError: isErrorResultPg, 
+  //   data: resultPgData, 
+  //   error: errorResultPg 
+  // } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
+
   const { 
-    isLoading: isLoadingResultPg, 
-    isError: isErrorResultPg, 
-    data: resultPgData, 
-    error: errorResultPg 
-  } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
+    isLoading: isLoadingResultPgAmount, 
+    isError: isErrorResultPgAmount, 
+    data: resultPgDataAmount, 
+    error: errorResultPgAmount 
+  } = useResultAmount(); // recebe a quantidade total de itens da busca na NOVA API
+
+  const { 
+    isLoading: isLoadingResultPgNew, 
+    isError: isErrorResultPgNew, 
+    data: resultPgDataNew, 
+    error: errorResultPgNew 
+  } = useResultPaginateNew(pages, rowsPerPages); // recebe os dados paginados da NOVA API 
+  
+  const processData = () => {
+    const newData: DataRow[] = resultPgDataNew.map((item: ResultPgData) => ({
+      resultTime: item.dateTime,
+      id: item.identifier,
+      tool: item.toolDTO.toolName,
+      job: item.jobNumber,
+      programName: item.toolProgramDTO?.programName || "N/A", // Lidando com valores null/undefined
+      fuso: item.spindleNumber,
+      torque: item.torque,
+      torqueStatus: item.torqueStatus === 0 ? 'OK' : 'NOK', 
+      torqueHigh: item.torqueHighLimit,
+      torqueLow: item.torqueLowLimit,
+      angle: item.angle,
+      angleStatus: item.angleStatus === 0 ? 'OK' : 'NOK', 
+      angleHigh: item.angleHighLimit,
+      angleLow: item.angleLowLimit,
+      generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK', 
+    }));  
+    console.log('dados formatados', newData);
+    return newData;
+  };
+  
+  if(!isErrorResultPgNew && resultPgDataNew){
+    console.log('resultPgDataNew', resultPgDataNew); 
+    // processData()
+  }
+  if(!isErrorResultPgAmount && resultPgDataAmount){
+    console.log('total de itens', resultPgDataAmount.total);  
+  }
 
   useEffect(() => {
-    async function fetchTotalCount() {
-      const count = await resultPgLength(); // Chama a função que busca o número de itens
-      setTotalCount(parseInt(count, 10));
-    }
-    fetchTotalCount();
-  }, []);
+    // async function fetchTotalCount() {
+    //   const count = await resultPgLength(); // Chama a função que busca o número de itens
+    //   setTotalCount(parseInt(count, 10));
+    // }
+    // fetchTotalCount();
+    // setTotalCount(parseInt(resultPgDataAmount, 10)); 
+    if (resultPgDataAmount){
+      setTotalCount(resultPgDataAmount.total) 
+    }  
+  }, [resultPgDataAmount]);
 
+  // useEffect(() => { // atualiza os dados da tabela
+  //   if (resultPgData) {
+  //     setData(resultPgData);
+  //   }
+  // }, [resultPgData]);
+  
   useEffect(() => { // atualiza os dados da tabela
-    if (resultPgData) {
-      setData(resultPgData);
+    if (resultPgDataNew) {
+      
+      setData(processData());
     }
-  }, [resultPgData]);
+    // eslint-disable-next-line
+  }, [resultPgDataNew]);
 
   // Atualiza o estado page e chama useResultPg para carregar os novos dados.
   const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
@@ -705,7 +833,8 @@ export default function ResultPage() {
             <TableBody>
               {paginatedData.map((row, index) => (
                 <TableRow
-                  key={row.id}
+                  // key={row.id}
+                  key={index}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
                   <TableCell sx={{ textAlign: 'left' }} >
@@ -755,7 +884,7 @@ export default function ResultPage() {
                         fontWeight: 'bold',
                       }}
                       >
-                      {getStatusIcon(row.torqueStatus, row.torque)}
+                      {getStatusIcon(row.torque, row.torqueHigh, row.torqueLow)}
                     </Box>
                       {row.torque}
                   </TableCell>
@@ -771,7 +900,7 @@ export default function ResultPage() {
                         fontWeight: 'bold',
                       }}
                     >
-                      {getStatusIcon(row.angleStatus, row.angle)}
+                      {getStatusIcon(row.angle, row.angleHigh, row.angleLow)}
                     </Box>
                     {row.angle}
                   </TableCell>
@@ -795,7 +924,7 @@ export default function ResultPage() {
           count={totalCount}
           rowsPerPage={rowsPerPages}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>

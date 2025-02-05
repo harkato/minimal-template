@@ -32,7 +32,8 @@ const areaChartOptions = {
                 //     class: 'download-icon',
                 //     /* eslint-disable */
                 //     click: function() {
-                //         window.print();
+                //         console.log();
+                //         ;
                 //     }
                 //     /* eslint-enable */
                 // }
