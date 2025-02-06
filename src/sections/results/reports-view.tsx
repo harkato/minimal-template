@@ -280,6 +280,7 @@ export default function ResultPage() {
   const handleResetFilters = () => {
     setFilters(initialFilters);
     setSelectedTools([]);
+    setSelectedPrograms([]);
   };
 
   const handleSearch = () => {

@@ -8,6 +8,7 @@ import {
   MenuItem,
   Chip,
   Button,
+  Autocomplete,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -64,64 +65,52 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Ferramentas */}
       <Grid item xs={12} sm={6} md={6}>
-        <FormControl fullWidth variant="outlined">
-          <InputLabel>{t('results.tools')}</InputLabel>
-          <Select
-            multiple
-            displayEmpty
-            value={selectedTools || []}
-            onChange={handleToolListChange}
-            renderValue={(selected) =>
-              selected.length === 0 ? (
-                <em />
-              ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {(selected as string[]).map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </div>
-              )
-            }
-          >
-            <MenuItem value="Todos">{t('results.all')}</MenuItem>
-            {toolsData.map((tool, index) => (
-              <MenuItem key={index} value={tool.toolName}>
-                {tool.toolName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          multiple
+          options={toolsData}
+          getOptionLabel={(option) => option.toolName}
+          value={selectedTools.map(
+            (name) => toolsData.find((tool) => tool.toolName === name) || null
+          )}
+          onChange={(_, newValue) =>
+            handleToolListChange({
+              target: { value: newValue.map((tool) => tool?.toolName) },
+            })
+          }
+          renderInput={(params) => (
+            <TextField {...params} label={t('results.tools')} variant="outlined" />
+          )}
+          renderTags={(selected, getTagProps) =>
+            selected.map((option, index) => (
+              <Chip label={option.toolName} {...getTagProps({ index })} />
+            ))
+          }
+        />
       </Grid>
 
       {/* Programas */}
       <Grid item xs={12} sm={6} md={6}>
-        <FormControl fullWidth variant="outlined">
-          <InputLabel>{t('results.programs')}</InputLabel>
-          <Select
-            multiple
-            displayEmpty
-            value={selectedPrograms || []}
-            onChange={handleProgramListChange}
-            renderValue={(selected) =>
-              selected.length === 0 ? (
-                <em />
-              ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {(selected as string[]).map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </div>
-              )
-            }
-          >
-            <MenuItem value="Todos">{t('results.all')}</MenuItem>
-            {programsData.map((program, index) => (
-              <MenuItem key={index} value={program.programName}>
-                {program.programName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          multiple
+          options={programsData}
+          getOptionLabel={(option) => option.programName}
+          value={selectedPrograms.map(
+            (name) => programsData.find((p) => p.programName === name) || null
+          )}
+          onChange={(_, newValue) =>
+            handleProgramListChange({
+              target: { value: newValue.map((p) => p?.programName) },
+            })
+          }
+          renderInput={(params) => (
+            <TextField {...params} label={t('results.programs')} variant="outlined" />
+          )}
+          renderTags={(selected, getTagProps) =>
+            selected.map((option, index) => (
+              <Chip label={option.programName} {...getTagProps({ index })} />
+            ))
+          }
+        />
       </Grid>
 
       {/* Status */}
@@ -149,6 +138,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             label={t('results.startDate')}
             type="datetime-local"
             name="initialDateTime"
+            value={filters.initialDateTime}
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
             sx={{ width: '100%' }}
@@ -163,6 +153,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             label={t('results.endDate')}
             type="datetime-local"
             name="finalDateTime"
+            value={filters.finalDateTime}
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
             sx={{ width: '100%' }}
