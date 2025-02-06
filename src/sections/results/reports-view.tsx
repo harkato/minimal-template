@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useRef, useMemo, useEffect } from 'react';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { format } from 'date-fns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
   Box,
@@ -23,6 +23,11 @@ import {
   Toolbar,
   Tooltip,
   IconButton,
+  SelectChangeEvent,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -30,15 +35,18 @@ import CheckIcon from '@mui/icons-material/Check';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
-import { useResultData, useResultPaginate, resultPgLength, useResultPaginateNew, useResultAmount } from 'src/routes/hooks/useToolData';
+import { useResultData, useResultPaginateNew, useResultAmount, useFetchToolsData, useProgramsData } from 'src/routes/hooks/useToolData';
 import { useNavigate } from 'react-router-dom';
 
 type Order = 'asc' | 'desc';
 
 interface DataRow {
-  resultTime: string;
-  id: string;
-  tool: string;
+  // resultTime: string;
+  dateTime: string;
+  // id: string;
+  tid: string;
+  // tool: string;
+  toolName: string;
   job: number;
   programName: string;
   fuso: number;
@@ -133,13 +141,26 @@ interface ResultPgData {
   userId: number;
 }
 
-const initialFilters = {
-  id: '',
-  tool: '',
-  programName: '',
-  status: '',
-  startDate: '',
-  endDate: '',
+interface Filters {
+  identifier: string;
+  toolList: any;
+  programList: any;
+  generalStatus: string;
+  initialDateTime: string;
+  finalDateTime: string;
+  // page: number;
+  // pageSize: number;
+}
+
+const initialFilters = { 
+  identifier: '',
+  toolList: '',
+  programList: [],
+  generalStatus: '',
+  finalDateTime: '',
+  initialDateTime: '',
+  // page: 1,
+  // pageSize: 50,
 };
 
 // Função para converter dados em CSV
@@ -159,7 +180,7 @@ const convertToCSV = (rows: DataRow[]) => {
   ];
   const csvRows = rows.map(
     (row) =>
-      `${row.resultTime},${row.id},${row.tool},${row.job},${row.programName},${row.fuso},${row.generalStatus},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus}`
+      `${row.dateTime},${row.tid},${row.toolName},${row.job},${row.programName},${row.fuso},${row.generalStatus},${row.torque},${row.torqueStatus},${row.angle},${row.angleStatus}`
   );
   return [headers.join(','), ...csvRows].join('\n');
 };
@@ -200,78 +221,96 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const applyFilters = (
-  data: DataRow[],
-  filters: typeof initialFilters,
-  startDate: Dayjs | null,
-  endDate: Dayjs | null
-) =>
-  data.filter((row) => {
-    const isIdMatch = filters.id ? row.id.includes(filters.id) : true;
-    const isToolMatch = filters.tool ? row.tool === filters.tool : true;
-    const isProgramNameMatch = filters.programName
-      ? row.programName.includes(filters.programName)
-      : true;
-    const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
+const transformDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return format(date, 'dd/MM/yyyy HH:mm');
+};
 
-    const resultDate = dayjs(row.resultTime);
-    const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
-    const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
+// const applyFilters = (
+//   data: DataRow[],
+//   filters: typeof initialFilters,
+//   startDate: Dayjs | null,
+//   endDate: Dayjs | null
+// ) =>
+//   data.filter((row) => {
+//     const isIdMatch = filters.id ? row.id.includes(filters.id) : true;
+//     const isToolMatch = filters.tool ? row.tool === filters.tool : true;
+//     const isProgramNameMatch = filters.programName
+//       ? row.programName.includes(filters.programName)
+//       : true;
+//     const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
 
-    return (
-      isIdMatch &&
-      isToolMatch &&
-      isProgramNameMatch &&
-      isStatusMatch &&
-      isStartDateMatch &&
-      isEndDateMatch
-    );
-  });
+//     const resultDate = dayjs(row.resultTime);
+//     const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
+//     const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
+
+//     return (
+//       isIdMatch &&
+//       isToolMatch &&
+//       isProgramNameMatch &&
+//       isStatusMatch &&
+//       isStartDateMatch &&
+//       isEndDateMatch
+//     );
+//   });
 
 export default function ResultPage() {
-  // const [filterData, setFilterData] = useState<DataRow[]>([]); 
-  // const [data, setData] = useState(initialData);
   const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof DataRow>('resultTime');
-  const [filters, setFilters] = useState(initialFilters);
+  const [toolsData, setToolsData] = useState(['']);
+  const [programsData, setProgramsData] = useState(['']);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
+  // const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState<Filters>(initialFilters);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { t, i18n } = useTranslation();
-  // const [filterData, setFilterData] = useState<DataRow[]>([]);
-
   const navigate = useNavigate();
   const handleNavigation = (path: string) => {
     navigate(path);
   };
-  const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
+  // const { isLoading: isLoadingResult, isError: isErrorResult, data: resultData, error: errorResult } = useResultData();
   // ==========================================================
   const [pages, setPages] = useState(0); // numero da pagina atual
   const [rowsPerPages, setRowsPerPages] = useState(100); // linhas por pagina
-  const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
+  const [totalCount, setTotalCount] = useState(0); // quantidade total de itens  
 
-  // const { 
-  //   isLoading: isLoadingResultPg, 
-  //   isError: isErrorResultPg, 
-  //   data: resultPgData, 
-  //   error: errorResultPg 
-  // } = useResultPaginate(pages, rowsPerPages); // recebe os dados paginados da API
-
+  const params = {
+    finalDateTime: '2020-06-25T00:00:00',
+    initialDateTime: '2020-06-20T00:00:00',
+    page: 1,
+    pageSize: 50,
+  };
+  
   const { 
     isLoading: isLoadingResultPgAmount, 
     isError: isErrorResultPgAmount, 
     data: resultPgDataAmount, 
     error: errorResultPgAmount 
-  } = useResultAmount(); // recebe a quantidade total de itens da busca na NOVA API
+  } = useResultAmount(filters); // recebe a quantidade total de itens da busca na NOVA API
 
   const { 
     isLoading: isLoadingResultPgNew, 
     isError: isErrorResultPgNew, 
     data: resultPgDataNew, 
     error: errorResultPgNew 
-  } = useResultPaginateNew(pages, rowsPerPages); // recebe os dados paginados da NOVA API 
+  } = useResultPaginateNew(pages, rowsPerPages, resultPgDataAmount?.total || 0, filters); // recebe os dados paginados da NOVA API 
+ 
+  const {
+    isLoading: isLoadingTools,
+    isError: isErrorTools,
+    data: fetchToolsData,
+    error: toolsError,
+    refetch,
+  } = useFetchToolsData();
+
+  const { data: queryProgramsData } = useProgramsData(filters.toolList)
+  // console.log('filters.toolList', filters.toolList);
   
-  const processData = () => {
+  
+  const processData = () => { // converter os dados recebidos da API para a interface da tabela
     const newData: DataRow[] = resultPgDataNew.map((item: ResultPgData) => ({
       resultTime: item.dateTime,
       id: item.identifier,
@@ -289,35 +328,23 @@ export default function ResultPage() {
       angleLow: item.angleLowLimit,
       generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK', 
     }));  
-    console.log('dados formatados', newData);
+    // console.log('dados formatados', newData);
     return newData;
   };
   
-  if(!isErrorResultPgNew && resultPgDataNew){
-    console.log('resultPgDataNew', resultPgDataNew); 
-    // processData()
-  }
-  if(!isErrorResultPgAmount && resultPgDataAmount){
-    console.log('total de itens', resultPgDataAmount.total);  
-  }
+  // if(!isErrorResultPgNew && resultPgDataNew){
+  //   console.log('resultPgDataNew', resultPgDataNew); 
+  //   // processData()
+  // }
+  // if(!isErrorResultPgAmount && resultPgDataAmount){
+  //   console.log('total de itens', resultPgDataAmount.total);  
+  // }
 
   useEffect(() => {
-    // async function fetchTotalCount() {
-    //   const count = await resultPgLength(); // Chama a função que busca o número de itens
-    //   setTotalCount(parseInt(count, 10));
-    // }
-    // fetchTotalCount();
-    // setTotalCount(parseInt(resultPgDataAmount, 10)); 
     if (resultPgDataAmount){
-      setTotalCount(resultPgDataAmount.total) 
+      setTotalCount(resultPgDataAmount?.total || 0) 
     }  
   }, [resultPgDataAmount]);
-
-  // useEffect(() => { // atualiza os dados da tabela
-  //   if (resultPgData) {
-  //     setData(resultPgData);
-  //   }
-  // }, [resultPgData]);
   
   useEffect(() => { // atualiza os dados da tabela
     if (resultPgDataNew) {
@@ -340,7 +367,6 @@ export default function ResultPage() {
     
   };
   
-  // =============================================================
   const classes = useStyles();
   const getCurrentDateTime = () => {
     const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
@@ -348,10 +374,10 @@ export default function ResultPage() {
     return isoString;
   };
 
-  const filteredData = useMemo(
-    () => applyFilters(data, filters, startDate, endDate),
-    [data, filters, startDate, endDate]
-  );
+  // const filteredData = useMemo(
+  //   () => applyFilters(data, filters, startDate, endDate),
+  //   [data, filters, startDate, endDate]
+  // );
   // Função para ordenar os dados
   const handleRequestSort = (property: keyof DataRow) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -368,90 +394,119 @@ export default function ResultPage() {
   };
 
   // Função para aplicar filtros
-
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleResetFilters = () => {
-    setFilters(initialFilters);
-    setStartDate(null);
-    setEndDate(null);
+  const handleToolListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedTools(selectedValues);
   };
 
-  const handleSearch = () => {
-    // Por enquanto, só atualiza os dados filtrados
-    const updatedData = applyFilters(data, filters, startDate, endDate);
-    setData(updatedData);
+  const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedPrograms(selectedValues);
+  };
 
-    // No futuro, aqui você pode integrar com uma API para buscar dados do banco
-    console.log('Filtros aplicados:', filters, startDate, endDate);
+  // const handleResetFilters = () => {
+  //   setFilters(initialFilters);
+  //   setStartDate(null);
+  //   setEndDate(null);
+  // };
+  const handleResetFilters = () => {
+    setFilters(initialFilters);
+    setSelectedTools([]);
+  };
+
+  useEffect(() => {
+    const toolsWithRevisions = toolsData
+      .filter((tool: any) => selectedTools.includes(tool.toolName))
+      .map((tool: any) => ({
+        id: tool.toolId,
+        revision: tool.revision,
+      }));
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      toolList: toolsWithRevisions, // Agora contém os objetos { id, revision }
+    }));
+  }, [toolsData, selectedTools]); // Atualiza sempre que `selectedTools` mudar
+
+  useEffect(() => {
+    const programNumbers = programsData
+      .filter((program: any) => selectedPrograms.includes(program.programName))
+      .map((program: any) => program.programNumber);
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      programList: programNumbers,
+    }));
+  }, [programsData, selectedPrograms]);
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+
+    setFilters({ ...filters, [name]: formattedDate });
+  };
+
+  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    // const status = () => (value === 'OK' ? 'OK' : 'NOK');
+    setFilters({ ...filters, generalStatus: value });
+  };
+
+  // const handleSearch = () => {
+  //   // Por enquanto, só atualiza os dados filtrados
+  //   const updatedData = applyFilters(data, filters, startDate, endDate);
+  //   setData(updatedData);
+  //   // No futuro, aqui você pode integrar com uma API para buscar dados do banco
+  //   console.log('Filtros aplicados:', filters, startDate, endDate);
+  // };
+  const handleSearch = () => {
+    refetch();
+    setPages(1);
   };
 
   const table = useTable();
-  const paginatedData = filteredData.slice(
+  // const paginatedData = filteredData.slice(
+  const paginatedData = data.slice(
     table.page * table.rowsPerPage,
     table.page * table.rowsPerPage + table.rowsPerPage
   );
 
   const tableRef = useRef<HTMLDivElement>(null);
-// ===========================================dados da API antiga=========================================
-  // useEffect(() => {
-  //   if (resultData) {
-  //     setData(resultData);
-  //   }
-  // }, [resultData]);  
 
-  // Função de impressão da tabela atual
-  // const handlePrint = () => {
-  //   if (tableRef.current) {
-  //     // Clona o nó da tabela
-  //     const tableClone = tableRef.current.cloneNode(true) as HTMLElement;
+  useEffect(() => {
+    if (fetchToolsData) {
+      setToolsData(fetchToolsData);
+    }
+    if (queryProgramsData) {
+      setProgramsData(queryProgramsData);
+    }
+  }, [fetchToolsData, queryProgramsData]);
 
-  //     // Remove as setas (ícones de ordenação) do clone
-  //     const sortLabels = tableClone.querySelectorAll('.MuiTableSortLabel-icon');
-  //     sortLabels.forEach((icon) => {
-  //       icon.remove();
-  //     });
-
-  //     // Obter o conteúdo atualizado do clone
-  //     const printContent = tableClone.innerHTML;
-
-  //     // Cria uma nova janela para impressão
-  //     const printWindow = window.open('', '_blank');
-  //     if (printWindow) {
-  //       printWindow.document.write(`
-  //         <html>
-  //           <head>
-  //             <title>Resultados</title>
-  //             <style>
-  //               body {
-  //                 font-family: Arial, sans-serif;
-  //                 margin: 20px;
-  //               }
-  //               table {
-  //                 width: 100%;
-  //                 border-collapse: collapse;
-  //               }
-  //               th, td {
-  //                 border: 1px solid black;
-  //                 padding: 8px;
-  //                 text-align: left;
-  //               }
-  //               th {
-  //                 background-color: #f2f2f2;
-  //               }
-  //             </style>
-  //           </head>
-  //           <body>${printContent}</body>
-  //         </html>
-  //       `);
-  //       printWindow.document.close();
-  //       printWindow.print();
-  //     }
-  //   }
-  // };
+  useEffect(() => {
+    // atualiza os dados da tabela
+    if (resultPgDataNew) {
+      const transformedData = resultPgDataNew.map((item: any) => ({
+        dateTime: transformDate(item.dateTime),
+        tid: item.identifier,
+        toolName: item.toolDTO.toolName || '', // Extrai de toolDTO
+        job: item.jobNumber || '',
+        programName: item.toolProgramDTO.programName || '',
+        fuso: item.spindleNumber || '',
+        torque: item.torque || '',
+        torqueStatus: item.torqueStatus,
+        angle: item.angle || '',
+        angleStatus: item.angleStatus,
+        generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK',
+      }));
+      setData(transformedData);
+      // console.log('transformedData', transformedData);
+    }
+  }, [resultPgDataNew]);
 
   const handlePrintAllPages = () => {
     const fullTable = document.createElement('div');
@@ -518,13 +573,13 @@ export default function ResultPage() {
           </tr>
         </thead>
         <tbody>
-          ${filteredData
+          ${data // filteredData
             .map(
               (row, index) => `
               <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
-                <td>${row.resultTime}</td>
-                <td>${row.id}</td>
-                <td>${row.tool}</td>
+                <td>${row.dateTime}</td>
+                <td>${row.tid}</td>
+                <td>${row.toolName}</td>
                 <td>${row.job}</td>
                 <td>${row.programName}</td>
                 <td>${row.fuso}</td>
@@ -571,6 +626,8 @@ export default function ResultPage() {
     }
   };
 
+  // TABELA
+
   return (
     <>
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
@@ -587,9 +644,9 @@ export default function ResultPage() {
         <Grid item xs={12} sm={6} md={6}>
           <TextField
             label={t('results.identifier')}
-            name="id"
+            name="identifier"
             variant="outlined"
-            value={filters.id}
+            value={filters.identifier}
             onChange={handleFilterChange}
             fullWidth
           />
@@ -597,7 +654,7 @@ export default function ResultPage() {
 
         {/* Ferramentas */}
         <Grid item xs={12} sm={6} md={6}>
-          <TextField
+          {/* <TextField
             select
             label={t('results.tools')}
             name="tool"
@@ -609,12 +666,39 @@ export default function ResultPage() {
             <MenuItem value="">{t('results.all')}</MenuItem>
             <MenuItem value="STANLEY">STANLEY</MenuItem>
             <MenuItem value="MAKITA">MAKITA</MenuItem>
-          </TextField>
+          </TextField> */}
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>{t('results.tools')}</InputLabel>
+            <Select
+              multiple
+              displayEmpty
+              value={selectedTools || []}
+              onChange={handleToolListChange}
+              renderValue={(selected) =>
+                selected.length === 0 ? (
+                  <em />
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </div>
+                )
+              }
+            >
+              <MenuItem value="Todos">{t('results.all')}</MenuItem>
+              {toolsData.map((tool: any, index: number) => (
+                <MenuItem key={index} value={tool.toolName}>
+                  {tool.toolName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         {/* Programas */}
         <Grid item xs={12} sm={6} md={6}>
-          <TextField
+          {/* <TextField
             select
             label={t('results.programs')}
             name="programName"
@@ -625,7 +709,34 @@ export default function ResultPage() {
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
             <MenuItem value="101-M001/task 1">PVT1</MenuItem>
-          </TextField>
+          </TextField> */}
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>{t('results.programs')}</InputLabel>
+            <Select
+              multiple
+              displayEmpty
+              value={selectedPrograms || []}
+              onChange={handleProgramListChange}
+              renderValue={(selected) =>
+                selected.length === 0 ? (
+                  <em />
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </div>
+                )
+              }
+            >
+              <MenuItem value="Todos">{t('results.all')}</MenuItem>
+              {programsData.map((program: any, index: number) => (
+                <MenuItem key={index} value={program.programName}>
+                  {program.programName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6} md={6}>
@@ -634,8 +745,8 @@ export default function ResultPage() {
             label="Status"
             name="status"
             variant="outlined"
-            value={filters.status}
-            onChange={handleFilterChange}
+            value={filters.generalStatus}
+            onChange={handleStatusChange}
             fullWidth
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
@@ -643,25 +754,36 @@ export default function ResultPage() {
             <MenuItem value="NOK">NOK</MenuItem>
           </TextField>
         </Grid>
-
         {/* Data */}
-        <Grid item xs={5} sm={5} md={3}>
-          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DatePicker
-              name="startDate"
-              label="Início"
-              value={startDate}
-              onChange={(newDate) => setStartDate(newDate)}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider> */}
+        <Grid item xs={5} sm={5} md={3}>          
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
             <TextField
               id="datetime-local"
               label={t('results.startDate')}
               type="datetime-local"
-              defaultValue={getCurrentDateTime()}
+              // defaultValue={getCurrentDateTime()}
+              defaultValue=""
+              name="initialDateTime"
               className={classes.textField}
+              onChange={handleDateChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
+        </Grid>
+        <Grid item xs={5} sm={5} md={3}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+            <TextField
+              id="datetime-local"
+              label={t('results.endDate')}
+              type="datetime-local"
+              // defaultValue={getCurrentDateTime()}
+              defaultValue=""
+              name="finalDateTime"
+              className={classes.textField}
+              onChange={handleDateChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -670,30 +792,24 @@ export default function ResultPage() {
           </LocalizationProvider>
         </Grid>
 
-        <Grid item xs={5} sm={5} md={3}>
-          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <DatePicker
-              name="endDate"
-              label="Fim"
-              value={endDate}
-              onChange={(newDate) => setEndDate(newDate)}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider> */}
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-            <TextField
-              id="datetime-local"
-              label={t('results.endDate')}
-              type="datetime-local"
-              defaultValue={getCurrentDateTime()}
-              className={classes.textField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider>
-        </Grid>
+        {/* Número de resultados */}
+
+        {/* <Grid item xs={12} sm={6} md={6}>
+          <TextField
+            select
+            label="Número de resultados"
+            name="pageSize"
+            variant="outlined"
+            value={filters.pageSize}
+            onChange={handleFilterChange}
+            fullWidth
+          >
+            <MenuItem value={25}>25</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+            <MenuItem value={200}>200</MenuItem>
+          </TextField>
+        </Grid> */}
 
         <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="contained" onClick={handleResetFilters}>
@@ -704,7 +820,6 @@ export default function ResultPage() {
           </Button>
         </Grid>
       </Grid>
-
       {/* Tabela de Dados */}
       <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
         <Toolbar
@@ -717,7 +832,8 @@ export default function ResultPage() {
         >
           <div>
             <Tooltip title={t('results.saveExport')}>
-              <IconButton onClick={() => downloadCSV(filteredData)}>
+              {/* <IconButton onClick={() => downloadCSV(filteredData)}> */}
+              <IconButton onClick={() => downloadCSV(data)}>
                 <Iconify icon="material-symbols:save" />
               </IconButton>
             </Tooltip>
@@ -734,9 +850,9 @@ export default function ResultPage() {
               <TableRow>
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'resultTime'}
-                    direction={orderBy === 'resultTime' ? order : 'asc'}
-                    onClick={() => handleRequestSort('resultTime')}
+                    active={orderBy === 'dateTime'}
+                    direction={orderBy === 'dateTime' ? order : 'asc'}
+                    onClick={() => handleRequestSort('dateTime')}
                     sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.date')}
@@ -744,26 +860,24 @@ export default function ResultPage() {
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'id'}
-                    direction={orderBy === 'id' ? order : 'asc'}
-                    onClick={() => handleRequestSort('id')}
+                    active={orderBy === 'tid'}
+                    direction={orderBy === 'tid' ? order : 'asc'}
+                    onClick={() => handleRequestSort('tid')}
                     sx={{ display: 'flex', justifyContent: 'right' }}
                   >
                     Id
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
-                    active={orderBy === 'tool'}
-                    direction={orderBy === 'tool' ? order : 'asc'}
-                    onClick={() => handleRequestSort('tool')}
+                    active={orderBy === 'toolName'}
+                    direction={orderBy === 'toolName' ? order : 'asc'}
+                    onClick={() => handleRequestSort('toolName')}
                     sx={{ display: 'flex', justifyContent: 'center' }}
                   >
                     {t('results.tools')}
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'job'}
@@ -774,7 +888,6 @@ export default function ResultPage() {
                     {t('results.job')}
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'programName'}
@@ -785,7 +898,6 @@ export default function ResultPage() {
                     {t('results.programs')}
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'fuso'}
@@ -796,7 +908,6 @@ export default function ResultPage() {
                     {t('results.spindle')}
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'generalStatus'}
@@ -807,7 +918,6 @@ export default function ResultPage() {
                     {t('results.generalStatus')}
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'torque'}
@@ -851,10 +961,10 @@ export default function ResultPage() {
                     >
                       <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
                     </Box>
-                    {row.resultTime}
+                    {row.dateTime}
                   </TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.id}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }} >{row.tool}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.tid}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }} >{row.toolName}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.job}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.programName}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }} >{row.fuso}</TableCell>
@@ -909,15 +1019,6 @@ export default function ResultPage() {
             </TableBody>
           </Table>
         </div>
-        {/* <TablePagination
-          component="div"
-          page={table.page}
-          count={filteredData.length}
-          rowsPerPage={table.rowsPerPage}
-          onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
-        /> */}
         <TablePagination
           component="div"
           page={pages}
