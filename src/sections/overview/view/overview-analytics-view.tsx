@@ -30,7 +30,84 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { useTopFiveData } from 'src/routes/hooks/useToolData';
+import { initialDataTopFive } from './initial-data-top-five';
+import {
+  getTopFiveData,
+  useToolData,
+  useToolListData,
+  useTopFiveData,
+} from 'src/routes/hooks/useToolData';
+import { log } from 'console';
+import { useQuery } from '@tanstack/react-query';
+import { Pending } from '@mui/icons-material';
+
+const style = {
+  position: 'absolute',
+  alignContent: 'center',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+
+  '@media (max-width: 768px)': {
+    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+    width: '90%', // Ocupa 90% da largura da tela
+  },
+};
+
+function valuetext(value: number) {
+  return `${value}°C`;
+}
+
+const StyledPopper = styled(Popper)(({ theme }) => ({
+  border: `1px solid ${'#e1e4e8'}`,
+  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
+  color: '#24292e',
+  backgroundColor: '#fff',
+  borderRadius: 6,
+  width: 300,
+  zIndex: theme.zIndex.modal,
+  fontSize: 13,
+  ...theme.applyStyles('dark', {
+    border: `1px solid ${'#30363d'}`,
+    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
+    color: '#c9d1d9',
+    backgroundColor: '#1c2128',
+  }),
+}));
+
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  padding: 10,
+  width: '100%',
+  borderBottom: `1px solid ${'#30363d'}`,
+  '& input': {
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    border: `1px solid ${'#30363d'}`,
+    padding: 8,
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    fontSize: 14,
+    '&:focus': {
+      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
+      borderColor: '#0366d6',
+      ...theme.applyStyles('dark', {
+        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
+        borderColor: '#388bfd',
+      }),
+    },
+    ...theme.applyStyles('dark', {
+      backgroundColor: '#0d1117',
+      border: `1px solid ${'#eaecef'}`,
+    }),
+  },
+  ...theme.applyStyles('dark', {
+    borderBottom: `1px solid ${'#eaecef'}`,
+  }),
+}));
 
 export function OverviewAnalyticsView() {
   const { t } = useTranslation();
@@ -71,8 +148,72 @@ export function OverviewAnalyticsView() {
     // Fecha o componente relacionado ao rótulo
     handleCloseLabel();
     // Fecha o modal
-    setOpenModal(false);
+    setOpen(false);
   };
+
+  const {
+    isLoading: isLoadingToolList,
+    isError: isErrorToolList,
+    data: toolListData,
+    error: errorToolList,
+  } = useToolListData();
+  const [selectLabels, setLabels] = useState<LabelType[]>([]);
+
+  useEffect(() => {
+    if (toolListData) {
+      setLabels(toolListData);
+      // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
+    }
+  }, [toolListData]);
+  // console.log("pendingValue: ", pendingValue, "\n pending", Pending);
+
+  // const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
+  // const { data, isLoading, isError, error } = useTopFiveData();
+  const {
+    isLoading: isLoadingTopFive,
+    isError: isErrorTopFive,
+    data: TopFiveData,
+    error: errorTopFive,
+  } = useTopFiveData();
+  // const dataAPI = getTopFiveData()
+  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+
+  // =======================================Simulando atualizações em tempo real==========================================
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTopFiveData((prevData) => {
+  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
+  //       const updatedCard = prevData[randomIndex];
+  //       // Atualiza apenas o card selecionado
+  //       const updatedData = prevData.map((card, index) =>
+  //         index === randomIndex
+  //           ? {
+  //               ...updatedCard,
+  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
+  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
+  //               title: updatedCard.title.includes('Novo')
+  //                 ? updatedCard.title.replace('Novo ', '')
+  //                 : `Novo ${updatedCard.title}`, // Alterna o título
+  //             }
+  //           : card
+  //       );
+
+  //       return updatedData;
+  //     });
+  //   }, 20000); // Atualiza a cada 20 segundos
+
+  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
+  // }, []);
+
+  // Garante que `data` está definido antes de usar
+  const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) => a.title.localeCompare(b.title));
+
+  // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
+
+  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
+  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
+
+  // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
@@ -305,12 +446,12 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
-                              options={[...labels].sort((a, b) => {
+                              options={[...selectLabels].sort((a, b) => {
                                 // Display the selected labels first.
                                 let ai = valueLabel.indexOf(a);
-                                ai = ai === -1 ? valueLabel.length + labels.indexOf(a) : ai;
+                                ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
                                 let bi = valueLabel.indexOf(b);
-                                bi = bi === -1 ? valueLabel.length + labels.indexOf(b) : bi;
+                                bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
                                 return ai - bi;
                               })}
                               getOptionLabel={(option) => option.name}
@@ -569,113 +710,113 @@ const StyledInput = styled(InputBase)(({ theme }) => ({
 }));
 
 // From https://github.com/abdonrd/github-labels
-const labels = [
-  {
-    id: 1,
-    name: 'MAKITA',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 2,
-    name: 'ZP6',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 3,
-    name: 'BANCOS',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 4,
-    name: 'TACTO12',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 5,
-    name: 'R2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 6,
-    name: 'FRONTEND',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 7,
-    name: 'FAHRWERK2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 8,
-    name: 'ZP62',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 9,
-    name: 'BANCOS2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 10,
-    name: 'TACTO11',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 11,
-    name: 'R3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 12,
-    name: 'FRONTEND2',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 13,
-    name: 'FAHRWERK3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 14,
-    name: 'ZP63',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 15,
-    name: 'BANCOS3',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 16,
-    name: 'TACTO10',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 17,
-    name: 'R1',
-    color: '#9fc3da29',
-    description: '',
-  },
-  {
-    id: 18,
-    name: 'FRONTEND3',
-    color: '#9fc3da29',
-    description: '',
-  },
-];
+// const labels = [
+//   {
+//     id: 1,
+//     name: 'MAKITA',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 2,
+//     name: 'ZP6',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 3,
+//     name: 'BANCOS',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 4,
+//     name: 'TACTO12',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 5,
+//     name: 'R2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 6,
+//     name: 'FRONTEND',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 7,
+//     name: 'FAHRWERK2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 8,
+//     name: 'ZP62',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 9,
+//     name: 'BANCOS2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 10,
+//     name: 'TACTO11',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 11,
+//     name: 'R3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 12,
+//     name: 'FRONTEND2',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 13,
+//     name: 'FAHRWERK3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 14,
+//     name: 'ZP63',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 15,
+//     name: 'BANCOS3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 16,
+//     name: 'TACTO10',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 17,
+//     name: 'R1',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+//   {
+//     id: 18,
+//     name: 'FRONTEND3',
+//     color: '#9fc3da29',
+//     description: '',
+//   },
+// ];

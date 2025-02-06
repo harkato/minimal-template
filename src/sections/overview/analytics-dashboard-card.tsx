@@ -62,7 +62,7 @@ export function AnalyticsDashboardCard({
   const newColor = getColor()
   const handleSliderClick = (event: { stopPropagation: () => void; }) => {
     event.stopPropagation(); // Impede a propagação do evento
-  };
+  };  
   const handleChangeTarget = (event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
