@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import qs from 'qs';
 
@@ -15,16 +15,44 @@ const fetchData = async (endpoint: string) => {
 export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: number) => {
   const { programList, ...otherFilters } = filters;
   const page = pages;
+
+  // Remove valores vazios, null e undefined dos filtros
   const cleanParams = Object.fromEntries(
     Object.entries(otherFilters).filter(
       ([_, value]) => value !== '' && value !== null && value !== undefined
     )
   );
+
+  // Serializa programList no formato correto (repeat para múltiplos valores)
   const programListQuery = programList
     ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
     : '';
+
+  // Faz a requisição com os filtros formatados
   const response = await axios.get(`${QUARKUS_URL}/${endpoint}?${programListQuery}`, {
     params: { ...cleanParams, page },
+  });
+  return response.data;
+};
+
+export const fetchDataTotal = async (filters: any) => {
+  const { programList, ...otherFilters } = filters;
+
+  // Remove valores vazios, null e undefined dos filtros
+  const cleanParams = Object.fromEntries(
+    Object.entries(otherFilters).filter(
+      ([_, value]) => value !== '' && value !== null && value !== undefined
+    )
+  );
+
+  // Serializa programList no formato correto (repeat para múltiplos valores)
+  const programListQuery = programList
+    ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
+    : '';
+
+  // Faz a requisição com os filtros formatados
+  const response = await axios.get(`${QUARKUS_URL}/results/amount?${programListQuery}`, {
+    params: { ...cleanParams },
   });
   return response.data;
 };
@@ -63,29 +91,36 @@ export function useResultPaginate(page: number, limit: number) {
   return query;
 }
 
-export async function resultPgLength() {
-  // retorna o total de itens
-  try {
-    const response = await axios.get(`${API_URL}/results`, {
-      params: { _limit: 0, StartPoint: 0 },
-      responseType: 'text', // Adiciona o responseType para texto
-    });
-    if (response.status !== 200) {
-      throw new Error('Erro ao buscar os dados');
-    }
-    return response.headers['x-total-count'];
-  } catch (error) {
-    console.error('Erro na requisição:', error);
-    throw error;
-  }
+export function useResultAmount(filters: any) {
+  // retorna a quantidade de itens da busca
+  const query = useQuery({
+    queryFn: () => fetchDataTotal(filters),
+    queryKey: ['amount', filters],
+  });
+  return query;
 }
 
-// export function useResultData(filters: any) {
-//   const query = useQuery({
-//     queryFn: () => fetchDataQuarkus('results', filters),
-//     queryKey: ['results-data'],
-//     placeholderData: keepPreviousData,
-//     enabled: false,
-//   });
-//   return query;
-// }
+export function useResultPaginateQuarkus(
+  page: number,
+  limit: number,
+  amount: number,
+  filters: any
+) {
+  const queryClient = useQueryClient();
+
+  // Chamada principal da API usando fetchDataQuarkus
+  const query = useQuery({
+    queryFn: () => fetchDataQuarkus('results', filters, page),
+    queryKey: ['results', page, limit, filters],
+  });
+
+  // Pré-carregamento da próxima página, se houver mais dados
+  if (query.data && amount && (page + 1) * limit < amount) {
+    queryClient.prefetchQuery({
+      queryFn: () => fetchDataQuarkus('results', filters, page + 1),
+      queryKey: ['results', page + 1, limit, filters],
+    });
+  }
+
+  return query;
+}

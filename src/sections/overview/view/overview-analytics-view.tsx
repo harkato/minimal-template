@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
@@ -31,83 +31,10 @@ import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import {
-  getTopFiveData,
-  useToolData,
-  useToolListData,
-  useTopFiveData,
-} from 'src/routes/hooks/useToolData';
+import { useFetchToolsData, useTopFiveData } from 'src/routes/hooks/useToolData';
 import { log } from 'console';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
-
-const style = {
-  position: 'absolute',
-  alignContent: 'center',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-
-  '@media (max-width: 768px)': {
-    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-    width: '90%', // Ocupa 90% da largura da tela
-  },
-};
-
-function valuetext(value: number) {
-  return `${value}°C`;
-}
-
-const StyledPopper = styled(Popper)(({ theme }) => ({
-  border: `1px solid ${'#e1e4e8'}`,
-  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
-  color: '#24292e',
-  backgroundColor: '#fff',
-  borderRadius: 6,
-  width: 300,
-  zIndex: theme.zIndex.modal,
-  fontSize: 13,
-  ...theme.applyStyles('dark', {
-    border: `1px solid ${'#30363d'}`,
-    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
-    color: '#c9d1d9',
-    backgroundColor: '#1c2128',
-  }),
-}));
-
-const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: 10,
-  width: '100%',
-  borderBottom: `1px solid ${'#30363d'}`,
-  '& input': {
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    border: `1px solid ${'#30363d'}`,
-    padding: 8,
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
-    fontSize: 14,
-    '&:focus': {
-      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
-      borderColor: '#0366d6',
-      ...theme.applyStyles('dark', {
-        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
-        borderColor: '#388bfd',
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#0d1117',
-      border: `1px solid ${'#eaecef'}`,
-    }),
-  },
-  ...theme.applyStyles('dark', {
-    borderBottom: `1px solid ${'#eaecef'}`,
-  }),
-}));
 
 export function OverviewAnalyticsView() {
   const { t } = useTranslation();
@@ -148,7 +75,7 @@ export function OverviewAnalyticsView() {
     // Fecha o componente relacionado ao rótulo
     handleCloseLabel();
     // Fecha o modal
-    setOpen(false);
+    // setOpen(false);
   };
 
   const {
@@ -156,7 +83,7 @@ export function OverviewAnalyticsView() {
     isError: isErrorToolList,
     data: toolListData,
     error: errorToolList,
-  } = useToolListData();
+  } = useFetchToolsData();
   const [selectLabels, setLabels] = useState<LabelType[]>([]);
 
   useEffect(() => {
@@ -204,9 +131,6 @@ export function OverviewAnalyticsView() {
 
   //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
   // }, []);
-
-  // Garante que `data` está definido antes de usar
-  const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) => a.title.localeCompare(b.title));
 
   // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
 

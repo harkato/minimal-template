@@ -18,6 +18,8 @@ import {
   Tooltip,
   IconButton,
   SelectChangeEvent,
+  listItemTextClasses,
+  TablePagination,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward, Cancel } from '@mui/icons-material';
@@ -28,9 +30,10 @@ import { useTranslation } from 'react-i18next';
 import {
   useFetchToolsData,
   useResultPaginate,
-  resultPgLength,
   fetchDataQuarkus,
   fetchProgramsData,
+  useResultPaginateQuarkus,
+  useResultAmount,
 } from 'src/routes/hooks/useToolData';
 import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
@@ -166,7 +169,7 @@ export default function ResultPage() {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [page, setPage] = useState(1); // numero da pagina atual
-  // const [rowsPerPages, setRowsPerPages] = useState(5); // linhas por pagina
+  const [rowsPerPages, setRowsPerPages] = useState(25); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
   // const {
   //   isLoading: isLoadingResultPg,
@@ -176,20 +179,15 @@ export default function ResultPage() {
   //   // refetch,
   // } = useResultPaginate(page, rowsPerPages); // recebe os dados paginados da API
 
-  useEffect(() => {
-    console.log('Program list:', filters.programList);
-  }, [filters]);
+  const { data: resultPgDataAmount } = useResultAmount(filters); // recebe a quantidade total de itens da busca na NOVA API
 
   const {
-    isPlaceholderData,
+    isLoading: isPlaceholderData,
     isError: isErrorResult,
     data: resultData,
     error: errorResult,
     refetch,
-  } = useQuery({
-    queryKey: ['results', page],
-    queryFn: () => fetchDataQuarkus('results', filters, page),
-  });
+  } = useResultPaginateQuarkus(page, filters.pageSize, resultPgDataAmount?.total || 0, filters);
 
   const {
     isLoading: isLoadingTools,
@@ -311,14 +309,11 @@ export default function ResultPage() {
     }
   }, [fetchToolsData, queryProgramsData]);
 
-  // useEffect(() => {
-  //   async function fetchTotalCount() {
-  //     const count = await resultPgLength(); // Chama a função que busca o número de itens
-  //     setTotalCount(parseInt(count, 10));
-  //   }
-  //   fetchTotalCount();
-  //   console.log(totalCount);
-  // }, [resultPgData, totalCount]);
+  useEffect(() => {
+    if (resultPgDataAmount) {
+      setTotalCount(resultPgDataAmount?.total || 0);
+    }
+  }, [resultPgDataAmount]);
 
   useEffect(() => {
     // atualiza os dados da tabela
@@ -344,11 +339,10 @@ export default function ResultPage() {
     setPage(newPage);
   };
   //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
-  // const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
-  //   setRowsPerPages(parseInt(event.target.value, 10));
-  //   setPage(0); // Resetar para a primeira página ao mudar rowsPerPage
-  //   // console.log('data:', data);
-  // };
+  const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
+    setRowsPerPages(parseInt(event.target.value, 10));
+    setPage(0); // Resetar para a primeira página ao mudar rowsPerPage
+  };
 
   const handlePrintAllPages = () => {
     printAllPages(data);
@@ -565,26 +559,15 @@ export default function ResultPage() {
             </TableBody>
           </Table>
         </div>
-        {/* <TablePagination
+        <TablePagination
           component="div"
-          page={table.page}
-          count={data.length}
-          rowsPerPage={table.rowsPerPage}
+          page={page}
+          count={totalCount}
+          rowsPerPage={rowsPerPages}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
-        /> */}
-        <Button
-          type="button"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-        >
-          Anterior
-        </Button>
-        <span> Página {page} </span>
-        <Button type="button" onClick={() => setPage((prev) => prev + 1)} disabled={!data?.length}>
-          Próxima
-        </Button>
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </TableContainer>
     </>
   );
