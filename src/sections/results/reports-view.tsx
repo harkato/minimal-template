@@ -277,11 +277,6 @@ export default function ResultPage() {
     setFilters({ ...filters, generalStatus: value });
   };
 
-  // const handleMaxResultsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
-  //   setFilters({ ...filters, pageSize: Number.parseInt(value, 10) });
-  // };
-
   const handleResetFilters = () => {
     setFilters(initialFilters);
     setSelectedTools([]);
@@ -293,10 +288,7 @@ export default function ResultPage() {
   };
 
   const table = useTable();
-  const paginatedData = data.slice(
-    table.page * table.rowsPerPage,
-    table.page * table.rowsPerPage + table.rowsPerPage
-  );
+  const paginatedData = data.slice(page * rowsPerPages, page * rowsPerPages + rowsPerPages);
 
   const tableRef = useRef<HTMLDivElement>(null);
 
