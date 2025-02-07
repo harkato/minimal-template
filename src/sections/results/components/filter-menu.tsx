@@ -161,24 +161,6 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         </LocalizationProvider>
       </Grid>
 
-      {/* Número de resultados */}
-      {/* <Grid item xs={12} sm={6} md={6}>
-        <TextField
-          select
-          label="Número de resultados"
-          name="pageSize"
-          variant="outlined"
-          value={filters.pageSize}
-          onChange={handleFilterChange}
-          fullWidth
-        >
-          <MenuItem value={25}>25</MenuItem>
-          <MenuItem value={50}>50</MenuItem>
-          <MenuItem value={100}>100</MenuItem>
-          <MenuItem value={200}>200</MenuItem>
-        </TextField>
-      </Grid> */}
-
       {/* Botões */}
       <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
         <Button variant="contained" onClick={handleResetFilters}>
