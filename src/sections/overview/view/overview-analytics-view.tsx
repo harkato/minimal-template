@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import { useFetchToolsData, useTopFiveData } from 'src/routes/hooks/api';
+import { useFetchToolsData } from 'src/routes/hooks/api';
 import { log } from 'console';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
@@ -45,10 +45,10 @@ export function OverviewAnalyticsView() {
   const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
     useDashboard();
 
-  const { data, isLoading, isError, error } = useTopFiveData();
+  // const { data, isLoading, isError, error } = useTopFiveData();
 
   // Ordena o TOP 5 por ordem alfabética
-  const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
+  // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
 
   // MENU DE SELEÇÃO DE CARDS
   const [openModal, setOpenModal] = React.useState(false);
@@ -96,12 +96,12 @@ export function OverviewAnalyticsView() {
 
   // const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   // const { data, isLoading, isError, error } = useTopFiveData();
-  const {
-    isLoading: isLoadingTopFive,
-    isError: isErrorTopFive,
-    data: TopFiveData,
-    error: errorTopFive,
-  } = useTopFiveData();
+  // const {
+  //   isLoading: isLoadingTopFive,
+  //   isError: isErrorTopFive,
+  //   data: TopFiveData,
+  //   error: errorTopFive,
+  // } = useTopFiveData();
   // const dataAPI = getTopFiveData()
   // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
 
@@ -408,7 +408,7 @@ export function OverviewAnalyticsView() {
           </Typography>
 
           <Grid container spacing={2}>
-            {sortedTopFiveData.map((item, index) => (
+            {/* {sortedTopFiveData.map((item, index) => (
               <Grid key={index} xs={12} sm={6} md={2.4}>
                 <AnalyticsWidgetSummary
                   title={item.title}
@@ -417,7 +417,7 @@ export function OverviewAnalyticsView() {
                   criticality={taxaTopFive}
                 />
               </Grid>
-            ))}
+            ))} */}
           </Grid>
         </div>
       )}

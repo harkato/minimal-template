@@ -154,87 +154,41 @@ const transformDate = (dateString: string): string => {
 
 export default function ResultPage() {
   const { t } = useTranslation();
-  const [data, setData] = useState<DataRow[]>([]);
-  const [toolsData, setToolsData] = useState(['']);
-  const [programsData, setProgramsData] = useState(['']);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const [data, setData] = useState<DataRow[]>([]); // Resultados
+  const [toolsData, setToolsData] = useState(['']); // Lista de ferramentas
+  const [programsData, setProgramsData] = useState(['']); // Lista de programas
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
-  const [page, setPage] = useState(0); // numero da pagina atual
-  const [rowsPerPage, setRowsPerPage] = useState(25); // linhas por pagina
-  const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
-  // const {
-  //   isLoading: isLoadingResultPg,
-  //   isError: isErrorResultPg,
-  //   data: resultPgData,
-  //   error: errorResultPg,
-  //   // refetch,
-  // } = useResultPaginate(page, rowsPerPages); // recebe os dados paginados da API
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [totalCount, setTotalCount] = useState(100);
 
-  const { data: resultPgDataAmount } = useResultAmount(filters); // recebe a quantidade total de itens da busca na NOVA API
+  // Recebe a quantidade total de itens da busca
+  const { data: resultPgDataAmount } = useResultAmount(filters);
 
-  const {
-    isLoading: isPlaceholderData,
-    isError: isErrorResult,
-    data: resultData,
-    error: errorResult,
-    refetch,
-  } = useResultPaginate(page, rowsPerPage, resultPgDataAmount?.total || 0, filters);
+  // Recebe os resultados filtrados
+  const { data: resultData, refetch } = useResultPaginate(
+    page,
+    rowsPerPage,
+    resultPgDataAmount?.total || 0,
+    filters
+  );
 
-  const {
-    isLoading: isLoadingTools,
-    isError: isErrorTools,
-    data: fetchToolsData,
-    error: toolsError,
-  } = useFetchToolsData();
+  // Lista de ferramentas
+  const { data: fetchToolsData } = useFetchToolsData();
 
+  // Lista dos programas das ferramentas
   const { data: queryProgramsData } = useQuery({
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
     enabled: !!filters.toolList && filters.toolList.length > 0,
   });
 
-  const classes = useStyles();
-  // const getCurrentDateTime = () => {
-  //   const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
-  //   const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
-  //   return isoString;
-  // };
-
-  // Função para ordenar os dados
-  const handleRequestSort = (property: keyof DataRow) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-    const sortedData = [...data].sort((a, b) => {
-      const aVal = a[property];
-      const bVal = b[property];
-      if (aVal < bVal) return isAsc ? -1 : 1;
-      if (aVal > bVal) return isAsc ? 1 : -1;
-      return 0;
-    });
-    setData(sortedData);
-  };
-
-  // Função para aplicar filtros
-
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFilters({ ...filters, [name]: value });
-  };
-
-  const handleToolListChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedValues = event.target.value as string[];
-    setSelectedTools(selectedValues);
-  };
-
-  const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedValues = event.target.value as string[];
-    setSelectedPrograms(selectedValues);
-  };
-  // Atualiza `filters` quando `selectedTools` mudar
+  // Atualiza o filtro de ferramentas
   useEffect(() => {
     const toolsWithRevisions = toolsData
       .filter((tool: any) => selectedTools.includes(tool.toolName))
@@ -245,10 +199,11 @@ export default function ResultPage() {
 
     setFilters((prevFilters) => ({
       ...prevFilters,
-      toolList: toolsWithRevisions, // Agora contém os objetos { id, revision }
+      toolList: toolsWithRevisions,
     }));
-  }, [toolsData, selectedTools]); // Atualiza sempre que `selectedTools` mudar
+  }, [toolsData, selectedTools]);
 
+  // Atualiza o filtro de programas
   useEffect(() => {
     const programNumbers = programsData
       .filter((program: any) => selectedPrograms.includes(program.programName))
@@ -259,32 +214,8 @@ export default function ResultPage() {
       programList: programNumbers,
     }));
   }, [programsData, selectedPrograms]);
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
 
-    setFilters({ ...filters, [name]: formattedDate });
-  };
-
-  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    // const status = () => (value === 'OK' ? 'OK' : 'NOK');
-    setFilters({ ...filters, generalStatus: value });
-  };
-
-  const handleResetFilters = () => {
-    setFilters(initialFilters);
-    setSelectedTools([]);
-    setSelectedPrograms([]);
-  };
-
-  const handleSearch = () => {
-    refetch();
-    setPage(0);
-  };
-
-  const tableRef = useRef<HTMLDivElement>(null);
-
+  // Atualiza a lista de ferramentas e de programas
   useEffect(() => {
     if (fetchToolsData) {
       setToolsData(fetchToolsData);
@@ -294,14 +225,15 @@ export default function ResultPage() {
     }
   }, [fetchToolsData, queryProgramsData]);
 
+  // Atualiza o número de itens totais
   useEffect(() => {
     if (resultPgDataAmount) {
       setTotalCount(resultPgDataAmount?.total || 0);
     }
   }, [resultPgDataAmount]);
 
+  // Tratamento de resultados para a tabela
   useEffect(() => {
-    // atualiza os dados da tabela
     if (resultData) {
       const transformedData = resultData.map((item: any) => ({
         dateTime: transformDate(item.dateTime),
@@ -319,29 +251,87 @@ export default function ResultPage() {
       setData(transformedData);
     }
   }, [resultData]);
-  // Atualiza o estado page e chama useResultPg para carregar os novos dados.
-  console.log('Dados: ', data);
 
+  // Função para ordenar os dados
+  const handleRequestSort = (property: keyof DataRow) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+    const sortedData = [...data].sort((a, b) => {
+      const aVal = a[property];
+      const bVal = b[property];
+      if (aVal < bVal) return isAsc ? -1 : 1;
+      if (aVal > bVal) return isAsc ? 1 : -1;
+      return 0;
+    });
+    setData(sortedData);
+  };
+
+  // Função para aplicar filtros
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFilters({ ...filters, [name]: value });
+  };
+
+  // Gerencia as ferramentas selecionadas
+  const handleToolListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedTools(selectedValues);
+  };
+
+  // Gerencia os programas selecionados
+  const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
+    const selectedValues = event.target.value as string[];
+    setSelectedPrograms(selectedValues);
+  };
+
+  // Gerencia o filtro de data
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+
+    setFilters({ ...filters, [name]: formattedDate });
+  };
+
+  // Gerencia o filtro de status
+  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setFilters({ ...filters, generalStatus: value });
+  };
+
+  // Reseta os filtros
+  const handleResetFilters = () => {
+    setFilters(initialFilters);
+    setSelectedTools([]);
+    setSelectedPrograms([]);
+  };
+
+  // Faz a pesquisa
+  const handleSearch = () => {
+    refetch();
+    setPage(0);
+  };
+
+  // Gerencia a mudança de página
   const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage);
   };
 
-  //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
+  //  Gerencia as linhas por página
   const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
     const newPageSize = parseInt(event.target.value, 10);
-
     setRowsPerPage(newPageSize);
-    setPage(0); // Resetar para a primeira página ao mudar pageSize
+    setPage(0);
     setFilters((prevFilters) => ({
       ...prevFilters,
       pageSize: newPageSize,
     }));
   };
 
+  // Função de impressão da tabela
   const handlePrintAllPages = () => {
     printAllPages(data);
   };
-  // TABELA
 
   return (
     <>
@@ -632,3 +622,9 @@ export function useTable() {
     onChangeRowsPerPage,
   };
 }
+
+// const getCurrentDateTime = () => {
+//   const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
+//   const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
+//   return isoString;
+// };
