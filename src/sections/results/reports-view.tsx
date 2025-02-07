@@ -207,7 +207,7 @@ export default function ResultPage() {
   useEffect(() => {
     const programNumbers = programsData
       .filter((program: any) => selectedPrograms.includes(program.programName))
-      .map((program: any) => program.programId);
+      .map((program: any) => program.programNumber);
 
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -273,16 +273,18 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
-  // Gerencia as ferramentas selecionadas
-  const handleToolListChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedValues = event.target.value as string[];
-    setSelectedTools(selectedValues);
-  };
-
   // Gerencia os programas selecionados
   const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
     const selectedValues = event.target.value as string[];
     setSelectedPrograms(selectedValues);
+  };
+
+  const handleSelectionChange = (
+    event: SelectChangeEvent<string[]>,
+    setState: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const selectedValues = event.target.value as string[];
+    setState(selectedValues);
   };
 
   // Gerencia o filtro de data
@@ -343,12 +345,13 @@ export default function ResultPage() {
       <FiltersMenu
         filters={filters}
         selectedTools={selectedTools}
+        setSelectedTools={setSelectedTools}
         selectedPrograms={selectedPrograms}
+        setSelectedPrograms={setSelectedPrograms}
         toolsData={toolsData}
         programsData={programsData}
         handleFilterChange={handleFilterChange}
-        handleToolListChange={handleToolListChange}
-        handleProgramListChange={handleProgramListChange}
+        handleSelectionChange={handleSelectionChange}
         handleStatusChange={handleStatusChange}
         handleDateChange={handleDateChange}
         handleResetFilters={handleResetFilters}

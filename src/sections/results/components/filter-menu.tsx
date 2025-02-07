@@ -17,12 +17,16 @@ import { useTranslation } from 'react-i18next';
 interface FiltersMenuProps {
   filters: any;
   selectedTools: string[];
+  setSelectedTools: React.Dispatch<React.SetStateAction<string[]>>;
   selectedPrograms: string[];
+  setSelectedPrograms: React.Dispatch<React.SetStateAction<string[]>>;
   toolsData: any[];
   programsData: any[];
   handleFilterChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleToolListChange: (event: any) => void;
-  handleProgramListChange: (event: any) => void;
+  handleSelectionChange: (
+    event: any,
+    setSeletedValues: React.Dispatch<React.SetStateAction<string[]>>
+  ) => void;
   handleStatusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDateChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleResetFilters: () => void;
@@ -32,12 +36,13 @@ interface FiltersMenuProps {
 const FiltersMenu: React.FC<FiltersMenuProps> = ({
   filters,
   selectedTools,
+  setSelectedTools,
   selectedPrograms,
+  setSelectedPrograms,
   toolsData,
   programsData,
   handleFilterChange,
-  handleToolListChange,
-  handleProgramListChange,
+  handleSelectionChange,
   handleStatusChange,
   handleDateChange,
   handleResetFilters,
@@ -73,9 +78,10 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             (name) => toolsData.find((tool) => tool.toolName === name) || null
           )}
           onChange={(_, newValue) =>
-            handleToolListChange({
-              target: { value: newValue.map((tool) => tool?.toolName) },
-            })
+            handleSelectionChange(
+              { target: { value: newValue.map((tool) => tool?.toolName) } },
+              setSelectedTools
+            )
           }
           renderInput={(params) => (
             <TextField {...params} label={t('results.tools')} variant="outlined" />
@@ -98,9 +104,10 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             (name) => programsData.find((p) => p.programName === name) || null
           )}
           onChange={(_, newValue) =>
-            handleProgramListChange({
-              target: { value: newValue.map((p) => p?.programName) },
-            })
+            handleSelectionChange(
+              { target: { value: newValue.map((p) => p?.programName) } },
+              setSelectedPrograms
+            )
           }
           renderInput={(params) => (
             <TextField {...params} label={t('results.programs')} variant="outlined" />
