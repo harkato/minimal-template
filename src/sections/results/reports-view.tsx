@@ -30,11 +30,9 @@ import { useTranslation } from 'react-i18next';
 import {
   useFetchToolsData,
   useResultPaginate,
-  fetchDataQuarkus,
   fetchProgramsData,
-  useResultPaginateQuarkus,
   useResultAmount,
-} from 'src/routes/hooks/useToolData';
+} from 'src/routes/hooks/api';
 import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
 import { printAllPages } from 'src/utils/print-table';
@@ -69,8 +67,6 @@ interface Filters {
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
-  // page: number;
-  pageSize: number;
 }
 
 const initialFilters = {
@@ -80,8 +76,6 @@ const initialFilters = {
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
-  // page: 1,
-  pageSize: 50,
 };
 
 // Função para converter dados em CSV
@@ -168,8 +162,8 @@ export default function ResultPage() {
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
-  const [page, setPage] = useState(1); // numero da pagina atual
-  const [rowsPerPages, setRowsPerPages] = useState(25); // linhas por pagina
+  const [page, setPage] = useState(0); // numero da pagina atual
+  const [rowsPerPage, setRowsPerPage] = useState(25); // linhas por pagina
   const [totalCount, setTotalCount] = useState(100); // quantidade total de itens
   // const {
   //   isLoading: isLoadingResultPg,
@@ -187,7 +181,7 @@ export default function ResultPage() {
     data: resultData,
     error: errorResult,
     refetch,
-  } = useResultPaginateQuarkus(page, filters.pageSize, resultPgDataAmount?.total || 0, filters);
+  } = useResultPaginate(page, rowsPerPage, resultPgDataAmount?.total || 0, filters);
 
   const {
     isLoading: isLoadingTools,
@@ -199,6 +193,7 @@ export default function ResultPage() {
   const { data: queryProgramsData } = useQuery({
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
+    enabled: !!filters.toolList && filters.toolList.length > 0,
   });
 
   const classes = useStyles();
@@ -285,11 +280,8 @@ export default function ResultPage() {
 
   const handleSearch = () => {
     refetch();
-    setPage(1);
+    setPage(0);
   };
-
-  const table = useTable();
-  const paginatedData = data.slice(page * rowsPerPages, page * rowsPerPages + rowsPerPages);
 
   const tableRef = useRef<HTMLDivElement>(null);
 
@@ -328,13 +320,22 @@ export default function ResultPage() {
     }
   }, [resultData]);
   // Atualiza o estado page e chama useResultPg para carregar os novos dados.
+  console.log('Dados: ', data);
+
   const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage);
   };
+
   //  Atualiza o estado rowsPerPage e chama useResultPg para carregar os novos dados.
   const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
-    setRowsPerPages(parseInt(event.target.value, 10));
-    setPage(0); // Resetar para a primeira página ao mudar rowsPerPage
+    const newPageSize = parseInt(event.target.value, 10);
+
+    setRowsPerPage(newPageSize);
+    setPage(0); // Resetar para a primeira página ao mudar pageSize
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      pageSize: newPageSize,
+    }));
   };
 
   const handlePrintAllPages = () => {
@@ -490,7 +491,7 @@ export default function ResultPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedData.map((row, index) => (
+              {data.map((row, index) => (
                 <TableRow
                   key={index}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
@@ -556,9 +557,9 @@ export default function ResultPage() {
           component="div"
           page={page}
           count={totalCount}
-          rowsPerPage={rowsPerPages}
+          rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          rowsPerPageOptions={[25, 50, 100, 200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>

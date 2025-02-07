@@ -162,7 +162,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Número de resultados */}
-      <Grid item xs={12} sm={6} md={6}>
+      {/* <Grid item xs={12} sm={6} md={6}>
         <TextField
           select
           label="Número de resultados"
@@ -177,7 +177,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           <MenuItem value={100}>100</MenuItem>
           <MenuItem value={200}>200</MenuItem>
         </TextField>
-      </Grid>
+      </Grid> */}
 
       {/* Botões */}
       <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>

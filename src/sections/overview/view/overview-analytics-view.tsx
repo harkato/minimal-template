@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { initialDataTopFive } from './initial-data-top-five';
-import { useFetchToolsData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { useFetchToolsData, useTopFiveData } from 'src/routes/hooks/api';
 import { log } from 'console';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';

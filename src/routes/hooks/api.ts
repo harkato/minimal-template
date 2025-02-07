@@ -1,20 +1,22 @@
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import qs from 'qs';
 
-const QUARKUS_URL = 'http://localhost:8080/msh/spc/v1';
 const API_URL = 'http://localhost:8080/msh/spc/v1';
 
+// Usado no GET do menu de ferramentas
 const fetchData = async (endpoint: string) => {
-  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`);
-  // console.log("response: ", response.data);
-
+  const response = await axios.get(`${API_URL}/${endpoint}`);
   return response.data;
 };
 
-export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: number) => {
+export const fetchDataFilters = async (
+  endpoint: string,
+  filters: any,
+  page: number,
+  pageSize: number
+) => {
   const { programList, ...otherFilters } = filters;
-  const page = pages;
 
   // Remove valores vazios, null e undefined dos filtros
   const cleanParams = Object.fromEntries(
@@ -29,12 +31,13 @@ export const fetchDataQuarkus = async (endpoint: string, filters: any, pages: nu
     : '';
 
   // Faz a requisição com os filtros formatados
-  const response = await axios.get(`${QUARKUS_URL}/${endpoint}?${programListQuery}`, {
-    params: { ...cleanParams, page },
+  const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}`, {
+    params: { ...cleanParams, page: page + 1, pageSize },
   });
   return response.data;
 };
 
+// Total de itens passando os filtros
 export const fetchDataTotal = async (filters: any) => {
   const { programList, ...otherFilters } = filters;
 
@@ -51,22 +54,22 @@ export const fetchDataTotal = async (filters: any) => {
     : '';
 
   // Faz a requisição com os filtros formatados
-  const response = await axios.get(`${QUARKUS_URL}/results/amount?${programListQuery}`, {
+  const response = await axios.get(`${API_URL}/results/amount?${programListQuery}`, {
     params: { ...cleanParams },
   });
   return response.data;
 };
 
+// Retorna lista de programas de acordo com as ferramentas
 export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
-  const response = await axios.get(`${QUARKUS_URL}/${endpoint}`, {
+  const response = await axios.get(`${API_URL}/${endpoint}`, {
     params: { toolList },
     paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
   });
   return response.data;
 };
 
-// LISTA DE FERRAMENTAS
-
+// Lista de ferramentas
 export function useFetchToolsData() {
   const query = useQuery({
     queryFn: () => fetchData('tools'),
@@ -75,24 +78,8 @@ export function useFetchToolsData() {
   return query;
 }
 
-export function useTopFiveData() {
-  return useQuery({
-    queryFn: () => fetchData('topFive'),
-    queryKey: ['topfive_data'],
-  });
-}
-
-export function useResultPaginate(page: number, limit: number) {
-  // faz a requisição por paginação
-  const query = useQuery({
-    queryFn: () => fetchData(`results?page=${page + 1}&pageSize=${limit}`),
-    queryKey: ['resultsPg-data', page, limit],
-  });
-  return query;
-}
-
+// Hook para retornar o total de itens
 export function useResultAmount(filters: any) {
-  // retorna a quantidade de itens da busca
   const query = useQuery({
     queryFn: () => fetchDataTotal(filters),
     queryKey: ['amount', filters],
@@ -100,24 +87,20 @@ export function useResultAmount(filters: any) {
   return query;
 }
 
-export function useResultPaginateQuarkus(
-  page: number,
-  limit: number,
-  amount: number,
-  filters: any
-) {
+// Hook para retornar os resultados passando os filtros
+export function useResultPaginate(page: number, limit: number, amount: number, filters: any) {
   const queryClient = useQueryClient();
 
-  // Chamada principal da API usando fetchDataQuarkus
+  // Chamada principal da API usando fetchDataFilters
   const query = useQuery({
-    queryFn: () => fetchDataQuarkus('results', filters, page),
+    queryFn: () => fetchDataFilters('results', filters, page, limit),
     queryKey: ['results', page, limit, filters],
   });
 
   // Pré-carregamento da próxima página, se houver mais dados
   if (query.data && amount && (page + 1) * limit < amount) {
     queryClient.prefetchQuery({
-      queryFn: () => fetchDataQuarkus('results', filters, page + 1),
+      queryFn: () => fetchDataFilters('results', filters, page + 1, limit),
       queryKey: ['results', page + 1, limit, filters],
     });
   }
