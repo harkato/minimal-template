@@ -86,10 +86,8 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           renderInput={(params) => (
             <TextField {...params} label={t('results.tools')} variant="outlined" />
           )}
-          renderTags={(selected, getTagProps) =>
-            selected.map((option, index) => (
-              <Chip label={option.toolName} {...getTagProps({ index })} />
-            ))
+          renderTags={(selected) =>
+            selected.map((option, index) => <Chip key={index} label={option.toolName} />)
           }
         />
       </Grid>
@@ -99,7 +97,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         <Autocomplete
           multiple
           options={programsData}
-          getOptionLabel={(option) => option.programName}
+          getOptionLabel={(option) => option.programName || ''}
           value={selectedPrograms.map(
             (name) => programsData.find((p) => p.programName === name) || null
           )}
