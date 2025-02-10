@@ -74,6 +74,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           multiple
           options={toolsData}
           getOptionLabel={(option) => option.toolName}
+          getOptionKey={(option) => option.toolId || option.toolName}
           value={selectedTools.map(
             (name) => toolsData.find((tool) => tool.toolName === name) || null
           )}
@@ -86,8 +87,11 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           renderInput={(params) => (
             <TextField {...params} label={t('results.tools')} variant="outlined" />
           )}
-          renderTags={(selected) =>
-            selected.map((option, index) => <Chip key={index} label={option.toolName} />)
+          renderTags={(selected, getTagProps) =>
+            selected.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return <Chip key={key} label={option.toolName} {...tagProps} />;
+            })
           }
         />
       </Grid>
@@ -97,7 +101,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         <Autocomplete
           multiple
           options={programsData}
-          getOptionLabel={(option) => option.programName || ''}
+          getOptionLabel={(option) => option.programName}
           value={selectedPrograms.map(
             (name) => programsData.find((p) => p.programName === name) || null
           )}
@@ -112,7 +116,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           )}
           renderTags={(selected, getTagProps) =>
             selected.map((option, index) => (
-              <Chip label={option.programName} {...getTagProps({ index })} />
+              <Chip {...getTagProps({ index })} key={index} label={option.programName} />
             ))
           }
         />

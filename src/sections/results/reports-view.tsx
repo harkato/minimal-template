@@ -273,12 +273,7 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: value });
   };
 
-  // Gerencia os programas selecionados
-  const handleProgramListChange = (event: SelectChangeEvent<string[]>) => {
-    const selectedValues = event.target.value as string[];
-    setSelectedPrograms(selectedValues);
-  };
-
+  // Gerencia filtros de múltipla seleção
   const handleSelectionChange = (
     event: SelectChangeEvent<string[]>,
     setState: React.Dispatch<React.SetStateAction<string[]>>
