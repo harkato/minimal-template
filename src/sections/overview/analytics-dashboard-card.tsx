@@ -204,7 +204,7 @@ export function AnalyticsDashboardCard({
           <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
             {t('dashboard.topPrograms')}
           </Typography>
-          {/* <TableContainer
+          <TableContainer
             component={Paper}
             style={{ backgroundColor: 'transparent', borderRadius: '5px' }}
           >
@@ -212,13 +212,14 @@ export function AnalyticsDashboardCard({
               <TableBody>
                 {topIssues.map((issue, index) => (
                   <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                    <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
                     <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
                     <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </TableContainer> */}
+          </TableContainer>
         </CardContent>
       </Collapse>
     </Card>

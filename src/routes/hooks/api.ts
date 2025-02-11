@@ -12,7 +12,11 @@ const fetchData = async (endpoint: string) => {
 
 const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-    params: { initialDateTime: '2020-01-01T00:00:00', finalDateTime: '2024-01-01T00:00:00' },
+    params: {
+      initialDateTime: '2020-01-01T00:00:00',
+      finalDateTime: '2024-01-01T00:00:00',
+      worstRatedPrograms: 5,
+    },
   });
   return response.data;
 };
