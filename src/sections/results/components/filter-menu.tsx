@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Button,
-  Autocomplete,
-} from '@mui/material';
+import { Grid, TextField, MenuItem, Chip, Button, Autocomplete } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useTranslation } from 'react-i18next';
@@ -102,6 +92,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           multiple
           options={programsData}
           getOptionLabel={(option) => option.programName}
+          getOptionKey={(option) => option.programId || option.programName}
           value={selectedPrograms.map(
             (name) => programsData.find((p) => p.programName === name) || null
           )}
@@ -115,9 +106,10 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             <TextField {...params} label={t('results.programs')} variant="outlined" />
           )}
           renderTags={(selected, getTagProps) =>
-            selected.map((option, index) => (
-              <Chip {...getTagProps({ index })} key={index} label={option.programName} />
-            ))
+            selected.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return <Chip key={key} label={option.programName} {...tagProps} />;
+            })
           }
         />
       </Grid>

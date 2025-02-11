@@ -4,7 +4,6 @@ import 'dayjs/locale/en-gb';
 import { format } from 'date-fns';
 import {
   Box,
-  Button,
   Paper,
   Table,
   TableBody,
@@ -18,11 +17,10 @@ import {
   Tooltip,
   IconButton,
   SelectChangeEvent,
-  listItemTextClasses,
   TablePagination,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
-import { ArrowUpward, ArrowDownward, Cancel } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { makeStyles } from '@material-ui/core/styles';
@@ -182,7 +180,11 @@ export default function ResultPage() {
   const { data: fetchToolsData } = useFetchToolsData();
 
   // Lista dos programas das ferramentas
-  const { data: queryProgramsData } = useQuery({
+  const {
+    data: queryProgramsData,
+    error: errorProgramsData,
+    isError: isErrorProgramsData,
+  } = useQuery({
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
     enabled: !!filters.toolList && filters.toolList.length > 0,
