@@ -10,6 +10,13 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
+const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
+  const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
+    params: { initialDateTime: '2020-01-01T00:00:00', finalDateTime: '2024-01-01T00:00:00' },
+  });
+  return response.data;
+};
+
 export const fetchDataFilters = async (
   endpoint: string,
   filters: any,
@@ -105,5 +112,13 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
     });
   }
 
+  return query;
+}
+
+export function useToolsInfo(toolId: number, toolRevision: number) {
+  const query = useQuery({
+    queryFn: () => fetchToolsInfo('dashboard/tools', toolId, toolRevision),
+    queryKey: ['toolInfo'],
+  });
   return query;
 }

@@ -30,9 +30,26 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { useFetchToolsData } from 'src/routes/hooks/api';
+import { useFetchToolsData, useToolsInfo } from 'src/routes/hooks/api';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
+
+interface ToolFilters {
+  toolId: number;
+  toolRevision: number;
+}
+
+interface ToolData {
+  toolName: string;
+  products: string;
+  nok: string;
+  nokOkRate: string;
+  topIssues: any[];
+}
+const initialFilters = {
+  toolId: 1,
+  toolRevision: 6,
+};
 
 export function OverviewAnalyticsView() {
   const { t } = useTranslation();
@@ -48,6 +65,8 @@ export function OverviewAnalyticsView() {
   const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]); // Limites de referência para o top 5
   const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
+  const [filters, setFilters] = useState<ToolFilters>(initialFilters);
+  const [tools, setTools] = useState<ToolData[]>([]);
   const openLabels = Boolean(anchorEl);
   const id = openLabels ? 'github-label' : undefined;
 
@@ -62,7 +81,6 @@ export function OverviewAnalyticsView() {
     const localData = localStorage.getItem('topFive');
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
-  const tools = true;
 
   // Dados das ferramentas
   const {
@@ -72,6 +90,8 @@ export function OverviewAnalyticsView() {
     error: errorToolList,
   } = useFetchToolsData();
 
+  const { data: toolsInfo } = useToolsInfo(filters.toolId, filters.toolRevision);
+  console.log(toolsInfo);
   // Dados do Top 5
   // const {
   //   isLoading: isLoadingTopFive,
@@ -86,7 +106,10 @@ export function OverviewAnalyticsView() {
       setLabels(toolListData);
       // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
     }
-  }, [toolListData]);
+    if (toolsInfo) {
+      setTools((prevTools) => [...prevTools, toolsInfo]);
+    }
+  }, [toolListData, toolsInfo]);
 
   // Ordena o Card Top 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
