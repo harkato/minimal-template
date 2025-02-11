@@ -58,7 +58,7 @@ interface DataRow {
   angleStatus: string;
   angleHigh: number,
   angleLow: number,
-  generalStatus: string;
+  generalStatus: number;
 }
 
 interface ResultPgData {
@@ -148,6 +148,7 @@ interface Filters {
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
+  blockSearch: boolean;
   // page: number;
   // pageSize: number;
 }
@@ -159,6 +160,7 @@ const initialFilters = {
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
+  blockSearch: true,
   // page: 1,
   // pageSize: 50,
 };
@@ -226,34 +228,6 @@ const transformDate = (dateString: string): string => {
   return format(date, 'dd/MM/yyyy HH:mm');
 };
 
-// const applyFilters = (
-//   data: DataRow[],
-//   filters: typeof initialFilters,
-//   startDate: Dayjs | null,
-//   endDate: Dayjs | null
-// ) =>
-//   data.filter((row) => {
-//     const isIdMatch = filters.id ? row.id.includes(filters.id) : true;
-//     const isToolMatch = filters.tool ? row.tool === filters.tool : true;
-//     const isProgramNameMatch = filters.programName
-//       ? row.programName.includes(filters.programName)
-//       : true;
-//     const isStatusMatch = filters.status ? row.generalStatus === filters.status : true;
-
-//     const resultDate = dayjs(row.resultTime);
-//     const isStartDateMatch = startDate ? resultDate.isAfter(startDate, 'day') : true;
-//     const isEndDateMatch = endDate ? resultDate.isBefore(endDate, 'day') : true;
-
-//     return (
-//       isIdMatch &&
-//       isToolMatch &&
-//       isProgramNameMatch &&
-//       isStatusMatch &&
-//       isStartDateMatch &&
-//       isEndDateMatch
-//     );
-//   });
-
 export default function ResultPage() {
   const [data, setData] = useState<DataRow[]>([]);
   const [order, setOrder] = useState<Order>('asc');
@@ -262,10 +236,9 @@ export default function ResultPage() {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
-  // const [filters, setFilters] = useState(initialFilters);
   const [filters, setFilters] = useState<Filters>(initialFilters);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const handleNavigation = (path: string) => {
@@ -288,7 +261,8 @@ export default function ResultPage() {
     isLoading: isLoadingResultPgAmount, 
     isError: isErrorResultPgAmount, 
     data: resultPgDataAmount, 
-    error: errorResultPgAmount 
+    error: errorResultPgAmount,
+    refetch, 
   } = useResultAmount(filters); // recebe a quantidade total de itens da busca na NOVA API
 
   const { 
@@ -303,7 +277,7 @@ export default function ResultPage() {
     isError: isErrorTools,
     data: fetchToolsData,
     error: toolsError,
-    refetch,
+    // refetch,
   } = useFetchToolsData();
 
   const { data: queryProgramsData } = useProgramsData(filters.toolList)
@@ -326,7 +300,7 @@ export default function ResultPage() {
       angleStatus: item.angleStatus === 0 ? 'OK' : 'NOK', 
       angleHigh: item.angleHighLimit,
       angleLow: item.angleLowLimit,
-      generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK', 
+      generalStatus: item.generalStatus, 
     }));  
     // console.log('dados formatados', newData);
     return newData;
@@ -415,8 +389,12 @@ export default function ResultPage() {
   //   setEndDate(null);
   // };
   const handleResetFilters = () => {
-    setFilters(initialFilters);
+    setFilters({ ...filters, blockSearch: true });
     setSelectedTools([]);
+    setFilters(initialFilters);
+    setSelectedPrograms([]);
+    setStartDate('');
+    setEndDate('');
   };
 
   useEffect(() => {
@@ -447,14 +425,14 @@ export default function ResultPage() {
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
-
+    name === 'initialDateTime' ? setStartDate(value) : setEndDate(value)
     setFilters({ ...filters, [name]: formattedDate });
   };
 
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+    const value = event.target.value;    
     // const status = () => (value === 'OK' ? 'OK' : 'NOK');
-    setFilters({ ...filters, generalStatus: value });
+    setFilters({ ...filters, generalStatus: value});
   };
 
   // const handleSearch = () => {
@@ -465,8 +443,9 @@ export default function ResultPage() {
   //   console.log('Filtros aplicados:', filters, startDate, endDate);
   // };
   const handleSearch = () => {
+    setFilters({ ...filters, blockSearch: false });
     refetch();
-    setPages(1);
+    setPages(0);
   };
 
   const table = useTable();
@@ -501,7 +480,7 @@ export default function ResultPage() {
         torqueStatus: item.torqueStatus,
         angle: item.angle || '',
         angleStatus: item.angleStatus,
-        generalStatus: item.generalStatus === 0 ? 'OK' : 'NOK',
+        generalStatus: item.generalStatus,
       }));
       setData(transformedData);
       // console.log('transformedData', transformedData);
@@ -585,9 +564,9 @@ export default function ResultPage() {
                 <td>${row.fuso}</td>
                 <td class="status-icon">
                     <span class="material-icons ${
-                      row.generalStatus === 'OK' ? 'status-ok' : 'status-error'
+                      row.generalStatus === 0 ? 'status-ok' : 'status-error'
                     }">
-                      ${row.generalStatus === 'OK' ? 'check_circle' : 'cancel'}
+                      ${row.generalStatus === 0 ? 'check_circle' : 'cancel'}
                     </span>
                     ${row.generalStatus}
                   </td>
@@ -719,7 +698,7 @@ export default function ResultPage() {
               onChange={handleProgramListChange}
               renderValue={(selected) =>
                 selected.length === 0 ? (
-                  <em />
+                  <em />                  
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                     {(selected as string[]).map((value) => (
@@ -728,6 +707,7 @@ export default function ResultPage() {
                   </div>
                 )
               }
+              disabled = {selectedTools.length === 0}
             >
               <MenuItem value="Todos">{t('results.all')}</MenuItem>
               {programsData.map((program: any, index: number) => (
@@ -750,8 +730,8 @@ export default function ResultPage() {
             fullWidth
           >
             <MenuItem value="">{t('results.all')}</MenuItem>
-            <MenuItem value="OK">OK</MenuItem>
-            <MenuItem value="NOK">NOK</MenuItem>
+            <MenuItem value="0">OK</MenuItem>
+            <MenuItem value="1">NOK</MenuItem>
           </TextField>
         </Grid>
         {/* Data */}
@@ -762,7 +742,8 @@ export default function ResultPage() {
               label={t('results.startDate')}
               type="datetime-local"
               // defaultValue={getCurrentDateTime()}
-              defaultValue=""
+              // defaultValue=""
+              value={startDate}
               name="initialDateTime"
               className={classes.textField}
               onChange={handleDateChange}
@@ -780,7 +761,8 @@ export default function ResultPage() {
               label={t('results.endDate')}
               type="datetime-local"
               // defaultValue={getCurrentDateTime()}
-              defaultValue=""
+              // defaultValue=""
+              value={endDate}
               name="finalDateTime"
               className={classes.textField}
               onChange={handleDateChange}
@@ -975,12 +957,12 @@ export default function ResultPage() {
                         padding: '2px 8px',
                         borderRadius: '8px',
                         color: 'white',
-                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
+                        backgroundColor: row.generalStatus === 1 ? '#f24f4f' : '#20878b',
                         textAlign: 'center',
                         fontWeight: 'bold',
                       }}
                     >
-                      {row.generalStatus}
+                      {row.generalStatus === 1 ? 'NOK' : 'OK'}
                     </Box>
                   </TableCell>
                   <TableCell >
