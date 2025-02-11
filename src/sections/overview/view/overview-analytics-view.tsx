@@ -39,33 +39,78 @@ export function OverviewAnalyticsView() {
   const theme = useTheme();
   const isLargeScreen = window.innerWidth > 768;
 
-  // Usa o context do Dashboard
-  const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
-    useDashboard();
-
-  // const { data, isLoading, isError, error } = useTopFiveData();
-
-  // Ordena o TOP 5 por ordem alfabética
-  // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
-
   // MENU DE SELEÇÃO DE CARDS
-  const [openModal, setOpenModal] = React.useState(false);
-  const [openListTopFive, setOpenListTopFive] = React.useState(false);
-  const [openListAperto, setOpenListAperto] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]); // verificar o uso
-  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]);
+  const [openModal, setOpenModal] = React.useState(false); // Abertura do modal de seleção de cards
+  const [openListTopFive, setOpenListTopFive] = React.useState(false); // Abre a categoria do Top 5
+  const [openListAperto, setOpenListAperto] = React.useState(false); // Abre a categoria das apertadeiras
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // Define a posição do popover
+  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]); // Valor de referência para ordenação das ferramentas selecionadas
+  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]); // Limites de referência para o top 5
   const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
   const openLabels = Boolean(anchorEl);
   const id = openLabels ? 'github-label' : undefined;
+
+  // Usa o context do Dashboard, pegando estados globais
+  const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
+    useDashboard();
+
+  const [selectLabels, setLabels] = useState<LabelType[]>([]);
 
   // MOSTRA TOP 5 E FERRAMENTAS
   const [topFive, setTopFive] = useState(() => {
     const localData = localStorage.getItem('topFive');
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
-  const [tools, setTools] = useState(true);
+  const tools = true;
+
+  // Dados das ferramentas
+  const {
+    isLoading: isLoadingToolList,
+    isError: isErrorToolList,
+    data: toolListData,
+    error: errorToolList,
+  } = useFetchToolsData();
+
+  // Dados do Top 5
+  // const {
+  //   isLoading: isLoadingTopFive,
+  //   isError: isErrorTopFive,
+  //   data: TopFiveData,
+  //   error: errorTopFive,
+  // } = useTopFiveData();
+  // const dataAPI = getTopFiveData()
+
+  useEffect(() => {
+    if (toolListData) {
+      setLabels(toolListData);
+      // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
+    }
+  }, [toolListData]);
+
+  // Ordena o Card Top 5 por ordem alfabética
+  // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
+
+  // Atualiza valores limite do Top 5
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
+    setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
+  };
+
+  // Gerencia a abertura do Top 5 no modal
+  const handleClickTopFive = () => {
+    setOpenListTopFive(!openListTopFive);
+  };
+
+  // Gerencia a abertura do Card Apertadeira no modal
+  const handleClickAperto = () => {
+    setOpenListAperto(!openListAperto);
+  };
+
+  // Gerencia o menu de Apertadeiras disponíveis
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   // Abre o menu
   const handleOpen = () => setOpenModal(true);
@@ -76,50 +121,7 @@ export function OverviewAnalyticsView() {
     setOpenModal(false);
   };
 
-  const {
-    isLoading: isLoadingToolList,
-    isError: isErrorToolList,
-    data: toolListData,
-    error: errorToolList,
-  } = useFetchToolsData();
-  const [selectLabels, setLabels] = useState<LabelType[]>([]);
-
-  useEffect(() => {
-    if (toolListData) {
-      setLabels(toolListData);
-      // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
-    }
-  }, [toolListData]);
-  // console.log("pendingValue: ", pendingValue, "\n pending", Pending);
-
-  // const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
-  // const { data, isLoading, isError, error } = useTopFiveData();
-  // const {
-  //   isLoading: isLoadingTopFive,
-  //   isError: isErrorTopFive,
-  //   data: TopFiveData,
-  //   error: errorTopFive,
-  // } = useTopFiveData();
-  // const dataAPI = getTopFiveData()
-  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
-
-  const handleChange = (event: Event, newValue: number | number[]) => {
-    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
-    setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
-  };
-
-  const handleClickTopFive = () => {
-    setOpenListTopFive(!openListTopFive);
-  };
-
-  const handleClickAperto = () => {
-    setOpenListAperto(!openListAperto);
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
+  // Gerencia os valores de seleção de apertadeiras
   const handleCloseLabel = () => {
     setValueLabel(pendingValue);
     if (anchorEl) {
