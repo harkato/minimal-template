@@ -125,25 +125,6 @@ const getStatusIcon = (status: Status) => {
       return null;
   }
 };
-//     <CheckIcon sx={{ color: '#20878b' }} />
-//   ) : i % 2 === 0 ? (
-//     <ArrowUpward sx={{ color: '#f24f4f' }} />
-//   ) : (
-//     <ArrowDownward sx={{ color: '#FFB300' }} />
-//   );
-// }
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
-}));
 
 const transformDate = (dateString: string): string => {
   const date = new Date(dateString);
