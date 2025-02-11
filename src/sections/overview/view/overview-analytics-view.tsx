@@ -41,14 +41,15 @@ interface ToolFilters {
 
 interface ToolData {
   toolName: string;
-  products: string;
-  nok: string;
-  nokOkRate: string;
+  products: number;
+  toolId: string;
+  nok: number;
+  nokOkRate: number;
   topIssues: any[];
 }
 const initialFilters = {
-  toolId: 1,
-  toolRevision: 6,
+  toolId: 6,
+  toolRevision: 3,
 };
 
 export function OverviewAnalyticsView() {
@@ -91,7 +92,6 @@ export function OverviewAnalyticsView() {
   } = useFetchToolsData();
 
   const { data: toolsInfo } = useToolsInfo(filters.toolId, filters.toolRevision);
-  console.log(toolsInfo);
   // Dados do Top 5
   // const {
   //   isLoading: isLoadingTopFive,
@@ -106,10 +106,23 @@ export function OverviewAnalyticsView() {
       setLabels(toolListData);
       // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
     }
+  }, [toolListData]);
+
+  useEffect(() => {
     if (toolsInfo) {
-      setTools((prevTools) => [...prevTools, toolsInfo]);
+      const transformedData = {
+        toolName: toolsInfo.toolName,
+        products: toolsInfo.products,
+        toolId: toolsInfo.toolId,
+        nok: toolsInfo.nok,
+        nokOkRate: toolsInfo.nokOkRate,
+        topIssues: toolsInfo.topIssues,
+      };
+      setTools((prevTools) => [...prevTools, transformedData]);
     }
-  }, [toolListData, toolsInfo]);
+  }, [toolsInfo]);
+
+  console.log('Dados atualizados toolsInfo: ', tools);
 
   // Ordena o Card Top 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
@@ -421,19 +434,20 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {(cardData || [])
-              .filter((data) => selectedCards.includes(data.id))
-              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
-              .map((data) => (
-                <Grid xs={12} sm={6} md={4} key={data.id}>
-                  <AnalyticsDashboardCard
-                    {...data}
-                    targetAlert={toolLimits[0]}
-                    targetCritical={toolLimits[1]}
-                    onDelete={() => handleDeleteCard(data.title)}
-                  />
-                </Grid>
-              ))}
+            {tools.map((tool) => (
+              <Grid xs={12} sm={6} md={4} key={tool.toolId}>
+                <AnalyticsDashboardCard
+                  title={tool.toolName}
+                  id={tool.toolId}
+                  vehicles={tool.products}
+                  nokVin={tool.nokOkRate}
+                  {...tool}
+                  targetAlert={toolLimits[0]}
+                  targetCritical={toolLimits[1]}
+                  onDelete={() => setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId))}
+                />
+              </Grid>
+            ))}
           </Grid>
         </div>
       )}
