@@ -208,9 +208,9 @@ export function AnalyticsDashboardCard({
             <Table size="small">
               <TableHead style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
                 <TableRow>
-                  <TableCell>Número</TableCell>
-                  <TableCell>Nome</TableCell>
-                  <TableCell>Taxa</TableCell>
+                  <TableCell sx={{ padding: '2px' }}>Número</TableCell>
+                  <TableCell sx={{ padding: '2px' }}>Nome</TableCell>
+                  <TableCell sx={{ padding: '2px' }}>Taxa</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
