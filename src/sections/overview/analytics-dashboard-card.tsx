@@ -35,7 +35,7 @@ export type Props = CardProps & {
   nokVin: number;
   targetAlert: number;
   targetCritical: number;
-  topIssues: { code: string; description: string; occurrences: number }[];
+  topIssues: { programNumber: number; programName: string; nokOkRate: number }[];
   onDelete?: (id: string) => void;
 };
 
@@ -49,11 +49,8 @@ export function AnalyticsDashboardCard({
   targetCritical,
   topIssues,
   onDelete,
-  // sx,
-  ...other
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   // const handleExpandClick = () => setExpanded(!expanded);
   const handleExpandClick = (event: any) => {
@@ -62,7 +59,7 @@ export function AnalyticsDashboardCard({
       setExpanded(!expanded);
     }
   };
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation(); // Impede a propagação do evento para o CardHeader
     setAnchorEl(event.currentTarget);
@@ -208,13 +205,22 @@ export function AnalyticsDashboardCard({
             component={Paper}
             style={{ backgroundColor: 'transparent', borderRadius: '5px' }}
           >
-            <Table>
+            <Table size="small">
+              <TableHead style={{ backgroundColor: 'transparent', borderRadius: '5px' }}>
+                <TableRow>
+                  <TableCell>Número</TableCell>
+                  <TableCell>Nome</TableCell>
+                  <TableCell>Taxa</TableCell>
+                </TableRow>
+              </TableHead>
               <TableBody>
                 {topIssues.map((issue, index) => (
                   <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                    <TableCell sx={{ padding: '2px' }}>{issue.code}</TableCell>
-                    <TableCell sx={{ padding: '2px' }}>{issue.description}</TableCell>
-                    <TableCell sx={{ padding: '2px' }}>({issue.occurrences})</TableCell>
+                    <TableCell sx={{ padding: '2px' }}>{issue.programNumber}</TableCell>
+                    <TableCell sx={{ padding: '2px' }}>
+                      {issue.programName || 'Nome desconhecido'}
+                    </TableCell>
+                    <TableCell sx={{ padding: '2px' }}>{issue.nokOkRate.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

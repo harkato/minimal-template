@@ -441,7 +441,8 @@ export function OverviewAnalyticsView() {
                   id={tool.toolId}
                   vehicles={tool.products}
                   nokVin={tool.nokOkRate}
-                  {...tool}
+                  nok={tool.nok}
+                  topIssues={tool.topIssues}
                   targetAlert={toolLimits[0]}
                   targetCritical={toolLimits[1]}
                   onDelete={() => setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId))}
