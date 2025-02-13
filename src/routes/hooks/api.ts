@@ -10,15 +10,27 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
-const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
-  const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-    params: {
-      initialDateTime: '2020-01-01T00:00:00',
-      finalDateTime: '2024-01-01T00:00:00',
-      worstRatedPrograms: 5,
-    },
-  });
-  return response.data;
+const fetchToolsInfo = async (
+  endpoint: string,
+  toolsWithRevisions: { toolId: number; toolRevision: number }[]
+) => {
+  try {
+    const requests = toolsWithRevisions.map(({ toolId, toolRevision }) =>
+      axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
+        params: {
+          initialDateTime: '2020-01-01T00:00:00',
+          finalDateTime: '2024-01-01T00:00:00',
+          worstRatedPrograms: 5,
+        },
+      })
+    );
+
+    const results = await Promise.all(requests);
+    return results.map((res) => res.data); // Retorna os dados diretamente
+  } catch (error) {
+    console.error('Erro ao buscar informações das ferramentas:', error);
+    throw error; // Lança o erro para que quem chamar a função possa tratá-lo
+  }
 };
 
 export const fetchDataFilters = async (
@@ -119,9 +131,9 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
   return query;
 }
 
-export function useToolsInfo(toolId: number, toolRevision: number) {
+export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
   const query = useQuery({
-    queryFn: () => fetchToolsInfo('dashboard/tools', toolId, toolRevision),
+    queryFn: () => fetchToolsInfo('dashboard/tools', toolsWithRevisions),
     queryKey: ['toolInfo'],
   });
   return query;

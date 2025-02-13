@@ -72,7 +72,7 @@ export function OverviewAnalyticsView() {
   const [filters, setFilters] = useState<ToolFilters>(initialFilters);
   const [tools, setTools] = useState<ToolData[]>([]);
   const [toolsWithRevisions, setToolsWithRevisions] = useState<
-    { toolId: number; revision: number }[]
+    { toolId: number; toolRevision: number }[]
   >([]);
   const openLabels = Boolean(anchorEl);
   const id = openLabels ? 'github-label' : undefined;
@@ -97,7 +97,7 @@ export function OverviewAnalyticsView() {
     error: errorToolList,
   } = useFetchToolsData();
 
-  const { data: toolsInfo } = useToolsInfo(filters.toolId, filters.toolRevision);
+  const { data: toolsInfo, refetch } = useToolsInfo(toolsWithRevisions);
   // Dados do Top 5
   // const {
   //   isLoading: isLoadingTopFive,
@@ -118,7 +118,7 @@ export function OverviewAnalyticsView() {
   useEffect(() => {
     const transformedData = pendingValue.map((tool: any) => ({
       toolId: tool.toolId,
-      revision: tool.revision,
+      toolRevision: tool.revision,
     }));
 
     setToolsWithRevisions(transformedData);
@@ -126,15 +126,15 @@ export function OverviewAnalyticsView() {
 
   useEffect(() => {
     if (toolsInfo) {
-      const transformedData = {
-        toolName: toolsInfo.toolName,
-        products: toolsInfo.products,
-        toolId: toolsInfo.toolId,
-        nok: toolsInfo.nok,
-        nokOkRate: toolsInfo.nokOkRate,
-        topIssues: toolsInfo.topIssues,
-      };
-      setTools((prevTools) => [...prevTools, transformedData]);
+      const transformedData = toolsInfo.map((tool: any) => ({
+        toolName: tool.toolName,
+        products: tool.products,
+        toolId: tool.toolId,
+        nok: tool.nok,
+        nokOkRate: tool.nokOkRate,
+        topIssues: tool.topIssues,
+      }));
+      setTools(transformedData);
     }
   }, [toolsInfo]);
 
@@ -178,6 +178,7 @@ export function OverviewAnalyticsView() {
       anchorEl.focus();
     }
     setAnchorEl(null);
+    refetch();
   };
 
   // Gerencia filtros de múltipla seleção
@@ -511,7 +512,10 @@ export function OverviewAnalyticsView() {
                   topIssues={tool.topIssues}
                   targetAlert={toolLimits[0]}
                   targetCritical={toolLimits[1]}
-                  onDelete={() => setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId))}
+                  onDelete={() => {
+                    setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId));
+                    setPendingValue((prev) => prev.filter((t) => t.toolId !== tool.toolId));
+                  }}
                 />
               </Grid>
             ))}

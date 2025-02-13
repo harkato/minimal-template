@@ -217,9 +217,7 @@ export function AnalyticsDashboardCard({
                 {topIssues.map((issue, index) => (
                   <TableRow key={index} style={{ borderBottom: '1px solid #ddd' }}>
                     <TableCell sx={{ padding: '2px' }}>{issue.programNumber}</TableCell>
-                    <TableCell sx={{ padding: '2px' }}>
-                      {issue.programName || 'Nome desconhecido'}
-                    </TableCell>
+                    <TableCell sx={{ padding: '2px' }}>{issue.programName}</TableCell>
                     <TableCell sx={{ padding: '2px' }}>{issue.nokOkRate.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
