@@ -30,122 +30,242 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { initialDataTopFive } from './initial-data-top-five';
-import { useFetchToolsData } from 'src/routes/hooks/api';
-import { log } from 'console';
-import { useQuery } from '@tanstack/react-query';
-import { Pending } from '@mui/icons-material';
+// import { initialDataTopFive } from './initial-data-top-five';
+import { useToolListData, useTopFiveData } from 'src/routes/hooks/useToolData';
+import { useTopNokOk } from 'src/routes/hooks/api';
+
+interface DataTopNokOk {
+  title: string; // toolName
+  trend: string;  // trend
+  total: number; // nokOkRate
+  color: string; // campo em branco
+  chart: {  // lastResults
+    categories: string[]; // apenas a hora do finalTimestamp
+      series: number[]; // nok
+  };
+}
+
+interface TopNokOkItem {
+  initialTimestamp: string;
+  finalTimestamp: string;
+  statusType: string;
+  toolName: string | null;
+  toolId: number;
+  toolRevision: number;
+  rows: number;
+  products: number;
+  ok: number;
+  nok: number;
+  nokOkRate: number;
+  trend: string;
+  topIssues: null;
+  lastResults: LastResultItem[] | null; // Adicionei a tipagem para lastResults
+}
+
+interface LastResultItem { // Interface para os itens de lastResults
+  initialTimestamp: string;
+  finalTimestamp: string;
+  statusType: string;
+  toolName: string | null;
+  toolId: number;
+  toolRevision: number;
+  rows: number;
+  products: number;
+  ok: number;
+  nok: number;
+  nokOkRate: number;
+  trend: string;
+  topIssues: null;
+  lastResults: null;
+}
+
+const style = {
+  position: 'absolute',
+  alignContent: 'center',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  '@media (max-width: 768px)': {
+    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
+    width: '90%', // Ocupa 90% da largura da tela
+  },
+};
+
+function valuetext(value: number) {
+  return `${value}`;
+}
+
+const StyledPopper = styled(Popper)(({ theme }) => ({
+  border: `1px solid ${'#e1e4e8'}`,
+  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
+  color: '#24292e',
+  backgroundColor: '#fff',
+  borderRadius: 6,
+  width: 300,
+  zIndex: theme.zIndex.modal,
+  fontSize: 13,
+  ...theme.applyStyles('dark', {
+    border: `1px solid ${'#30363d'}`,
+    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
+    color: '#c9d1d9',
+    backgroundColor: '#1c2128',
+  }),
+}));
+
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  padding: 10,
+  width: '100%',
+  borderBottom: `1px solid ${'#30363d'}`,
+  '& input': {
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    border: `1px solid ${'#30363d'}`,
+    padding: 8,
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    fontSize: 14,
+    '&:focus': {
+      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
+      borderColor: '#0366d6',
+      ...theme.applyStyles('dark', {
+        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
+        borderColor: '#388bfd',
+      }),
+    },
+    ...theme.applyStyles('dark', {
+      backgroundColor: '#0d1117',
+      border: `1px solid ${'#eaecef'}`,
+    }),
+  },
+  ...theme.applyStyles('dark', {
+    borderBottom: `1px solid ${'#eaecef'}`,
+  }),
+}));
 
 export function OverviewAnalyticsView() {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const isLargeScreen = window.innerWidth > 768;
+  const { t, i18n } = useTranslation();
 
-  // Usa o context do Dashboard
-  const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
-    useDashboard();
-
-  // const { data, isLoading, isError, error } = useTopFiveData();
-
-  // Ordena o TOP 5 por ordem alfabética
-  // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
-
-  // MENU DE SELEÇÃO DE CARDS
-  const [openModal, setOpenModal] = React.useState(false);
-  const [openListTopFive, setOpenListTopFive] = React.useState(false);
+  const {
+    cardData,
+    pendingValue,
+    setPendingValue,
+    selectedCards,
+    setSelectedCards,
+    handleDeleteCard
+  } = useDashboard();
+  
+  // const [topFiveData, setTopFiveData] = useState(initialDataTopFive);
+  const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);;
+  const [value, setValue] = React.useState<number[]>(() => {
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.0, 1.0];     
+  });
+  const [open, setOpen] = React.useState(false);
+  const [openListTop5, setOpenListTop5] = React.useState(false);
   const [openListAperto, setOpenListAperto] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]); // verificar o uso
-  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]);
-  const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
-  const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
-  const openLabels = Boolean(anchorEl);
-  const id = openLabels ? 'github-label' : undefined;
-
-  // MOSTRA TOP 5 E FERRAMENTAS
-  const [topFive, setTopFive] = useState(() => {
-    const localData = localStorage.getItem('topFive');
+  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]);
+  const [taxaTop5, setTaxaTop5] = React.useState<number[]>(() => {
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];     
+  });
+  const [targetTools, setTargetTools] = React.useState<number[]>([0.7, 0.8]);
+  const [top5, setTop5] = useState(() => {
+    const localData = localStorage.getItem("top5");
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
-  const [tools, setTools] = useState(true);
-
-  // Abre o menu
-  const handleOpen = () => setOpenModal(true);
+  const [ferramentas, setFerramentas] = useState(true);
+  const theme = useTheme();
+  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     // Fecha o componente relacionado ao rótulo
     handleCloseLabel();
     // Fecha o modal
-    // setOpen(false);
+    setOpen(false);
   };
 
-  const {
-    isLoading: isLoadingToolList,
-    isError: isErrorToolList,
-    data: toolListData,
-    error: errorToolList,
-  } = useFetchToolsData();
+  const isOptionEqualToValue = (option: LabelType, value: LabelType) => option.id === value.id;
+  const { isLoading: isLoadingToolList, isError: isErrorToolList, data: toolListData, error: errorToolList } = useToolListData();
   const [selectLabels, setLabels] = useState<LabelType[]>([]);
 
   useEffect(() => {
-    if (toolListData) {
-      setLabels(toolListData);
-      // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
+      if (toolListData) {
+        setLabels(toolListData);
+      }
+    }, [toolListData]);
+    
+  // TOP5 do JsonServer
+  // const { isLoading: isLoadingTopFive, isError: isErrorTopFive, data: TopFiveData, error: errorTopFive } = useTopFiveData();
+
+    // =============================================== TOP 5 QUARKUS =================================================
+  const iniDateTime = '2022-03-10T16:00:00'
+  const { isLoading: isLoadingTopNokOk, isError: isErrorTopNokOk, data: TopNokOkData, error: errorTopNokOk } = useTopNokOk(iniDateTime);
+  // console.log('TopNokOkData', TopNokOkData)  
+  const transformarDados = () => {
+    if (!TopNokOkData) {  // Verifica se TopNokOkData está definido
+        console.error("TopNokOkData is undefined. Cannot transform data.");
+        return; // Ou retorne um array vazio: return [];
     }
-  }, [toolListData]);
-  // console.log("pendingValue: ", pendingValue, "\n pending", Pending);
 
-  // const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
-  // const { data, isLoading, isError, error } = useTopFiveData();
-  // const {
-  //   isLoading: isLoadingTopFive,
-  //   isError: isErrorTopFive,
-  //   data: TopFiveData,
-  //   error: errorTopFive,
-  // } = useTopFiveData();
-  // const dataAPI = getTopFiveData()
-  // const {} = useQuery(['dadosdotop5'], () => getTopFiveData())
+    const novosDados: DataTopNokOk[] = TopNokOkData.map((item: TopNokOkItem) => {
+        if (!item) { // Verificação adicional para cada item
+            console.warn("An item in TopNokOkData is null or undefined. Skipping.");
+            return null; 
+        }
 
-  // =======================================Simulando atualizações em tempo real==========================================
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTopFiveData((prevData) => {
-  //       const randomIndex = Math.floor(Math.random() * prevData.length); // Seleciona um card aleatório
-  //       const updatedCard = prevData[randomIndex];
-  //       // Atualiza apenas o card selecionado
-  //       const updatedData = prevData.map((card, index) =>
-  //         index === randomIndex
-  //           ? {
-  //               ...updatedCard,
-  //               total: Math.round(Math.random() * 100) / 100, // Atualiza o valor total aleatoriamente
-  //               percent: Math.round((Math.random() * 5 - 2.5) * 100) / 100, // Atualiza o percent aleatoriamente
-  //               title: updatedCard.title.includes('Novo')
-  //                 ? updatedCard.title.replace('Novo ', '')
-  //                 : `Novo ${updatedCard.title}`, // Alterna o título
-  //             }
-  //           : card
-  //       );
+        const chartData = {
+          categories: item.lastResults?.map(result => { // Tratamento para lastResults null/undefined
+                const finalTimestamp = new Date(result.finalTimestamp);
+                return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }) || [],
+            series: item.lastResults?.map(result => result.nok) || 0,
+        };
 
-  //       return updatedData;
-  //     });
-  //   }, 20000); // Atualiza a cada 20 segundos
+        return {
+            title: `${item.toolName}/${item.toolRevision}` || "N/A",
+            trend: item.trend,
+            total: item.nokOkRate,
+            color: "",
+            chart: chartData,
+        };
+    }).filter((item: null) => item !== null); // Remove itens nulos que possam ter sido retornados
 
-  //   return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-  // }, []);
+    setTopFiveData(novosDados);
+};
 
-  // console.log("TopFiveData ordenado:", sortedTopFiveData, "\nAPI Data:", data);
+  useEffect(() => {
+    transformarDados();
+    // console.log('topFiveData',  topFiveData)
+    // console.log('TopNokOkData', TopNokOkData);
+    // eslint-disable-next-line
+  }, [TopNokOkData]);
 
-  /* const sortedTopFiveData = [...top5Data].sort((a, b) => a.title.localeCompare(b.title));
-  console.log("topFiveData: " , topFiveData, '\n API: ', top5Data); */
 
-  // const sortedTopFiveData = [...topFiveData].sort((a, b) => a.title.localeCompare(b.title));
+
+
+  // Garante que `data` está definido antes de usar
+  // const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) =>
+  const sortedTopFiveData = [...(topFiveData || [])].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  );
+
+  useEffect(() => {
+    // Sempre que o valor do slider mudar, salva no localStorage
+    localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTop5));
+}, [taxaTop5]);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
-    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
-    setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
+    setValue(newValue as number[]); // Atualiza o estado do slider
+    setTaxaTop5(newValue as number[]); // Atualiza o estado do top 5
+    localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTop5));
   };
 
-  const handleClickTopFive = () => {
-    setOpenListTopFive(!openListTopFive);
+  const handleClickTop5 = () => {
+    setOpenListTop5(!openListTop5);
   };
 
   const handleClickAperto = () => {
@@ -153,6 +273,7 @@ export function OverviewAnalyticsView() {
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
@@ -163,6 +284,10 @@ export function OverviewAnalyticsView() {
     }
     setAnchorEl(null);
   };
+
+  const openLabels = Boolean(anchorEl);
+  const id = openLabels ? 'github-label' : undefined;
+  const isLargeScreen = window.innerWidth > 768;  
 
   return (
     <DashboardContent maxWidth="xl">
@@ -178,7 +303,7 @@ export function OverviewAnalyticsView() {
         </Button>
 
         <Modal
-          open={openModal}
+          open={open}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
@@ -190,11 +315,11 @@ export function OverviewAnalyticsView() {
                 component="nav"
                 aria-labelledby="nested-list-subheader"
               >
-                <ListItemButton onClick={handleClickTopFive}>
+                <ListItemButton onClick={handleClickTop5}>
                   <ListItemText primary="TOP 5" />
-                  {openListTopFive ? <ExpandLess /> : <ExpandMore />}
+                  {openListTop5 ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openListTopFive} timeout="auto" unmountOnExit>
+                <Collapse in={openListTop5} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       {/* ================================== habilita o top 5                       */}
@@ -203,20 +328,20 @@ export function OverviewAnalyticsView() {
                           style={{ color: 'blue', textAlign: 'center' }}
                           control={
                             <Switch
-                              checked={topFive}
-                              onChange={(event) => setTopFive(event.target.checked)}
+                              checked={top5}
+                              onChange={(event) => setTop5(event.target.checked)}
                             />
                           }
                           label=""
                         />
                       </div>
                       <Slider
-                        getAriaLabel={() => 'Temperature range'}
-                        value={valueSliderTopFive}
+                        getAriaLabel={() => 'Criticidade'}
+                        value={value}
                         onChange={handleChange}
                         valueLabelDisplay="auto"
                         getAriaValueText={valuetext}
-                        disabled={!topFive}
+                        disabled={!top5}
                         min={0.0}
                         step={0.1}
                         max={1.0}
@@ -236,6 +361,7 @@ export function OverviewAnalyticsView() {
                         flexDirection: 'column',
                       }}
                     >
+
                       <Box
                         sx={{
                           width: 600,
@@ -262,12 +388,14 @@ export function OverviewAnalyticsView() {
                           }}
                           onClick={handleClick}
                         >
-                          <span style={{ alignSelf: 'center' }}>{t('dashboard.selectTools')}</span>
+                          <span style={{ alignSelf: 'center' }}>
+                            {t('dashboard.selectTools')}
+                          </span>
                         </Button>
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map((label) => (
                             <Box
-                              key={label.name}
+                              key={label.id}
                               sx={{
                                 mb: '20px',
                                 height: 20,
@@ -282,6 +410,7 @@ export function OverviewAnalyticsView() {
                                 color: theme.palette.getContrastText(label.color),
                               }}
                             >
+                              {/* lista tool selecionada */}
                               {label.name}
                             </Box>
                           ))}
@@ -356,6 +485,7 @@ export function OverviewAnalyticsView() {
                                         },
                                       })}
                                     >
+                                      {/* scroll tool */}
                                       {option.name}
                                       <br />
                                       <span>{option.description}</span>
@@ -370,6 +500,7 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
+                              isOptionEqualToValue={isOptionEqualToValue}
                               options={[...selectLabels].sort((a, b) => {
                                 // Display the selected labels first.
                                 let ai = valueLabel.indexOf(a);
@@ -378,7 +509,7 @@ export function OverviewAnalyticsView() {
                                 bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
                                 return ai - bi;
                               })}
-                              getOptionLabel={(option) => option.name}
+                              getOptionLabel={(option) => option.id}
                               renderInput={(params) => (
                                 <StyledInput
                                   ref={params.InputProps.ref}
@@ -401,158 +532,50 @@ export function OverviewAnalyticsView() {
       </Grid>
 
       {/* ================================TP 5===================================== */}
-      {topFive && (
-        <div id="TopFive">
+      {top5 && (
+        <div id="top5">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
-
           <Grid container spacing={2}>
-            {/* {sortedTopFiveData.map((item, index) => (
+            {sortedTopFiveData.map((item, index) => (
               <Grid key={index} xs={12} sm={6} md={2.4}>
                 <AnalyticsWidgetSummary
                   title={item.title}
                   total={item.total}
                   chart={item.chart}
-                  criticality={taxaTopFive}
+                  trend={item.trend}
+                  criticality={taxaTop5}
                 />
               </Grid>
-            ))} */}
+            ))}
           </Grid>
         </div>
       )}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      {tools && (
+      {ferramentas && (
         <div id="ferramentas">
           <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
             <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
               {t('dashboard.process')}
             </Typography>
           </Grid>
-
           <Grid container spacing={5}>
             {(cardData || [])
               .filter((data) => selectedCards.includes(data.id))
-              .filter((data) => pendingValue.some((pending) => pending.name === data.title))
+              .filter((data) => pendingValue.some((pending) => pending.id === data.id))
               .map((data) => (
                 <Grid xs={12} sm={6} md={4} key={data.id}>
                   <AnalyticsDashboardCard
                     {...data}
-                    targetAlert={toolLimits[0]}
-                    targetCritical={toolLimits[1]}
-                    onDelete={() => handleDeleteCard(data.title)}
+                    targetAlert={targetTools[0]}
+                    targetCritical={targetTools[1]}
+                    onDelete={() => handleDeleteCard(data.id)}
                   />
                 </Grid>
-              ))}
-
-            {/* ====================================================GRÁFICO DE DISPERSÃO - ok ============================ */}
-            {/* <Grid xs={12} md={6} lg={8}>
-          <Card>
-          <h2 style={{ textAlign: 'center' }}>Dispersão</h2>
-          <ScatterChart
-            width={900}
-            height={400} 
-            series={[{ data: [
-              { x: 100, y: 200, id: 1 },
-              { x: 120, y: 100, id: 2 },
-              { x: 170, y: 300, id: 3 },
-              { x: 140, y: 250, id: 4 },
-              { x: 150, y: 400, id: 5 },
-              { x: 110, y: 280, id: 6 },
-              { x: 300, y: 300, id: 7 },
-              { x: 400, y: 500, id: 8 },
-              { x: 200, y: 700, id: 9 },
-              { x: 340, y: 350, id: 10 },
-              { x: 560, y: 500, id: 11 },
-              { x: 230, y: 780, id: 12 },
-              { x: 500, y: 400, id: 13 },
-              { x: 300, y: 500, id: 14 },
-              { x: 240, y: 300, id: 15 },
-              { x: 320, y: 550, id: 16 },
-              { x: 500, y: 400, id: 17 },
-              { x: 420, y: 280, id: 18 },
-          ]}]}
-          grid={{ vertical: true, horizontal: true }}          
-          />
-          </Card>
-        </Grid> */}
-            {/* ========================================CARD TORQUE============================== */}
-            {/* <Grid xs={12}>
-          <AnalyticsChartCard id="12" />
-        </Grid> */}
-
-            {/* <Grid xs={12} md={6} lg={12}>
-          <TorqueChart />
-        </Grid> */}
-            {/* ======================================ANGULO/TORQUE X TEMPO ============================ */}
-            {/* <Grid xs={12} md={6} lg={12}>
-          <Card>
-            <CardContent>
-              <AreaChart />
-            </CardContent>
-          </Card>
-        </Grid> */}
-            {/* ==========================================NUMERO DE APERTOS POR ESTAÇÃO===================== */}
-            {/* <Grid xs={12} md={6} lg={12}>
-          <LineChart />
-        </Grid> */}
-            {/* =============================================OK/NOK Última hora================================= */}
-            {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentVisits
-            title="OK/NOK Última hora"
-            chart={{
-              series: [
-                { label: 'OK', value: 3500 },
-                { label: 'NOK', value: 500 },
-                // { label: 'Europe', value: 1500 },
-                // { label: 'Africa', value: 500 },
-              ],
-            }}
-          />
-        </Grid> */}
-            {/* ==================================NOK BARRA======================================== */}
-            {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsWebsiteVisits
-            title="NOK"
-            subheader="por hora"
-            chart={{
-              categories: ['10h', '11h', '12h', '13h', '14h'],
-              series: [{
-                 name: 'ALTA',
-                 data: [93, 90, 86, 87, 77] 
-              },],
-            }}
-          />
-        </Grid> */}
-
-            {/* ==============================TOP 5 BARRA COLORIDO=============================== */}
-            {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsChartBar            
-          />
-        </Grid> */}
-
-            {/* <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentSubject
-            title="Current subject"
-            chart={{
-              categories: ['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math'],
-              series: [
-                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
-              ],
-            }}
-          />
-        </Grid> */}
+              ))} 
           </Grid>
-
-          {/* ================================GRAFICO DE AREA - OK ================================ */}
-          {/* <Grid xs={12} md={6} lg={4} paddingTop={5}>
-          <Card>
-          <AreaChartNew />
-          </Card>
-        </Grid> */}
         </div>
       )}
     </DashboardContent>
@@ -560,187 +583,8 @@ export function OverviewAnalyticsView() {
 }
 
 interface LabelType {
+  id: string;
   name: string;
   color: string;
   description?: string;
 }
-
-const style = {
-  position: 'absolute',
-  alignContent: 'center',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-
-  '@media (max-width: 768px)': {
-    // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-    width: '90%', // Ocupa 90% da largura da tela
-  },
-};
-
-function valuetext(value: number) {
-  return `${value}°C`;
-}
-
-const StyledPopper = styled(Popper)(({ theme }) => ({
-  border: `1px solid ${'#e1e4e8'}`,
-  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
-  color: '#24292e',
-  backgroundColor: '#fff',
-  borderRadius: 6,
-  width: 300,
-  zIndex: theme.zIndex.modal,
-  fontSize: 13,
-  ...theme.applyStyles('dark', {
-    border: `1px solid ${'#30363d'}`,
-    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
-    color: '#c9d1d9',
-    backgroundColor: '#1c2128',
-  }),
-}));
-
-const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: 10,
-  width: '100%',
-  borderBottom: `1px solid ${'#30363d'}`,
-  '& input': {
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    border: `1px solid ${'#30363d'}`,
-    padding: 8,
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
-    fontSize: 14,
-    '&:focus': {
-      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
-      borderColor: '#0366d6',
-      ...theme.applyStyles('dark', {
-        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
-        borderColor: '#388bfd',
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#0d1117',
-      border: `1px solid ${'#eaecef'}`,
-    }),
-  },
-  ...theme.applyStyles('dark', {
-    borderBottom: `1px solid ${'#eaecef'}`,
-  }),
-}));
-
-// From https://github.com/abdonrd/github-labels
-// const labels = [
-//   {
-//     id: 1,
-//     name: 'MAKITA',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 2,
-//     name: 'ZP6',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 3,
-//     name: 'BANCOS',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 4,
-//     name: 'TACTO12',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 5,
-//     name: 'R2',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 6,
-//     name: 'FRONTEND',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 7,
-//     name: 'FAHRWERK2',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 8,
-//     name: 'ZP62',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 9,
-//     name: 'BANCOS2',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 10,
-//     name: 'TACTO11',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 11,
-//     name: 'R3',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 12,
-//     name: 'FRONTEND2',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 13,
-//     name: 'FAHRWERK3',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 14,
-//     name: 'ZP63',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 15,
-//     name: 'BANCOS3',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 16,
-//     name: 'TACTO10',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 17,
-//     name: 'R1',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-//   {
-//     id: 18,
-//     name: 'FRONTEND3',
-//     color: '#9fc3da29',
-//     description: '',
-//   },
-// ];

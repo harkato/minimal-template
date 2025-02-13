@@ -26,6 +26,7 @@ import { blue } from '@mui/material/colors';
 type Props = CardProps & {
   title: string;
   total: number;
+  trend: string;
   // percent: number;
   // color?: ColorType;
   // icon: React.ReactNode;
@@ -42,6 +43,7 @@ export function AnalyticsWidgetSummary({
   title,
   total,
   chart,
+  trend,
   // percent,
   color = 'primary',
   criticality,
@@ -92,10 +94,19 @@ export function AnalyticsWidgetSummary({
     
   }
 
-  function getIcon(taxaAtual: number){
-    if (taxaAtual >= criticality[1]) {
+  // function getIcon(taxaAtual: number){
+  //   if (taxaAtual >= criticality[1]) {
+  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+  //   } if (taxaAtual >= criticality[0]) {
+  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+  //   }
+  //     return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
+  // }
+
+  function getIcon(trend: string){
+    if (trend === 'Up') {
       return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-    } if (taxaAtual >= criticality[0]) {
+    } if (trend === 'Steady') {
       return <img alt="icon" src="/assets/icons/glass/dash.png" />;
     }
       return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
@@ -140,12 +151,12 @@ export function AnalyticsWidgetSummary({
         {...other}
       >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Box sx={{ width: 40, height: 40 }}>{getIcon(total)}</Box>
+      <Box sx={{ width: 40, height: 40 }}>{getIcon(trend)}</Box>
         <Chart
           type="bar"
           series={[{ data: chart.series }]}
           options={chartOptions}
-          width={70}
+          width={40}
           height={56}
         />
       </Box>

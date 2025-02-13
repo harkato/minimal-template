@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { useFetchToolsData } from 'src/routes/hooks/api';
 import { Props } from 'src/sections/overview/analytics-dashboard-card';
 import { initialData } from 'src/sections/overview/view/initial-data';
+import { useToolData } from 'src/routes/hooks/useToolData';
+
 // Define o tipo do valor do contexto
 export interface DashboardContextProps {
   cardData: Array<Props>;
@@ -13,6 +14,7 @@ export interface DashboardContextProps {
 }
 
 interface LabelType {
+  id: string;
   name: string;
   color: string;
   description?: string;
@@ -23,29 +25,29 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 
 // Provedor do contexto
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const {
-    isLoading: isLoadingTools,
-    isError: isErrorTools,
-    data: toolData,
-    error: errorTools,
-  } = useFetchToolsData();
+  // const [cardData, setCardData] = useState(initialData);
+
+  // const [selectedCards, setSelectedCards] = useState<string[]>(
+  //   cardData?.map((card: { id: any; }) => card.id)
+  // );
+
+  const { isLoading: isLoadingTools, isError: isErrorTools, data: toolData, error: errorTools } = useToolData();
   const [cardData, setCardData] = useState([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
   useEffect(() => {
     if (toolData) {
       setCardData(toolData);
-      setSelectedCards(toolData.map((card: { id: any }) => card.id));
+      setSelectedCards(toolData.map((card: { id: any; }) => card.id));
     }
   }, [toolData]);
-  // ===============================================================
 
-  const [pendingValue, setPendingValue] = useState<LabelType[]>(() =>
-    JSON.parse(localStorage.getItem('pendingValue') || '[]')
+  const [pendingValue, setPendingValue] = useState<LabelType[]>(
+    () => JSON.parse(localStorage.getItem("pendingValue") || '[]')
   );
 
   const handleDeleteCard = (id: string) => {
-    setPendingValue((prevPending) => prevPending.filter((item) => item.name !== id));
+    setPendingValue((prevPending) => prevPending.filter((item) => item.id !== id));
     setSelectedCards((prevSelected) => prevSelected.filter((cardId) => cardId !== id));
   };
 
@@ -62,9 +64,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }),
     [cardData, pendingValue, selectedCards] // Dependências que afetam o valor do contexto
   );
-
+  
   useEffect(() => {
-    localStorage.setItem('pendingValue', JSON.stringify(pendingValue));
+    localStorage.setItem("pendingValue", JSON.stringify(pendingValue));
   }, [pendingValue]);
 
   return <DashboardContext.Provider value={contextValue}>{children}</DashboardContext.Provider>;
