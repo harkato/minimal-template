@@ -162,7 +162,7 @@ export function AnalyticsDashboardCard({
                       aria-labelledby="continuous-slider"
                       valueLabelDisplay="auto"
                       min={0.0}
-                      step={0.1}
+                      step={0.01}
                       max={1.0}
                       onChange={handleChangeTarget}
                     />

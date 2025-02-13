@@ -6,6 +6,7 @@ import {
   AutocompleteCloseReason,
   Box,
   Button,
+  Chip,
   ClickAwayListener,
   Collapse,
   FormControlLabel,
@@ -15,9 +16,11 @@ import {
   ListItemText,
   Modal,
   Popper,
+  SelectChangeEvent,
   Slider,
   styled,
   Switch,
+  TextField,
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -48,8 +51,8 @@ interface ToolData {
   topIssues: any[];
 }
 const initialFilters = {
-  toolId: 6,
-  toolRevision: 3,
+  toolId: 0,
+  toolRevision: 0,
 };
 
 export function OverviewAnalyticsView() {
@@ -62,12 +65,15 @@ export function OverviewAnalyticsView() {
   const [openListTopFive, setOpenListTopFive] = React.useState(false); // Abre a categoria do Top 5
   const [openListAperto, setOpenListAperto] = React.useState(false); // Abre a categoria das apertadeiras
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // Define a posição do popover
-  const [valueLabel, setValueLabel] = React.useState<LabelType[]>([]); // Valor de referência para ordenação das ferramentas selecionadas
+  const [valueLabel, setValueLabel] = React.useState<string[]>([]); // Valor de referência para ordenação das ferramentas selecionadas
   const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]); // Limites de referência para o top 5
   const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
   const [filters, setFilters] = useState<ToolFilters>(initialFilters);
   const [tools, setTools] = useState<ToolData[]>([]);
+  const [toolsWithRevisions, setToolsWithRevisions] = useState<
+    { toolId: number; revision: number }[]
+  >([]);
   const openLabels = Boolean(anchorEl);
   const id = openLabels ? 'github-label' : undefined;
 
@@ -75,7 +81,7 @@ export function OverviewAnalyticsView() {
   const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
     useDashboard();
 
-  const [selectLabels, setLabels] = useState<LabelType[]>([]);
+  const [selectLabels, setLabels] = useState<any[]>([]);
 
   // MOSTRA TOP 5 E FERRAMENTAS
   const [topFive, setTopFive] = useState(() => {
@@ -108,6 +114,16 @@ export function OverviewAnalyticsView() {
     }
   }, [toolListData]);
 
+  // Atualiza o filtro de ferramentas
+  useEffect(() => {
+    const transformedData = pendingValue.map((tool: any) => ({
+      toolId: tool.toolId,
+      revision: tool.revision,
+    }));
+
+    setToolsWithRevisions(transformedData);
+  }, [pendingValue]);
+
   useEffect(() => {
     if (toolsInfo) {
       const transformedData = {
@@ -121,8 +137,6 @@ export function OverviewAnalyticsView() {
       setTools((prevTools) => [...prevTools, transformedData]);
     }
   }, [toolsInfo]);
-
-  console.log('Dados atualizados toolsInfo: ', tools);
 
   // Ordena o Card Top 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
@@ -164,6 +178,15 @@ export function OverviewAnalyticsView() {
       anchorEl.focus();
     }
     setAnchorEl(null);
+  };
+
+  // Gerencia filtros de múltipla seleção
+  const handleSelectionChange = (
+    event: any,
+    setState: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const selectedValues = event.target.value as string[];
+    setState(selectedValues);
   };
 
   return (
@@ -239,6 +262,7 @@ export function OverviewAnalyticsView() {
                       }}
                     >
                       <Box
+                        onClick={handleClick}
                         sx={{
                           width: 600,
                           display: 'flex',
@@ -250,7 +274,7 @@ export function OverviewAnalyticsView() {
                           },
                         }}
                       >
-                        <Button
+                        {/* <Button // Botão de seleção das ferramentas
                           disableRipple
                           aria-describedby={id}
                           sx={{
@@ -263,30 +287,45 @@ export function OverviewAnalyticsView() {
                             },
                           }}
                           onClick={handleClick}
+                        > */}
+                        <Typography
+                          variant="button"
+                          sx={{
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                            width: '85%',
+                            color: 'black',
+                            marginBottom: '10px',
+                            '@media (max-width: 768px)': {
+                              alignSelf: 'center',
+                            },
+                          }}
                         >
-                          <span style={{ alignSelf: 'center' }}>{t('dashboard.selectTools')}</span>
-                        </Button>
+                          {t('dashboard.selectTools')}
+                        </Typography>
+                        {/* </Button> */}
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
-                          {pendingValue.map((label) => (
-                            <Box
-                              key={label.name}
-                              sx={{
-                                mb: '20px',
-                                height: 20,
-                                padding: '.15em 4px',
-                                fontWeight: 400,
-                                lineHeight: '15px',
-                                borderRadius: '2px',
-                                width: '100%',
-                              }}
-                              style={{
-                                backgroundColor: label.color,
-                                color: theme.palette.getContrastText(label.color),
-                              }}
-                            >
-                              {label.name}
-                            </Box>
-                          ))}
+                          {pendingValue.map(
+                            (
+                              tool,
+                              id // Mostra as ferramentas selecionadas
+                            ) => (
+                              <Box
+                                key={id}
+                                sx={{
+                                  mb: '20px',
+                                  height: 20,
+                                  padding: '.15em 4px',
+                                  fontWeight: 400,
+                                  lineHeight: '15px',
+                                  borderRadius: '2px',
+                                  width: '100%',
+                                }}
+                              >
+                                {tool.toolName}
+                              </Box>
+                            )
+                          )}
                         </div>
                       </Box>
                       <StyledPopper
@@ -297,6 +336,34 @@ export function OverviewAnalyticsView() {
                       >
                         <ClickAwayListener onClickAway={handleCloseLabel}>
                           <div>
+                            {/* <Autocomplete
+                              multiple
+                              options={selectLabels}
+                              getOptionLabel={(option) => option.toolName}
+                              getOptionKey={(option) => option.toolId || option.toolName}
+                              value={pendingValue.map(
+                                (name) =>
+                                  selectLabels.find((tool) => tool.toolName === name) || null
+                              )}
+                              onChange={(_, newValue) =>
+                                handleToolListChange({
+                                  target: { value: newValue.map((tool) => tool?.toolName) },
+                                })
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label={t('results.tools')}
+                                  variant="outlined"
+                                />
+                              )}
+                              renderTags={(selected, getTagProps) =>
+                                selected.map((option, index) => {
+                                  const { key, ...tagProps } = getTagProps({ index });
+                                  return <Chip key={key} label={option.toolName} {...tagProps} />;
+                                })
+                              }
+                            /> */}
                             <Autocomplete
                               open
                               multiple
@@ -310,20 +377,17 @@ export function OverviewAnalyticsView() {
                                 }
                               }}
                               value={pendingValue}
-                              onChange={(event, newValue, reason) => {
-                                if (
-                                  event.type === 'keydown' &&
-                                  ((event as React.KeyboardEvent).key === 'Backspace' ||
-                                    (event as React.KeyboardEvent).key === 'Delete') &&
-                                  reason === 'removeOption'
-                                ) {
-                                  return;
-                                }
-                                setPendingValue(newValue);
-                              }}
+                              onChange={(_, newValue: string[]) =>
+                                handleSelectionChange(
+                                  { target: { value: newValue.map((tool) => tool) } },
+                                  setPendingValue
+                                )
+                              }
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
+                              getOptionLabel={(option) => option.toolName}
+                              getOptionKey={(option) => option.toolId || option.toolName}
                               renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props;
                                 return (
@@ -358,7 +422,7 @@ export function OverviewAnalyticsView() {
                                         },
                                       })}
                                     >
-                                      {option.name}
+                                      {option.toolName}
                                       <br />
                                       <span>{option.description}</span>
                                     </Box>
@@ -372,15 +436,17 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
-                              options={[...selectLabels].sort((a, b) => {
-                                // Display the selected labels first.
-                                let ai = valueLabel.indexOf(a);
-                                ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
-                                let bi = valueLabel.indexOf(b);
-                                bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
-                                return ai - bi;
-                              })}
-                              getOptionLabel={(option) => option.name}
+                              options={
+                                // selectLabels}
+                                [...selectLabels].sort((a, b) => {
+                                  // Display the selected labels first.
+                                  let ai = valueLabel.indexOf(a);
+                                  ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
+                                  let bi = valueLabel.indexOf(b);
+                                  bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
+                                  return ai - bi;
+                                })
+                              }
                               renderInput={(params) => (
                                 <StyledInput
                                   ref={params.InputProps.ref}
@@ -454,12 +520,6 @@ export function OverviewAnalyticsView() {
       )}
     </DashboardContent>
   );
-}
-
-interface LabelType {
-  name: string;
-  color: string;
-  description?: string;
 }
 
 const style = {
