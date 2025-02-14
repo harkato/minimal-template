@@ -99,6 +99,7 @@ export function OverviewAnalyticsView() {
 
   const toolsQueries = useToolsInfo(toolsWithRevisions);
   const toolsInfo = toolsQueries.map((query) => query.data).filter(Boolean);
+  console.log(toolsInfo);
 
   // Dados do Top 5
   // const {
@@ -125,20 +126,6 @@ export function OverviewAnalyticsView() {
 
     setToolsWithRevisions(transformedData);
   }, [pendingValue]);
-
-  // useEffect(() => {
-  //   if (toolsInfo) {
-  //     const transformedData = toolsInfo.map((tool: any) => ({
-  //       toolName: tool.toolName,
-  //       products: tool.products,
-  //       toolId: tool.toolId,
-  //       nok: tool.nok,
-  //       nokOkRate: tool.nokOkRate,
-  //       topIssues: tool.topIssues,
-  //     }));
-  //     setTools(transformedData);
-  //   }
-  // }, [toolsInfo]);
 
   // Ordena o Card Top 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
@@ -221,24 +208,26 @@ export function OverviewAnalyticsView() {
               >
                 <ListItemButton onClick={handleClickTopFive}>
                   <ListItemText primary="TOP 5" />
+                  <div style={{ alignSelf: 'end' }}>
+                    <FormControlLabel
+                      style={{ color: 'blue', textAlign: 'center' }}
+                      control={
+                        <Switch
+                          checked={topFive}
+                          onChange={(event) => setTopFive(event.target.checked)}
+                        />
+                      }
+                      label=""
+                    />
+                  </div>
                   {openListTopFive ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={openListTopFive} timeout="auto" unmountOnExit>
+                  <Typography variant="h5" sx={{ textAlign: 'center' }}>
+                    Taxa de criticidade
+                  </Typography>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
-                      {/* ================================== habilita o top 5                       */}
-                      <div style={{ alignSelf: 'end' }}>
-                        <FormControlLabel
-                          style={{ color: 'blue', textAlign: 'center' }}
-                          control={
-                            <Switch
-                              checked={topFive}
-                              onChange={(event) => setTopFive(event.target.checked)}
-                            />
-                          }
-                          label=""
-                        />
-                      </div>
                       <Slider
                         getAriaLabel={() => 'Temperature range'}
                         value={valueSliderTopFive}
@@ -247,7 +236,7 @@ export function OverviewAnalyticsView() {
                         getAriaValueText={valuetext}
                         disabled={!topFive}
                         min={0.0}
-                        step={0.1}
+                        step={0.01}
                         max={1.0}
                       />
                     </ListItemButton>
@@ -504,7 +493,7 @@ export function OverviewAnalyticsView() {
           </Grid>
 
           <Grid container spacing={5}>
-            {tools.map((tool) => (
+            {toolsInfo.map((tool) => (
               <Grid xs={12} sm={6} md={4} key={tool.toolId}>
                 <AnalyticsDashboardCard
                   title={tool.toolName}

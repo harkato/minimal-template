@@ -10,12 +10,13 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
+// Busca os resultados de uma apertadeira
 const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
     const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
       params: {
+        finalDateTime: '2024-01-01T00:00:00',
         initialDateTime: '2020-01-01T00:00:00',
-        finalDateTime: '2024-12-30T00:00:00',
         amount: 5,
       },
     });
