@@ -97,7 +97,9 @@ export function OverviewAnalyticsView() {
     error: errorToolList,
   } = useFetchToolsData();
 
-  const { data: toolsInfo, refetch } = useToolsInfo(toolsWithRevisions);
+  const toolsQueries = useToolsInfo(toolsWithRevisions);
+  const toolsInfo = toolsQueries.map((query) => query.data).filter(Boolean);
+
   // Dados do Top 5
   // const {
   //   isLoading: isLoadingTopFive,
@@ -124,19 +126,19 @@ export function OverviewAnalyticsView() {
     setToolsWithRevisions(transformedData);
   }, [pendingValue]);
 
-  useEffect(() => {
-    if (toolsInfo) {
-      const transformedData = toolsInfo.map((tool: any) => ({
-        toolName: tool.toolName,
-        products: tool.products,
-        toolId: tool.toolId,
-        nok: tool.nok,
-        nokOkRate: tool.nokOkRate,
-        topIssues: tool.topIssues,
-      }));
-      setTools(transformedData);
-    }
-  }, [toolsInfo]);
+  // useEffect(() => {
+  //   if (toolsInfo) {
+  //     const transformedData = toolsInfo.map((tool: any) => ({
+  //       toolName: tool.toolName,
+  //       products: tool.products,
+  //       toolId: tool.toolId,
+  //       nok: tool.nok,
+  //       nokOkRate: tool.nokOkRate,
+  //       topIssues: tool.topIssues,
+  //     }));
+  //     setTools(transformedData);
+  //   }
+  // }, [toolsInfo]);
 
   // Ordena o Card Top 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
@@ -178,7 +180,6 @@ export function OverviewAnalyticsView() {
       anchorEl.focus();
     }
     setAnchorEl(null);
-    refetch();
   };
 
   // Gerencia filtros de múltipla seleção
@@ -205,7 +206,9 @@ export function OverviewAnalyticsView() {
 
         <Modal
           open={openModal}
-          onClose={handleClose}
+          onClose={() => {
+            handleClose();
+          }}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import qs from 'qs';
 
@@ -10,26 +10,19 @@ const fetchData = async (endpoint: string) => {
   return response.data;
 };
 
-const fetchToolsInfo = async (
-  endpoint: string,
-  toolsWithRevisions: { toolId: number; toolRevision: number }[]
-) => {
+const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
-    const requests = toolsWithRevisions.map(({ toolId, toolRevision }) =>
-      axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-        params: {
-          initialDateTime: '2020-01-01T00:00:00',
-          finalDateTime: '2024-01-01T00:00:00',
-          worstRatedPrograms: 5,
-        },
-      })
-    );
-
-    const results = await Promise.all(requests);
-    return results.map((res) => res.data); // Retorna os dados diretamente
+    const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
+      params: {
+        initialDateTime: '2020-01-01T00:00:00',
+        finalDateTime: '2024-12-30T00:00:00',
+        amount: 5,
+      },
+    });
+    return response.data;
   } catch (error) {
     console.error('Erro ao buscar informações das ferramentas:', error);
-    throw error; // Lança o erro para que quem chamar a função possa tratá-lo
+    throw error;
   }
 };
 
@@ -132,9 +125,13 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
 }
 
 export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
-  const query = useQuery({
-    queryFn: () => fetchToolsInfo('dashboard/tools', toolsWithRevisions),
-    queryKey: ['toolInfo'],
+  const toolQueries = useQueries({
+    queries: toolsWithRevisions.map((tool) => ({
+      queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
+      queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
+      staleTime: 1000 * 60 * 5,
+    })),
   });
-  return query;
+
+  return toolQueries;
 }
