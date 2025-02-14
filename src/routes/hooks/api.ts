@@ -205,7 +205,9 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
 }
 
 // ====================================================DASHBOARD=======================================
-const fetchDataJServer = async (endpoint: string) => { // fetch top5 quarkus
+
+const fetchDataTop5 = async (endpoint: string) => { // fetch top5 quarkus
+   
   try {
   const response = await axios.get(`${DASHBOARD_URL}/${endpoint}`);
   return response.data;    
@@ -216,13 +218,15 @@ const fetchDataJServer = async (endpoint: string) => { // fetch top5 quarkus
       console.error("Erro:", error.message); // Erro genérico
       throw new Error("Ocorreu um erro inesperado.");
     }
-    return Promise.resolve([]); // Retorna um array vazio em caso de erro
+    return Promise.resolve([]); 
   }
 };
 
-export function useTopNokOk(finalDateTime: string) { // Lista do TOP5 QUARKUS  
+export function useTopNokOk(finalDateTime: string, switchTop5: any) { // Lista do TOP5 QUARKUS 
   return useQuery({
-    queryFn: () => fetchDataJServer(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
-    queryKey: ['topNokOk_data'], 
+    queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
+    queryKey: ['topNokOk_data'],
+    refetchInterval: 60000, // Refetch a cada 60 segundos (1 minuto)
+    enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true 
   });
 }

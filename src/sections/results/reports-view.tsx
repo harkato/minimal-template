@@ -32,9 +32,11 @@ import {
   fetchProgramsData,
   useResultAmount,
 } from 'src/routes/hooks/api';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
 import { printAllPages } from 'src/utils/print-table';
+import { useNavigate } from 'react-router-dom';
 
 type Order = 'asc' | 'desc';
 
@@ -167,6 +169,10 @@ export default function ResultPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [totalCount, setTotalCount] = useState(0);
+  const navigate = useNavigate();
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -513,7 +519,24 @@ export default function ResultPage() {
                   key={index}
                   sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                 >
-                  <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell>
+                  {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
+                  <TableCell sx={{ textAlign: 'left' }} >
+                  <Box
+                      sx={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}
+                      onClick={() => handleNavigation('/detail')}
+                    >
+                      <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
+                    </Box>
+                    {row.dateTime}
+                  </TableCell>
+                  
                   <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>

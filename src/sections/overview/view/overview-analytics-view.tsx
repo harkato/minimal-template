@@ -38,7 +38,7 @@ interface DataTopNokOk {
   title: string; // toolName
   trend: string;  // trend
   total: number; // nokOkRate
-  color: string; // campo em branco
+  // color: string; // campo em branco
   chart: {  // lastResults
     categories: string[]; // apenas a hora do finalTimestamp
       series: number[]; // nok
@@ -201,9 +201,9 @@ export function OverviewAnalyticsView() {
   // TOP5 do JsonServer
   // const { isLoading: isLoadingTopFive, isError: isErrorTopFive, data: TopFiveData, error: errorTopFive } = useTopFiveData();
 
-    // =============================================== TOP 5 QUARKUS =================================================
-  const iniDateTime = '2022-03-10T16:00:00'
-  const { isLoading: isLoadingTopNokOk, isError: isErrorTopNokOk, data: TopNokOkData, error: errorTopNokOk } = useTopNokOk(iniDateTime);
+    //  TOP 5 QUARKUS 
+  const iniDateTime = '2022-03-10T16:00:00'  // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  const { isLoading: isLoadingTopNokOk, isError: isErrorTopNokOk, data: TopNokOkData, error: errorTopNokOk } = useTopNokOk(iniDateTime, top5);
   // console.log('TopNokOkData', TopNokOkData)  
   const transformarDados = () => {
     if (!TopNokOkData) {  // Verifica se TopNokOkData está definido
@@ -229,7 +229,7 @@ export function OverviewAnalyticsView() {
             title: `${item.toolName}/${item.toolRevision}` || "N/A",
             trend: item.trend,
             total: item.nokOkRate,
-            color: "",
+            // color: "",
             chart: chartData,
         };
     }).filter((item: null) => item !== null); // Remove itens nulos que possam ter sido retornados
@@ -243,9 +243,6 @@ export function OverviewAnalyticsView() {
     // console.log('TopNokOkData', TopNokOkData);
     // eslint-disable-next-line
   }, [TopNokOkData]);
-
-
-
 
   // Garante que `data` está definido antes de usar
   // const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) =>

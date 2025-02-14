@@ -15,7 +15,17 @@ const areaChartOptions = {
     height: 450,
     type: 'area',
     toolbar: {
-      show: false
+      // show: false
+      tools: {
+        download: true,
+        selection: true,
+        zoom: true,
+        zoomin: true,
+        zoomout: true,
+        pan: false,
+        // reset: true | '<img src="/static/icons/reset.png" width="20">',
+        // customIcons: []
+      },
     }
   },
   dataLabels: {
