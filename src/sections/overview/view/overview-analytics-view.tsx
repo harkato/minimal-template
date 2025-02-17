@@ -204,8 +204,8 @@ export function OverviewAnalyticsView() {
     //  TOP 5 QUARKUS 
   const iniDateTime = '2022-03-10T16:00:00'  // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const { isLoading: isLoadingTopNokOk, isError: isErrorTopNokOk, data: TopNokOkData, error: errorTopNokOk } = useTopNokOk(iniDateTime, top5);
-  // console.log('TopNokOkData', TopNokOkData)  
   const transformarDados = () => {
+    console.log('TopNokOkData', TopNokOkData)  
     if (!TopNokOkData) {  // Verifica se TopNokOkData está definido
         console.error("TopNokOkData is undefined. Cannot transform data.");
         return; // Ou retorne um array vazio: return [];
@@ -222,11 +222,11 @@ export function OverviewAnalyticsView() {
                 const finalTimestamp = new Date(result.finalTimestamp);
                 return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }) || [],
-            series: item.lastResults?.map(result => result.nok) || 0,
+            series: item.lastResults?.map(result => result.nokOkRate) || 0,
         };
 
         return {
-            title: `${item.toolName}/${item.toolRevision}` || "N/A",
+            title: item.toolName || "N/A",
             trend: item.trend,
             total: item.nokOkRate,
             // color: "",
