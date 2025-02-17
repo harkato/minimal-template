@@ -175,11 +175,11 @@ export function OverviewAnalyticsView() {
             const finalTimestamp = new Date(result.finalTimestamp);
             return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           }) || [],
-        series: item.lastResults?.map((result) => result.nok) || 0,
+        series: item.lastResults?.map((result) => result.nokOkRate) || 0,
       };
 
       return {
-        title: `${item.toolName}/${item.toolRevision}` || 'N/A',
+        title: item.toolName || 'N/A',
         trend: item.trend,
         total: item.nokOkRate,
         // color: "",
