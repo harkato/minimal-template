@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { useFetchToolsData } from 'src/routes/hooks/api';
 import { Props } from 'src/sections/overview/analytics-dashboard-card';
 import { initialData } from 'src/sections/overview/view/initial-data';
+import { useToolData } from 'src/routes/hooks/useToolData';
+
 // Define o tipo do valor do contexto
 export interface DashboardContextProps {
   cardData: Array<Props>;
@@ -17,12 +18,18 @@ const DashboardContext = createContext<DashboardContextProps | undefined>(undefi
 
 // Provedor do contexto
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // const [cardData, setCardData] = useState(initialData);
+
+  // const [selectedCards, setSelectedCards] = useState<string[]>(
+  //   cardData?.map((card: { id: any; }) => card.id)
+  // );
+
   const {
     isLoading: isLoadingTools,
     isError: isErrorTools,
     data: toolData,
     error: errorTools,
-  } = useFetchToolsData();
+  } = useToolData();
   const [cardData, setCardData] = useState([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
@@ -32,7 +39,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setSelectedCards(toolData.map((card: { id: any }) => card.id));
     }
   }, [toolData]);
-  // ===============================================================
 
   const [pendingValue, setPendingValue] = useState<string[]>([]);
   // (() =>

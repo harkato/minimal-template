@@ -60,58 +60,82 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Ferramentas */}
       <Grid item xs={12} sm={6} md={6}>
-        <Autocomplete
-          multiple
-          options={toolsData}
-          getOptionLabel={(option) => option.toolName}
-          getOptionKey={(option) => option.toolId || option.toolName}
-          value={selectedTools.map(
-            (name) => toolsData.find((tool) => tool.toolName === name) || null
-          )}
-          onChange={(_, newValue) =>
-            handleSelectionChange(
-              { target: { value: newValue.map((tool) => tool?.toolName) } },
-              setSelectedTools
-            )
-          }
-          renderInput={(params) => (
-            <TextField {...params} label={t('results.tools')} variant="outlined" />
-          )}
-          renderTags={(selected, getTagProps) =>
-            selected.map((option, index) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return <Chip key={key} label={option.toolName} {...tagProps} />;
-            })
-          }
-        />
+        {toolsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
+          <Autocomplete
+            multiple
+            options={toolsData}
+            getOptionLabel={(option) => option.toolName}
+            getOptionKey={(option) => option.toolId || option.toolName}
+            value={selectedTools.map(
+              (name) => toolsData.find((tool) => tool.toolName === name) || null
+            )}
+            onChange={(_, newValue) =>
+              handleSelectionChange(
+                { target: { value: newValue.map((tool) => tool?.toolName) } },
+                setSelectedTools
+              )
+            }
+            renderInput={(params) => (
+              <TextField {...params} label={t('results.tools')} variant="outlined" />
+            )}
+            renderTags={(selected, getTagProps) =>
+              selected.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return <Chip key={key} label={option.toolName} {...tagProps} />;
+              })
+            }
+          />
+        ) : (
+          <TextField
+          select
+          label={t('results.tools')}
+          variant="outlined"
+          // value='Ferramenta não encontrada'
+          fullWidth
+          >
+            <MenuItem>Ferramenta não encontrada</MenuItem>
+          </TextField>
+        )} 
       </Grid>
 
       {/* Programas */}
       <Grid item xs={12} sm={6} md={6}>
-        <Autocomplete
-          multiple
-          options={programsData}
-          getOptionLabel={(option) => option.programName}
-          getOptionKey={(option) => option.programId || option.programName}
-          value={selectedPrograms.map(
-            (name) => programsData.find((p) => p.programName === name) || null
-          )}
-          onChange={(_, newValue) =>
-            handleSelectionChange(
-              { target: { value: newValue.map((p) => p?.programName) } },
-              setSelectedPrograms
-            )
-          }
-          renderInput={(params) => (
-            <TextField {...params} label={t('results.programs')} variant="outlined" />
-          )}
-          renderTags={(selected, getTagProps) =>
-            selected.map((option, index) => {
-              const { key, ...tagProps } = getTagProps({ index });
-              return <Chip key={key} label={option.programName} {...tagProps} />;
-            })
-          }
-        />
+      {programsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
+          <Autocomplete
+            multiple
+            options={programsData}
+            getOptionLabel={(option) => option.programName}
+            getOptionKey ={(option) => option.programId || option.programName}
+            value={selectedPrograms.map(
+              (name) => programsData.find((p) => p.programName === name) || null
+            )}
+            onChange={(_, newValue) =>
+              handleSelectionChange(
+                { target: { value: newValue.map((p) => p?.programName) } },
+                setSelectedPrograms
+              )
+            }
+            renderInput={(params) => (
+              <TextField {...params} label={t('results.programs')} variant="outlined" />
+            )}
+            renderTags={(selected, getTagProps) =>
+              selected.map((option, index) => {
+                const { key , ...tagProps } = getTagProps({ index });
+                return <Chip key={key} label={option.programName} {...getTagProps} />
+              })
+            }
+          />
+        ) : (
+          <TextField
+          select
+            label={t('results.programs')}
+            variant="outlined"
+            // value='Programa não encontrado'
+            fullWidth
+          >
+            <MenuItem>Programa não encontrado</MenuItem>
+            </TextField>
+        )}
       </Grid>
 
       {/* Status */}
@@ -126,8 +150,8 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           fullWidth
         >
           <MenuItem value="">{t('results.all')}</MenuItem>
-          <MenuItem value="1">OK</MenuItem>
-          <MenuItem value="0">NOK</MenuItem>
+          <MenuItem value="0">OK</MenuItem>
+          <MenuItem value="1">NOK</MenuItem>
         </TextField>
       </Grid>
 

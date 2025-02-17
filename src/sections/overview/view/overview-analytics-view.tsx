@@ -33,9 +33,56 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { useFetchToolsData, useToolsInfo } from 'src/routes/hooks/api';
+import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
+
+interface DataTopNokOk {
+  title: string; // toolName
+  trend: string; // trend
+  total: number; // nokOkRate
+  // color: string; // campo em branco
+  chart: {
+    // lastResults
+    categories: string[]; // apenas a hora do finalTimestamp
+    series: number[]; // nok
+  };
+}
+
+interface TopNokOkItem {
+  initialTimestamp: string;
+  finalTimestamp: string;
+  statusType: string;
+  toolName: string | null;
+  toolId: number;
+  toolRevision: number;
+  rows: number;
+  products: number;
+  ok: number;
+  nok: number;
+  nokOkRate: number;
+  trend: string;
+  topIssues: null;
+  lastResults: LastResultItem[] | null; // Adicionei a tipagem para lastResults
+}
+
+interface LastResultItem {
+  // Interface para os itens de lastResults
+  initialTimestamp: string;
+  finalTimestamp: string;
+  statusType: string;
+  toolName: string | null;
+  toolId: number;
+  toolRevision: number;
+  rows: number;
+  products: number;
+  ok: number;
+  nok: number;
+  nokOkRate: number;
+  trend: string;
+  topIssues: null;
+  lastResults: null;
+}
 
 interface ToolFilters {
   toolId: number;
@@ -66,8 +113,15 @@ export function OverviewAnalyticsView() {
   const [openListAperto, setOpenListAperto] = React.useState(false); // Abre a categoria das apertadeiras
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // Define a posição do popover
   const [valueLabel, setValueLabel] = React.useState<string[]>([]); // Valor de referência para ordenação das ferramentas selecionadas
-  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>([0.0, 1.0]); // Limites de referência para o top 5
-  const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>([0.6, 0.8]);
+  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>(() => {
+    // Limites de referência para o top 5
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.0, 1.0];
+  });
+  const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>(() => {
+    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
+    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];
+  });
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
   const [filters, setFilters] = useState<ToolFilters>(initialFilters);
   const [tools, setTools] = useState<ToolData[]>([]);
@@ -89,6 +143,69 @@ export function OverviewAnalyticsView() {
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
 
+  const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);
+
+  //  TOP 5 QUARKUS
+  const iniDateTime = '2022-03-10T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  const {
+    isLoading: isLoadingTopNokOk,
+    isError: isErrorTopNokOk,
+    data: TopNokOkData,
+    error: errorTopNokOk,
+  } = useTopNokOk(iniDateTime, topFive);
+  // console.log('TopNokOkData', TopNokOkData)
+  const transformarDados = () => {
+    if (!TopNokOkData) {
+      // Verifica se TopNokOkData está definido
+      console.error('TopNokOkData is undefined. Cannot transform data.');
+      return; // Ou retorne um array vazio: return [];
+    }
+
+    const novosDados: DataTopNokOk[] = TopNokOkData.map((item: TopNokOkItem) => {
+      if (!item) {
+        // Verificação adicional para cada item
+        console.warn('An item in TopNokOkData is null or undefined. Skipping.');
+        return null;
+      }
+
+      const chartData = {
+        categories:
+          item.lastResults?.map((result) => {
+            // Tratamento para lastResults null/undefined
+            const finalTimestamp = new Date(result.finalTimestamp);
+            return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }) || [],
+        series: item.lastResults?.map((result) => result.nok) || 0,
+      };
+
+      return {
+        title: `${item.toolName}/${item.toolRevision}` || 'N/A',
+        trend: item.trend,
+        total: item.nokOkRate,
+        // color: "",
+        chart: chartData,
+      };
+    }).filter((item: null) => item !== null); // Remove itens nulos que possam ter sido retornados
+
+    setTopFiveData(novosDados);
+  };
+
+  useEffect(() => {
+    transformarDados();
+    // console.log('topFiveData',  topFiveData)
+    // console.log('TopNokOkData', TopNokOkData);
+    // eslint-disable-next-line
+  }, [TopNokOkData]);
+
+  // Garante que `data` está definido antes de usar
+  // const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) =>
+  const sortedTopFiveData = [...(topFiveData || [])].sort((a, b) => a.title.localeCompare(b.title));
+
+  useEffect(() => {
+    // Sempre que o valor do slider mudar, salva no localStorage
+    localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTopFive));
+  }, [taxaTopFive]);
+
   // Dados das ferramentas
   const {
     isLoading: isLoadingToolList,
@@ -99,21 +216,10 @@ export function OverviewAnalyticsView() {
 
   const toolsQueries = useToolsInfo(toolsWithRevisions);
   const toolsInfo = toolsQueries.map((query) => query.data).filter(Boolean);
-  console.log(toolsInfo);
-
-  // Dados do Top 5
-  // const {
-  //   isLoading: isLoadingTopFive,
-  //   isError: isErrorTopFive,
-  //   data: TopFiveData,
-  //   error: errorTopFive,
-  // } = useTopFiveData();
-  // const dataAPI = getTopFiveData()
 
   useEffect(() => {
     if (toolListData) {
       setLabels(toolListData);
-      // setSelectedCards(toolListData.map((card: { id: any; }) => card.id));
     }
   }, [toolListData]);
 
@@ -127,13 +233,13 @@ export function OverviewAnalyticsView() {
     setToolsWithRevisions(transformedData);
   }, [pendingValue]);
 
-  // Ordena o Card Top 5 por ordem alfabética
+  // Ordena o TOP 5 por ordem alfabética
   // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
 
-  // Atualiza valores limite do Top 5
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
     setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
+    localStorage.setItem('taxaTopFiveSlider', JSON.stringify(taxaTopFive));
   };
 
   // Gerencia a abertura do Top 5 no modal
@@ -148,6 +254,7 @@ export function OverviewAnalyticsView() {
 
   // Gerencia o menu de Apertadeiras disponíveis
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
@@ -229,7 +336,7 @@ export function OverviewAnalyticsView() {
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       <Slider
-                        getAriaLabel={() => 'Temperature range'}
+                        getAriaLabel={() => 'Criticidade'}
                         value={valueSliderTopFive}
                         onChange={handleChange}
                         valueLabelDisplay="auto"
@@ -267,20 +374,6 @@ export function OverviewAnalyticsView() {
                           },
                         }}
                       >
-                        {/* <Button // Botão de seleção das ferramentas
-                          disableRipple
-                          aria-describedby={id}
-                          sx={{
-                            alignSelf: 'center',
-                            width: '85%',
-                            color: 'black',
-                            marginBottom: '10px',
-                            '@media (max-width: 768px)': {
-                              alignSelf: 'center',
-                            },
-                          }}
-                          onClick={handleClick}
-                        > */}
                         <Typography
                           variant="button"
                           sx={{
@@ -329,34 +422,6 @@ export function OverviewAnalyticsView() {
                       >
                         <ClickAwayListener onClickAway={handleCloseLabel}>
                           <div>
-                            {/* <Autocomplete
-                              multiple
-                              options={selectLabels}
-                              getOptionLabel={(option) => option.toolName}
-                              getOptionKey={(option) => option.toolId || option.toolName}
-                              value={pendingValue.map(
-                                (name) =>
-                                  selectLabels.find((tool) => tool.toolName === name) || null
-                              )}
-                              onChange={(_, newValue) =>
-                                handleToolListChange({
-                                  target: { value: newValue.map((tool) => tool?.toolName) },
-                                })
-                              }
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label={t('results.tools')}
-                                  variant="outlined"
-                                />
-                              )}
-                              renderTags={(selected, getTagProps) =>
-                                selected.map((option, index) => {
-                                  const { key, ...tagProps } = getTagProps({ index });
-                                  return <Chip key={key} label={option.toolName} {...tagProps} />;
-                                })
-                              }
-                            /> */}
                             <Autocomplete
                               open
                               multiple
@@ -429,17 +494,14 @@ export function OverviewAnalyticsView() {
                                   </li>
                                 );
                               }}
-                              options={
-                                // selectLabels}
-                                [...selectLabels].sort((a, b) => {
-                                  // Display the selected labels first.
-                                  let ai = valueLabel.indexOf(a);
-                                  ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
-                                  let bi = valueLabel.indexOf(b);
-                                  bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
-                                  return ai - bi;
-                                })
-                              }
+                              options={[...selectLabels].sort((a, b) => {
+                                // Display the selected labels first.
+                                let ai = valueLabel.indexOf(a);
+                                ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
+                                let bi = valueLabel.indexOf(b);
+                                bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
+                                return ai - bi;
+                              })}
                               renderInput={(params) => (
                                 <StyledInput
                                   ref={params.InputProps.ref}
@@ -463,22 +525,22 @@ export function OverviewAnalyticsView() {
 
       {/* ================================TP 5===================================== */}
       {topFive && (
-        <div id="TopFive">
+        <div id="topFive">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
-
           <Grid container spacing={2}>
-            {/* {sortedTopFiveData.map((item, index) => (
+            {sortedTopFiveData.map((item, index) => (
               <Grid key={index} xs={12} sm={6} md={2.4}>
                 <AnalyticsWidgetSummary
                   title={item.title}
                   total={item.total}
                   chart={item.chart}
+                  trend={item.trend}
                   criticality={taxaTopFive}
                 />
               </Grid>
-            ))} */}
+            ))}
           </Grid>
         </div>
       )}
@@ -491,7 +553,6 @@ export function OverviewAnalyticsView() {
               {t('dashboard.process')}
             </Typography>
           </Grid>
-
           <Grid container spacing={5}>
             {toolsInfo.map((tool) => (
               <Grid xs={12} sm={6} md={4} key={tool.toolId}>

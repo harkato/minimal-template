@@ -26,6 +26,7 @@ import { blue } from '@mui/material/colors';
 type Props = CardProps & {
   title: string;
   total: number;
+  trend: string;
   // percent: number;
   // color?: ColorType;
   // icon: React.ReactNode;
@@ -42,6 +43,7 @@ export function AnalyticsWidgetSummary({
   title,
   total,
   chart,
+  trend,
   // percent,
   color = 'primary',
   criticality,
@@ -59,6 +61,10 @@ export function AnalyticsWidgetSummary({
     chart: { sparkline: { enabled: true } },
     colors: chartColors,
     xaxis: { categories: chart.categories },
+    // stroke: {
+    // // curve: 'straight',
+    // colors: ['#FFFFFF'] // Define a cor da linha para vermelho (#FF0000)
+    // },
     grid: {
       padding: {
         top: 6,
@@ -92,10 +98,19 @@ export function AnalyticsWidgetSummary({
     
   }
 
-  function getIcon(taxaAtual: number){
-    if (taxaAtual >= criticality[1]) {
+  // function getIcon(taxaAtual: number){
+  //   if (taxaAtual >= criticality[1]) {
+  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
+  //   } if (taxaAtual >= criticality[0]) {
+  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
+  //   }
+  //     return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
+  // }
+
+  function getIcon(trend: string){
+    if (trend === 'Up') {
       return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-    } if (taxaAtual >= criticality[0]) {
+    } if (trend === 'Steady') {
       return <img alt="icon" src="/assets/icons/glass/dash.png" />;
     }
       return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
@@ -124,12 +139,6 @@ export function AnalyticsWidgetSummary({
   return (
     <Card
       sx={{
-        // ...bgGradient({
-        //   // color: `135deg, ${varAlpha(theme.vars.palette[color as ColorType].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color as ColorType].lightChannel, 0.48)}`,
-        //   color: `${cor}, ${cor}`,
-        //   // color: '#FFEA00, #FEDF01'
-        //   // color: 'yellow, red',
-        // }),
         p: 3,
         boxShadow: 'none',
         position: 'relative',
@@ -140,10 +149,10 @@ export function AnalyticsWidgetSummary({
         {...other}
       >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Box sx={{ width: 40, height: 40 }}>{getIcon(total)}</Box>
+      <Box sx={{ width: 40, height: 40 }}>{getIcon(trend)}</Box>
         <Chart
           type="bar"
-          series={[{ data: chart.series }]}
+          series={[{ data: chart.series, color: '#FFFFFF' }]}
           options={chartOptions}
           width={70}
           height={56}

@@ -3,27 +3,42 @@ import axios from 'axios';
 import qs from 'qs';
 
 const API_URL = 'http://localhost:8080/msh/spc/v1';
+const DASHBOARD_URL = 'http://localhost:8080/msh/spc/v1/dashboard';
 
 // Usado no GET do menu de ferramentas
 const fetchData = async (endpoint: string) => {
-  const response = await axios.get(`${API_URL}/${endpoint}`);
-  return response.data;
-};
-
-// Busca os resultados de uma apertadeira
-const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-      params: {
-        finalDateTime: '2024-01-01T00:00:00',
-        initialDateTime: '2020-01-01T00:00:00',
-        amount: 5,
-      },
-    });
+    const response = await axios.get(`${API_URL}/${endpoint}`);
     return response.data;
-  } catch (error) {
-    console.error('Erro ao buscar informações das ferramentas:', error);
-    throw error;
+  } catch (error: any) {
+    // Tipagem do erro para melhor tratamento
+    // Tratamento de erro mais específico baseado no tipo de erro
+    if (axios.isAxiosError(error)) {
+      // Erros específicos do Axios (ex: erro de rede, erro do servidor)
+      console.error('Erro Axios:', error.message);
+      if (error.response) {
+        // console.error("Dados da Resposta:", error.response.data);
+        console.error('Status da Resposta:', error.response.status);
+        // Exemplo: Lançar um erro customizado baseado no código de status
+        if (error.response.status === 404) {
+          throw new Error('Ferramentas não encontradas.'); // Ou uma mensagem mais amigável
+        }
+        if (error.response.status === 500) {
+          throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
+        }
+      } else if (error.request) {
+        console.error('Erro de Requisição:', error.request); // A requisição foi feita mas não houve resposta
+        throw new Error('Nenhuma resposta do servidor.');
+      } else {
+        console.error('Erro de Configuração:', error.message); // Algo aconteceu na configuração da requisição
+        throw new Error('Falha na configuração da requisição.');
+      }
+    } else {
+      // Erro genérico
+      console.error('Erro Genérico:', error.message);
+      throw new Error('Ocorreu um erro inesperado.'); // Ou uma mensagem mais genérica
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
   }
 };
 
@@ -33,8 +48,10 @@ export const fetchDataFilters = async (
   page: number,
   pageSize: number
 ) => {
-  const { programList, ...otherFilters } = filters;
-
+  const { programList, blockSearch, ...otherFilters } = filters;
+  if (blockSearch) {
+    return Promise.resolve([]); // Retorna um array vazio
+  }
   // Remove valores vazios, null e undefined dos filtros
   const cleanParams = Object.fromEntries(
     Object.entries(otherFilters).filter(
@@ -46,18 +63,30 @@ export const fetchDataFilters = async (
   const programListQuery = programList
     ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
     : '';
-
-  // Faz a requisição com os filtros formatados
-  const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}`, {
-    params: { ...cleanParams, page: page + 1, pageSize },
-  });
-  return response.data;
+  try {
+    // Faz a requisição com os filtros formatados
+    const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}`, {
+      params: { ...cleanParams, page: page + 1, pageSize },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
+  }
 };
 
 // Total de itens passando os filtros
 export const fetchDataTotal = async (filters: any) => {
-  const { programList, ...otherFilters } = filters;
+  const { programList, blockSearch, ...otherFilters } = filters;
 
+  if (blockSearch) {
+    return Promise.resolve([]); // Retorna um array vazio
+  }
   // Remove valores vazios, null e undefined dos filtros
   const cleanParams = Object.fromEntries(
     Object.entries(otherFilters).filter(
@@ -69,21 +98,60 @@ export const fetchDataTotal = async (filters: any) => {
   const programListQuery = programList
     ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
     : '';
-
-  // Faz a requisição com os filtros formatados
-  const response = await axios.get(`${API_URL}/results/amount?${programListQuery}`, {
-    params: { ...cleanParams },
-  });
-  return response.data;
+  try {
+    // Faz a requisição com os filtros formatados
+    const response = await axios.get(`${API_URL}/results/amount?${programListQuery}`, {
+      params: { ...cleanParams },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
+  }
 };
 
 // Retorna lista de programas de acordo com as ferramentas
 export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
-  const response = await axios.get(`${API_URL}/${endpoint}`, {
-    params: { toolList },
-    paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
-  });
-  return response.data;
+  try {
+    const response = await axios.get(`${API_URL}/${endpoint}`, {
+      params: { toolList },
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
+    });
+    return response.data;
+  } catch (error: any) {
+    // Tipagem do erro
+    // Tratamento de erro mais específico baseado no tipo de erro
+    if (axios.isAxiosError(error)) {
+      // Erros específicos do Axios (ex: erro de rede, erro do servidor)
+      console.error('Erro Axios:', error.message);
+      if (error.response) {
+        // console.error("Dados da Resposta:", error.response.data);
+        console.error('Status da Resposta:', error.response.status);
+        if (error.response.status === 404) {
+          // Exemplo de um erro customizado baseado no código de status
+          throw new Error('Programas não encontrados.');
+        }
+        if (error.response.status === 500) {
+          throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
+        }
+      } else if (error.request) {
+        console.error('Erro de Requisição:', error.request); // A requisição foi feita mas não houve resposta
+        throw new Error('Nenhuma resposta do servidor.');
+      } else {
+        console.error('Erro de Configuração:', error.message); // Algo aconteceu na configuração da requisição
+        throw new Error('Falha na configuração da requisição.');
+      }
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
+  }
 };
 
 // Lista de ferramentas
@@ -107,7 +175,6 @@ export function useResultAmount(filters: any) {
 // Hook para retornar os resultados passando os filtros
 export function useResultPaginate(page: number, limit: number, amount: number, filters: any) {
   const queryClient = useQueryClient();
-
   // Chamada principal da API usando fetchDataFilters
   const query = useQuery({
     queryFn: () => fetchDataFilters('results', filters, page, limit),
@@ -124,6 +191,50 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
 
   return query;
 }
+
+// ====================================================DASHBOARD=======================================
+
+const fetchDataTop5 = async (endpoint: string) => {
+  try {
+    const response = await axios.get(`${DASHBOARD_URL}/${endpoint}`);
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]);
+  }
+};
+
+export function useTopNokOk(finalDateTime: string, switchTop5: any) {
+  // Lista do TOP5 QUARKUS
+  return useQuery({
+    queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
+    queryKey: ['topNokOk_data'],
+    refetchInterval: 60000, // Refetch a cada 60 segundos (1 minuto)
+    enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
+  });
+}
+
+// Busca os resultados de uma apertadeira
+const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
+  try {
+    const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
+      params: {
+        finalDateTime: '2024-01-01T00:00:00',
+        initialDateTime: '2020-01-01T00:00:00',
+        amount: 5,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar informações das ferramentas:', error);
+    throw error;
+  }
+};
 
 export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
   const toolQueries = useQueries({
