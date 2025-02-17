@@ -156,8 +156,6 @@ export function OverviewAnalyticsView() {
 
   const transformarDados = () => {
     if (!TopNokOkData) {
-      // Verifica se TopNokOkData está definido
-      console.error('TopNokOkData is undefined. Cannot transform data.');
       return; // Ou retorne um array vazio: return [];
     }
 
@@ -232,9 +230,6 @@ export function OverviewAnalyticsView() {
 
     setToolsWithRevisions(transformedData);
   }, [pendingValue]);
-
-  // Ordena o TOP 5 por ordem alfabética
-  // const sortedTopFiveData = [...(data || [])].sort((a, b) => a.title.localeCompare(b.title));
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider

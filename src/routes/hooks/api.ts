@@ -185,7 +185,7 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
   if (query.data && amount && (page + 1) * limit < amount) {
     queryClient.prefetchQuery({
       queryFn: () => fetchDataFilters('results', filters, page + 1, limit),
-      queryKey: ['results', page + 1, limit, filters],
+      queryKey: ['resultsPrefetch', page + 1, limit, filters],
     });
   }
 
