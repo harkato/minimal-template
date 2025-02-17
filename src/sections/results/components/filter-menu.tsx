@@ -145,13 +145,21 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           label="Status"
           name="status"
           variant="outlined"
-          value={filters.generalStatus}
+          value={
+            filters.torqueStatus === '2' ? "4" :
+             filters.torqueStatus === '3' ? "5" :
+              filters.generalStatus || filters.angleStatus
+          }
           onChange={handleStatusChange}
           fullWidth
         >
           <MenuItem value="">{t('results.all')}</MenuItem>
           <MenuItem value="0">OK</MenuItem>
           <MenuItem value="1">NOK</MenuItem>
+          <MenuItem value="2">Ângulo Baixo</MenuItem>
+          <MenuItem value="3">Ângulo Alto</MenuItem>
+          <MenuItem value="4">Torque Baixo</MenuItem>
+          <MenuItem value="5">Torque Alto</MenuItem>
         </TextField>
       </Grid>
 

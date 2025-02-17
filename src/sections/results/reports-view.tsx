@@ -65,6 +65,8 @@ interface Filters {
   identifier: string;
   toolList: any;
   programList: any;
+  angleStatus: string;
+  torqueStatus: string;
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
@@ -75,6 +77,8 @@ const initialFilters = {
   identifier: '',
   toolList: '',
   programList: '',
+  angleStatus: '',
+  torqueStatus: '',
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
@@ -290,9 +294,23 @@ export default function ResultPage() {
   };
 
   // Gerencia o filtro de status
+  // const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = event.target.value;
+  //   setFilters({ ...filters, generalStatus: value, blockSearch: true });
+  // };
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setFilters({ ...filters, generalStatus: value, blockSearch: true });
+    if(value === '0' || value === '1'){
+      setFilters({ ...filters, generalStatus: value, angleStatus: '', torqueStatus: '', blockSearch: true });
+    } else if(value === '2' || value === '3'){
+      setFilters({ ...filters, angleStatus: value, generalStatus: '', torqueStatus: '', blockSearch: true });
+    } else if(value === '4' ){
+      setFilters({ ...filters, torqueStatus: '2', generalStatus: '', angleStatus: '', blockSearch: true });
+    } else if(value === '5' ){
+      setFilters({ ...filters, torqueStatus: '3', generalStatus: '', angleStatus: '', blockSearch: true });
+    }else{
+      setFilters({ ...filters, generalStatus: '', angleStatus: '', torqueStatus: '', blockSearch: true });
+    }
   };
 
   // Reseta os filtros
@@ -386,7 +404,7 @@ export default function ResultPage() {
                 <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
                   <CircularProgress />
                 </TableCell>
-              ) : totalCount === 0 && !filters.blockSearch ? (
+              ) : !filters.blockSearch && resultData.length === 0 ? (
                 <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
                   Não foram encontrados registros.
                 </TableCell>
