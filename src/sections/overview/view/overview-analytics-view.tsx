@@ -146,14 +146,14 @@ export function OverviewAnalyticsView() {
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);
 
   //  TOP 5 QUARKUS
-  const iniDateTime = '2022-03-10T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  const finalDateTime = '2022-03-10T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
     isLoading: isLoadingTopNokOk,
     isError: isErrorTopNokOk,
     data: TopNokOkData,
     error: errorTopNokOk,
-  } = useTopNokOk(iniDateTime, topFive);
-  // console.log('TopNokOkData', TopNokOkData)
+  } = useTopNokOk(finalDateTime, topFive);
+
   const transformarDados = () => {
     if (!TopNokOkData) {
       // Verifica se TopNokOkData está definido
