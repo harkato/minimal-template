@@ -347,6 +347,7 @@ export default function ResultPage() {
     setSelectedTools([]);
     setSelectedPrograms([]);
     setSelectedPeriod('');
+    setProgramsData(['']);
   };
 
   // Faz a pesquisa

@@ -36,6 +36,7 @@ import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
+import dayjs from 'dayjs';
 
 interface DataTopNokOk {
   title: string; // toolName
@@ -146,7 +147,8 @@ export function OverviewAnalyticsView() {
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);
 
   //  TOP 5 QUARKUS
-  const finalDateTime = '2022-03-10T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  const finalDateTime = '2022-03-10T16:00:00';  // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  // const finalDateTime = dayjs().subtract(2, 'year').format('YYYY-MM-DDTHH:mm:ss');
   const {
     isLoading: isLoadingTopNokOk,
     isError: isErrorTopNokOk,
