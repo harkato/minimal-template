@@ -66,8 +66,8 @@ interface TopNokOkItem {
   lastResults: LastResultItem[] | null; // Adicionei a tipagem para lastResults
 }
 
+// Interface para os itens de lastResults
 interface LastResultItem {
-  // Interface para os itens de lastResults
   initialTimestamp: string;
   finalTimestamp: string;
   statusType: string;
