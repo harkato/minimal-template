@@ -19,8 +19,11 @@ interface FiltersMenuProps {
   ) => void;
   handleStatusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDateChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDateChangePeriod: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleResetFilters: () => void;
   handleSearch: () => void;
+  selectedPeriod: string;
+  setSelectedPeriod: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const FiltersMenu: React.FC<FiltersMenuProps> = ({
@@ -35,8 +38,11 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
   handleSelectionChange,
   handleStatusChange,
   handleDateChange,
+  handleDateChangePeriod,
   handleResetFilters,
   handleSearch,
+  setSelectedPeriod,
+  selectedPeriod,
 }) => {
   const { t } = useTranslation();
 
@@ -160,6 +166,28 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           <MenuItem value="3">Ângulo Alto</MenuItem>
           <MenuItem value="4">Torque Baixo</MenuItem>
           <MenuItem value="5">Torque Alto</MenuItem>
+        </TextField>
+      </Grid>
+
+      {/* Periodo */}
+      <Grid item xs={12} sm={6} md={6}>
+        <TextField
+          select
+          label="Período"
+          name="periodo"
+          variant="outlined"
+          value={ selectedPeriod }
+          onChange={handleDateChangePeriod}
+          fullWidth
+        >
+          <MenuItem value="">_ </MenuItem> 
+          <MenuItem value="yesterday">ontem e hoje</MenuItem>
+          <MenuItem value="3days">útimos 3 dias</MenuItem>
+          <MenuItem value="7days">útimos 7 dias</MenuItem>
+          <MenuItem value="30days">útimos 30 dias</MenuItem>
+          <MenuItem value="3months">útimos 3 meses</MenuItem>
+          <MenuItem value="6months">útimos 6 meses</MenuItem>
+          <MenuItem value="1year">último ano</MenuItem>
         </TextField>
       </Grid>
 
