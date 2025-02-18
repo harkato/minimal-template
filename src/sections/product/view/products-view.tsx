@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
 
@@ -94,8 +94,8 @@ export function ProductsView() {
   );
 
   const [tableData, setTableData] = useState([
-    [ 'Tiger Nixon', 'System Architect' ],
-    [ 'Garrett Winters', 'Accountant' ],
+    ['Tiger Nixon', 'System Architect'],
+    ['Garrett Winters', 'Accountant'],
     // ...
   ]);
 
@@ -120,14 +120,14 @@ export function ProductsView() {
         <button type="button" onClick={() => changeLanguage('es-ES')}>
           {t('app.spanish')}
         </button>
-        
+
         <DataTable data={tableData} className="display">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Position</th>
-                </tr>
-            </thead>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+            </tr>
+          </thead>
         </DataTable>
       </div>
       {/* <Typography variant="h4" sx={{ mb: 5 }}>

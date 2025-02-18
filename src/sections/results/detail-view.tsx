@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
 import { useFetchToolsData } from 'src/routes/hooks/api';
@@ -55,18 +54,6 @@ function getStatusIcon(status: string, i: number) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
-}));
-
 export default function DetailsPage() {
   const [data, setData] = useState<DataDetail | null>(null);
   const { t, i18n } = useTranslation();
@@ -77,7 +64,6 @@ export default function DetailsPage() {
     data: detailData,
     error: errorDetail,
   } = useFetchToolsData();
-  const classes = useStyles();
   const tableRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (detailData && detailData.length > 0) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import {
   Autocomplete,
@@ -526,7 +526,7 @@ export function OverviewAnalyticsView() {
           </Typography>
           <Grid container spacing={2}>
             {sortedTopFiveData.map((item, index) => (
-              <Grid key={index} xs={12} sm={6} md={2.4}>
+              <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
                 <AnalyticsWidgetSummary
                   title={item.title}
                   total={item.total}
@@ -550,7 +550,7 @@ export function OverviewAnalyticsView() {
           </Grid>
           <Grid container spacing={5}>
             {toolsInfo.map((tool) => (
-              <Grid xs={12} sm={6} md={4} key={tool.toolId}>
+              <Grid container size={{ xs: 12, sm: 6, md: 4 }} key={tool.toolId}>
                 <AnalyticsDashboardCard
                   title={tool.toolName}
                   id={tool.toolId}

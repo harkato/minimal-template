@@ -24,7 +24,6 @@ import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import {
   useFetchToolsData,
