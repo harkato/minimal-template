@@ -65,6 +65,8 @@ interface Filters {
   identifier: string;
   toolList: any;
   programList: any;
+  angleStatus: string;
+  torqueStatus: string;
   generalStatus: string;
   initialDateTime: string;
   finalDateTime: string;
@@ -75,6 +77,8 @@ const initialFilters = {
   identifier: '',
   toolList: '',
   programList: '',
+  angleStatus: '',
+  torqueStatus: '',
   generalStatus: '',
   finalDateTime: '',
   initialDateTime: '',
@@ -154,6 +158,7 @@ export default function ResultPage() {
   const handleNavigation = (path: string) => {
     navigate(path);
   };
+  const [selectedPeriod, setSelectedPeriod] = useState('');
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -284,10 +289,81 @@ export default function ResultPage() {
     setFilters({ ...filters, [name]: formattedDate, blockSearch: true });
   };
 
+  // Gerencia o filtro de data por periodo
+  const handleDateChangePeriod = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSelectedPeriod(value);
+    let period = '';
+    let today = dayjs().format('YYYY-MM-DDTHH:mm:ss');
+
+    if (value === 'yesterday') {
+      period = dayjs().subtract(1, 'day').format('YYYY-MM-DDTHH:mm:ss'); // Subtrai 1 dia da data atual
+    } else if (value === '3days') {
+      period = dayjs().subtract(3, 'day').format('YYYY-MM-DDTHH:mm:ss');
+    } else if (value === '7days') {
+      period = dayjs().subtract(7, 'day').format('YYYY-MM-DDTHH:mm:ss');
+    } else if (value === '30days') {
+      period = dayjs().subtract(30, 'day').format('YYYY-MM-DDTHH:mm:ss');
+    } else if (value === '3months') {
+      period = dayjs().subtract(3, 'month').format('YYYY-MM-DDTHH:mm:ss');
+    } else if (value === '6months') {
+      period = dayjs().subtract(6, 'month').format('YYYY-MM-DDTHH:mm:ss');
+    } else if (value === '1year') {
+      period = dayjs().subtract(1, 'year').format('YYYY-MM-DDTHH:mm:ss');
+    } else {
+      today = '';
+    }
+    setFilters({ ...filters, initialDateTime: period, finalDateTime: today, blockSearch: true });
+  };
+
   // Gerencia o filtro de status
+  // const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = event.target.value;
+  //   setFilters({ ...filters, generalStatus: value, blockSearch: true });
+  // };
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setFilters({ ...filters, generalStatus: value, blockSearch: true });
+    if (value === '0' || value === '1') {
+      setFilters({
+        ...filters,
+        generalStatus: value,
+        angleStatus: '',
+        torqueStatus: '',
+        blockSearch: true,
+      });
+    } else if (value === '2' || value === '3') {
+      setFilters({
+        ...filters,
+        angleStatus: value,
+        generalStatus: '',
+        torqueStatus: '',
+        blockSearch: true,
+      });
+    } else if (value === '4') {
+      setFilters({
+        ...filters,
+        torqueStatus: '2',
+        generalStatus: '',
+        angleStatus: '',
+        blockSearch: true,
+      });
+    } else if (value === '5') {
+      setFilters({
+        ...filters,
+        torqueStatus: '3',
+        generalStatus: '',
+        angleStatus: '',
+        blockSearch: true,
+      });
+    } else {
+      setFilters({
+        ...filters,
+        generalStatus: '',
+        angleStatus: '',
+        torqueStatus: '',
+        blockSearch: true,
+      });
+    }
   };
 
   // Reseta os filtros
@@ -295,6 +371,7 @@ export default function ResultPage() {
     setFilters(initialFilters);
     setSelectedTools([]);
     setSelectedPrograms([]);
+    setSelectedPeriod('');
   };
 
   // Faz a pesquisa
@@ -345,8 +422,11 @@ export default function ResultPage() {
         handleSelectionChange={handleSelectionChange}
         handleStatusChange={handleStatusChange}
         handleDateChange={handleDateChange}
+        handleDateChangePeriod={handleDateChangePeriod}
         handleResetFilters={handleResetFilters}
         handleSearch={handleSearch}
+        selectedPeriod={selectedPeriod}
+        setSelectedPeriod={setSelectedPeriod}
       />
 
       {/* Tabela de Dados */}
