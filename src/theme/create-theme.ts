@@ -7,7 +7,7 @@ import { shadows, typography, components, colorSchemes, customShadows } from './
 // ----------------------------------------------------------------------
 
 export function createTheme(): Theme {
-  const initialTheme = {
+  const initialTheme: Parameters<typeof extendTheme>[0] = {
     colorSchemes,
     shadows: shadows(),
     customShadows: customShadows(),
