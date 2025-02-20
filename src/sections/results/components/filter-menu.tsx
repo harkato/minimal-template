@@ -1,5 +1,6 @@
 import React from 'react';
-import { Grid, TextField, MenuItem, Chip, Button, Autocomplete } from '@mui/material';
+import { TextField, MenuItem, Chip, Button, Autocomplete } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
     >
       {/* ID */}
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         <TextField
           label={t('results.identifier')}
           name="identifier"
@@ -65,7 +66,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Ferramentas */}
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         {toolsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
           <Autocomplete
             multiple
@@ -92,26 +93,20 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             }
           />
         ) : (
-          <TextField
-          select
-          label={t('results.tools')}
-          variant="outlined"
-          // value='Ferramenta não encontrada'
-          fullWidth
-          >
+          <TextField select label={t('results.tools')} variant="outlined" fullWidth>
             <MenuItem>Ferramenta não encontrada</MenuItem>
           </TextField>
-        )} 
+        )}
       </Grid>
 
       {/* Programas */}
-      <Grid item xs={12} sm={6} md={6}>
-      {programsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        {programsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
           <Autocomplete
             multiple
             options={programsData}
             getOptionLabel={(option) => option.programName}
-            getOptionKey ={(option) => option.programId || option.programName}
+            getOptionKey={(option) => option.programId || option.programName}
             value={selectedPrograms.map(
               (name) => programsData.find((p) => p.programName === name) || null
             )}
@@ -126,35 +121,37 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             )}
             renderTags={(selected, getTagProps) =>
               selected.map((option, index) => {
-                const { key , ...tagProps } = getTagProps({ index });
-                return <Chip key={key} label={option.programName} {...getTagProps} />
+                const { key, ...tagProps } = getTagProps({ index });
+                return <Chip key={key} label={option.programName} {...getTagProps} />;
               })
             }
           />
         ) : (
           <TextField
-          select
+            select
             label={t('results.programs')}
             variant="outlined"
             // value='Programa não encontrado'
             fullWidth
           >
             <MenuItem>Programa não encontrado</MenuItem>
-            </TextField>
+          </TextField>
         )}
       </Grid>
 
       {/* Status */}
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         <TextField
           select
           label="Status"
           name="status"
           variant="outlined"
           value={
-            filters.torqueStatus === '2' ? "4" :
-             filters.torqueStatus === '3' ? "5" :
-              filters.generalStatus || filters.angleStatus
+            filters.torqueStatus === '2'
+              ? '4'
+              : filters.torqueStatus === '3'
+                ? '5'
+                : filters.generalStatus || filters.angleStatus
           }
           onChange={handleStatusChange}
           fullWidth
@@ -170,17 +167,17 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Periodo */}
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         <TextField
           select
           label="Período"
           name="periodo"
           variant="outlined"
-          value={ selectedPeriod }
+          value={selectedPeriod}
           onChange={handleDateChangePeriod}
           fullWidth
         >
-          <MenuItem value="">_ </MenuItem> 
+          <MenuItem value="">_ </MenuItem>
           <MenuItem value="yesterday">ontem e hoje</MenuItem>
           <MenuItem value="3days">útimos 3 dias</MenuItem>
           <MenuItem value="7days">útimos 7 dias</MenuItem>
@@ -192,7 +189,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Datas */}
-      <Grid item xs={5} sm={5} md={3}>
+      <Grid size={{ xs: 5, sm: 5, md: 3 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
             id="datetime-local"
@@ -207,7 +204,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         </LocalizationProvider>
       </Grid>
 
-      <Grid item xs={5} sm={5} md={3}>
+      <Grid size={{ xs: 5, sm: 5, md: 3 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
             id="datetime-local"
@@ -223,7 +220,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Botões */}
-      <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
+      <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end" gap={2}>
         <Button variant="contained" onClick={handleResetFilters}>
           {t('results.clearFilters')}
         </Button>
