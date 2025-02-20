@@ -117,25 +117,25 @@ export const fetchDataTotal = async (filters: any) => {
 
 // Retorna lista de programas de acordo com as ferramentas
 export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
+  const queryString = toolList
+    .map(
+      (tool) => `&toolList=${encodeURIComponent(`{"id":${tool.id},"revision":${tool.revision}}`)}`
+    )
+    .join('');
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}`, {
-      params: { toolList },
-      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
-    });
+    const response = await axios.get(`${API_URL}/${endpoint}?${queryString.slice(1)}`, {});
     return response.data;
   } catch (error: any) {
     // Tipagem do erro
     // Tratamento de erro mais específico baseado no tipo de erro
     if (axios.isAxiosError(error)) {
-      // Erros específicos do Axios (ex: erro de rede, erro do servidor)
-      console.error('Erro Axios:', error.message);
       if (error.response) {
         // console.error("Dados da Resposta:", error.response.data);
-        console.error('Status da Resposta:', error.response.status);
-        if (error.response.status === 404) {
-          // Exemplo de um erro customizado baseado no código de status
-          throw new Error('Programas não encontrados.');
-        }
+        // console.error('Status da Resposta:', error.response.status);
+        // if (error.response.status === 404) {
+        //   // Exemplo de um erro customizado baseado no código de status
+        //   throw new Error('Programas não encontrados.');
+        // }
         if (error.response.status === 500) {
           throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
         }
@@ -224,8 +224,8 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
   try {
     const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
       params: {
-        finalDateTime: '2024-01-01T00:00:00',
-        initialDateTime: '2020-01-01T00:00:00',
+        finalDateTime: '2022-09-24T10:00:00',
+        initialDateTime: '2022-09-24T06:00:00',
         amount: 5,
       },
     });
