@@ -14,10 +14,10 @@ import {
   TableContainer,
   Paper,
   CardHeader,
-  Grid,
   Popover,
   Slider,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

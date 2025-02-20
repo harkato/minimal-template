@@ -543,14 +543,14 @@ export function OverviewAnalyticsView() {
       {/* ======================================CARDS APERTADEIRAS============================ */}
       {tools && (
         <div id="ferramentas">
-          <Grid container sx={{ justifyContent: 'space-between', mt: 4 }}>
+          <Grid container sx={{ mt: 4 }}>
             <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
               {t('dashboard.process')}
             </Typography>
           </Grid>
-          <Grid container spacing={5}>
+          <Grid container spacing={2}>
             {toolsInfo.map((tool) => (
-              <Grid container size={{ xs: 12, sm: 6, md: 4 }} key={tool.toolId}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={tool.toolId}>
                 <AnalyticsDashboardCard
                   title={tool.toolName}
                   id={tool.toolId}
