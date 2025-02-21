@@ -1,6 +1,7 @@
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import qs from 'qs';
+import { json } from 'stream/consumers';
 
 const API_URL = 'http://localhost:8080/msh/spc/v1';
 const DASHBOARD_URL = 'http://localhost:8080/msh/spc/v1/dashboard';
@@ -48,7 +49,7 @@ export const fetchDataFilters = async (
   page: number,
   pageSize: number
 ) => {
-  const { programList, blockSearch, ...otherFilters } = filters;
+  const { programList, blockSearch, toolList, ...otherFilters } = filters;
   if (blockSearch) {
     return Promise.resolve([]); // Retorna um array vazio
   }
@@ -58,14 +59,19 @@ export const fetchDataFilters = async (
       ([_, value]) => value !== '' && value !== null && value !== undefined
     )
   );
-
+  // console.log('cleanParams',  JSON.stringify(cleanParams));
+  const toolListQuery = toolList ?
+   toolList.map((tool: { id: any; revision: any; }) => `&toolList=${encodeURIComponent(`{"id":${tool.id},"revision":${tool.revision}}`)}`).join('')
+   : ""
   // Serializa programList no formato correto (repeat para múltiplos valores)
   const programListQuery = programList
     ? qs.stringify({ programList }, { arrayFormat: 'repeat' })
     : '';
+  // console.log('programListQuery', JSON.stringify(programListQuery));
+  
   try {
     // Faz a requisição com os filtros formatados
-    const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}`, {
+    const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}${toolListQuery}`, {
       params: { ...cleanParams, page: page + 1, pageSize },
     });
     return response.data;
@@ -118,9 +124,6 @@ export const fetchDataTotal = async (filters: any) => {
 // Retorna lista de programas de acordo com as ferramentas
 export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
   const queryString = toolList.map(tool => `&toolList=${encodeURIComponent(`{"id":${tool.id},"revision":${tool.revision}}`)}`).join('');
-  // console.log("toolList", JSON.stringify(toolList[0]));
-  // console.log("queryString", queryString);
-  // console.log("encodeURIComponent", encodeURIComponent(queryString));
   
   try {
     const response = await axios.get(`${API_URL}/${endpoint}?${queryString.slice(1)}`, {

@@ -24,7 +24,6 @@ import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import {
   useFetchToolsData,
@@ -462,103 +461,115 @@ export default function ResultPage() {
                 </TableCell>
               ) : (
                 <>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'dateTime'}
-                      direction={orderBy === 'dateTime' ? order : 'asc'}
-                      onClick={() => handleRequestSort('dateTime')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.date')}
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'tid'}
-                      direction={orderBy === 'tid' ? order : 'asc'}
-                      onClick={() => handleRequestSort('tid')}
-                      sx={{ display: 'flex', justifyContent: 'right' }}
-                    >
-                      Id
-                    </TableSortLabel>
-                  </TableCell>
+                  <TableCell align="center">{t('results.date')}</TableCell>
+                  <TableCell align="center">Id</TableCell>
+                  <TableCell align="center">{t('results.tools')}</TableCell>
+                  <TableCell align="center">{t('results.job')}</TableCell>
+                  <TableCell align="center">{t('results.programs')}</TableCell>
+                  <TableCell align="center">{t('results.spindle')}</TableCell>
+                  <TableCell align="center">{t('results.generalStatus')}</TableCell>
+                  <TableCell align="center">Torque</TableCell>
+                  <TableCell align="center">{t('results.angle')}</TableCell>
+                </>
+                // orderBy temporariamente desativado, precisa implementar na API
+                // <>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'dateTime'}
+                //       direction={orderBy === 'dateTime' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('dateTime')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.date')}
+                //     </TableSortLabel>
+                //   </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'tid'}
+                //       direction={orderBy === 'tid' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('tid')}
+                //       sx={{ display: 'flex', justifyContent: 'right' }}
+                //     >
+                //       Id
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'toolName'}
-                      direction={orderBy === 'toolName' ? order : 'asc'}
-                      onClick={() => handleRequestSort('toolName')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.tools')}
-                    </TableSortLabel>
-                  </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'toolName'}
+                //       direction={orderBy === 'toolName' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('toolName')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.tools')}
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'job'}
-                      direction={orderBy === 'job' ? order : 'asc'}
-                      onClick={() => handleRequestSort('job')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.job')}
-                    </TableSortLabel>
-                  </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'job'}
+                //       direction={orderBy === 'job' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('job')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.job')}
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'programName'}
-                      direction={orderBy === 'programName' ? order : 'asc'}
-                      onClick={() => handleRequestSort('programName')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.programs')}
-                    </TableSortLabel>
-                  </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'programName'}
+                //       direction={orderBy === 'programName' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('programName')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.programs')}
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'fuso'}
-                      direction={orderBy === 'fuso' ? order : 'asc'}
-                      onClick={() => handleRequestSort('fuso')}
-                      sx={{ display: 'flex', justifyContent: 'right' }}
-                    >
-                      {t('results.spindle')}
-                    </TableSortLabel>
-                  </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'fuso'}
+                //       direction={orderBy === 'fuso' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('fuso')}
+                //       sx={{ display: 'flex', justifyContent: 'right' }}
+                //     >
+                //       {t('results.spindle')}
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'generalStatus'}
-                      direction={orderBy === 'generalStatus' ? order : 'asc'}
-                      onClick={() => handleRequestSort('generalStatus')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.generalStatus')}
-                    </TableSortLabel>
-                  </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'generalStatus'}
+                //       direction={orderBy === 'generalStatus' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('generalStatus')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.generalStatus')}
+                //     </TableSortLabel>
+                //   </TableCell>
 
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'torque'}
-                      direction={orderBy === 'torque' ? order : 'asc'}
-                      onClick={() => handleRequestSort('torque')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      Torque
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === 'angle'}
-                      direction={orderBy === 'angle' ? order : 'asc'}
-                      onClick={() => handleRequestSort('angle')}
-                      sx={{ display: 'flex', justifyContent: 'center' }}
-                    >
-                      {t('results.angle')}
-                    </TableSortLabel>
-                  </TableCell>
-                  </>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'torque'}
+                //       direction={orderBy === 'torque' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('torque')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       Torque
+                //     </TableSortLabel>
+                //   </TableCell>
+                //   <TableCell>
+                //     <TableSortLabel
+                //       active={orderBy === 'angle'}
+                //       direction={orderBy === 'angle' ? order : 'asc'}
+                //       onClick={() => handleRequestSort('angle')}
+                //       sx={{ display: 'flex', justifyContent: 'center' }}
+                //     >
+                //       {t('results.angle')}
+                //     </TableSortLabel>
+                //   </TableCell>
+                //   </>
                 )}
               </TableRow>
             </TableHead>
