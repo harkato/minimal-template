@@ -188,7 +188,7 @@ export default function ResultPage() {
   // Atualiza o filtro de ferramentas
   useEffect(() => {
     const toolsWithRevisions = toolsData
-      .filter((tool: any) => selectedTools.includes(tool.toolName))
+      .filter((tool: any) => selectedTools.includes(tool.toolId))
       .map((tool: any) => ({
         id: tool.toolId,
         revision: tool.revision,
@@ -278,6 +278,7 @@ export default function ResultPage() {
     const selectedValues = event.target.value as string[];
     setState(selectedValues);
     setFilters({ ...filters, blockSearch: true });
+    console.log(selectedTools);
   };
 
   // Gerencia o filtro de data

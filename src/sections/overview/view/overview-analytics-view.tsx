@@ -146,7 +146,7 @@ export function OverviewAnalyticsView() {
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);
 
   //  TOP 5 QUARKUS
-  const finalDateTime = '2022-03-10T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
+  const finalDateTime = '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
     isLoading: isLoadingTopNokOk,
     isError: isErrorTopNokOk,

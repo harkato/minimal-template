@@ -69,16 +69,15 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         {toolsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
           <Autocomplete
+            data-testid="ferramentas"
             multiple
             options={toolsData}
-            getOptionLabel={(option) => option.toolName}
-            getOptionKey={(option) => option.toolId || option.toolName}
-            value={selectedTools.map(
-              (name) => toolsData.find((tool) => tool.toolName === name) || null
-            )}
+            getOptionLabel={(option) => option.toolName || ''}
+            getOptionKey={(option) => option.toolId}
+            value={toolsData.filter((tool) => selectedTools.includes(tool.toolId))}
             onChange={(_, newValue) =>
               handleSelectionChange(
-                { target: { value: newValue.map((tool) => tool?.toolName) } },
+                { target: { value: newValue.map((tool) => tool?.toolId) } },
                 setSelectedTools
               )
             }
