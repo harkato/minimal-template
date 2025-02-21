@@ -117,10 +117,15 @@ export const fetchDataTotal = async (filters: any) => {
 
 // Retorna lista de programas de acordo com as ferramentas
 export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
+  const queryString = toolList.map(tool => `&toolList=${encodeURIComponent(`{"id":${tool.id},"revision":${tool.revision}}`)}`).join('');
+  // console.log("toolList", JSON.stringify(toolList[0]));
+  // console.log("queryString", queryString);
+  // console.log("encodeURIComponent", encodeURIComponent(queryString));
+  
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}`, {
-      params: { toolList },
-      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
+    const response = await axios.get(`${API_URL}/${endpoint}?${queryString.slice(1)}`, {
+      // params: { toolList },
+      // paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'indices' }),
     });
     return response.data;
   } catch (error: any) {
@@ -128,14 +133,14 @@ export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
     // Tratamento de erro mais específico baseado no tipo de erro
     if (axios.isAxiosError(error)) {
       // Erros específicos do Axios (ex: erro de rede, erro do servidor)
-      console.error('Erro Axios:', error.message);
+      // console.error('Erro Axios:', error.message);
       if (error.response) {
         // console.error("Dados da Resposta:", error.response.data);
-        console.error('Status da Resposta:', error.response.status);
-        if (error.response.status === 404) {
-          // Exemplo de um erro customizado baseado no código de status
-          throw new Error('Programas não encontrados.');
-        }
+        // console.error('Status da Resposta:', error.response.status);
+        // if (error.response.status === 404) {
+        //   // Exemplo de um erro customizado baseado no código de status
+        //   throw new Error('Programas não encontrados.');
+        // }
         if (error.response.status === 500) {
           throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
         }
@@ -185,7 +190,7 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
   if (query.data && amount && (page + 1) * limit < amount) {
     queryClient.prefetchQuery({
       queryFn: () => fetchDataFilters('results', filters, page + 1, limit),
-      queryKey: ['resultsPrefetch', page + 1, limit, filters],
+      queryKey: ['results', page + 1, limit, filters],
     });
   }
 

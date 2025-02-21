@@ -152,13 +152,14 @@ export default function ResultPage() {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
   const handleNavigation = (path: string) => {
     navigate(path);
   };
   const [selectedPeriod, setSelectedPeriod] = useState('');
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -219,13 +220,16 @@ export default function ResultPage() {
   }, [programsData, selectedPrograms]);
 
   // Atualiza a lista de ferramentas e de programas
-  useEffect(() => {    
+  useEffect(() => {        
     if (fetchToolsData) {
       setToolsData(fetchToolsData);
     }
     if (queryProgramsData) {
       setProgramsData(queryProgramsData);
     }
+    // console.log(`programsData ${programsData} size ${programsData.length}`);
+    // console.log("selectedTools", selectedTools.length);
+    
   }, [fetchToolsData, queryProgramsData]);
 
   // Atualiza o número de itens totais
@@ -358,10 +362,16 @@ export default function ResultPage() {
   };
 
   // Gerencia a mudança de página
-  const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+  // const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+  //   setPage(newPage);
+  // };
+  const handleChangePage = useCallback((event: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage);
-  };
-
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop = 0; // Rola para o topo ao mudar a página
+    }
+  }, []);
+  
   //  Gerencia as linhas por página
   const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
     const newPageSize = parseInt(event.target.value, 10);
@@ -406,7 +416,7 @@ export default function ResultPage() {
       />
 
       {/* Tabela de Dados */}
-      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef}>
         <Toolbar
           sx={{
             height: 50,
@@ -414,7 +424,7 @@ export default function ResultPage() {
             justifyContent: 'flex-end',
             p: (theme) => theme.spacing(0, 1, 0, 3),
           }}
-        >
+          >
           <div>
             <Tooltip title={t('results.saveExport')}>
               <IconButton onClick={() => downloadCSV(data)}>
@@ -428,6 +438,15 @@ export default function ResultPage() {
             </Tooltip>
           </div>
         </Toolbar>
+        <TablePagination
+          component="div"
+          page={page}
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[25, 50, 100, 200]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
             {/* Head da tabela */}
@@ -544,7 +563,7 @@ export default function ResultPage() {
               </TableRow>
             </TableHead>
             {/* Corpo da tabela */}
-
+            {!isLoadingResult && (
             <TableBody>
               {data.map((row, index) => (
                 <TableRow
@@ -623,6 +642,7 @@ export default function ResultPage() {
                 </TableRow>
               ))}
             </TableBody>
+            )}
           </Table>
         </div>
         <TablePagination
@@ -645,6 +665,7 @@ export function useTable() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selected, setSelected] = useState<string[]>([]);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  
 
   const onSort = useCallback(
     (id: string) => {

@@ -106,7 +106,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Programas */}
       <Grid item xs={12} sm={6} md={6}>
-      {programsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
+      {programsData[0] !== '' && selectedTools.length ? ( // Verifica se toolsData existe e não está vazio
           <Autocomplete
             multiple
             options={programsData}
