@@ -278,7 +278,6 @@ export default function ResultPage() {
     const selectedValues = event.target.value as string[];
     setState(selectedValues);
     setFilters({ ...filters, blockSearch: true });
-    console.log(selectedTools);
   };
 
   // Gerencia o filtro de data
@@ -317,10 +316,6 @@ export default function ResultPage() {
   };
 
   // Gerencia o filtro de status
-  // const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = event.target.value;
-  //   setFilters({ ...filters, generalStatus: value, blockSearch: true });
-  // };
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (value === '0' || value === '1') {
@@ -404,10 +399,9 @@ export default function ResultPage() {
 
   return (
     <>
-      {/* ================================================================== titulo da pagina ============================================= */}
-      {/* <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>  
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
         {t('results.results')}
-      </Typography> */}
+      </Typography>
 
       {/* Menu de Filtros */}
       <FiltersMenu
