@@ -1,5 +1,14 @@
 import React from 'react';
-import { TextField, MenuItem, Chip, Button, Autocomplete } from '@mui/material';
+import {
+  TextField,
+  MenuItem,
+  Chip,
+  Button,
+  Autocomplete,
+  Alert,
+  Snackbar,
+  Stack,
+} from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,6 +34,7 @@ interface FiltersMenuProps {
   handleSearch: () => void;
   selectedPeriod: string;
   setSelectedPeriod: React.Dispatch<React.SetStateAction<string>>;
+  openStack: boolean;
 }
 
 const FiltersMenu: React.FC<FiltersMenuProps> = ({
@@ -42,8 +52,8 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
   handleDateChangePeriod,
   handleResetFilters,
   handleSearch,
-  setSelectedPeriod,
   selectedPeriod,
+  openStack,
 }) => {
   const { t } = useTranslation();
 
@@ -100,7 +110,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Programas */}
       <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-        {programsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
+        {programsData[0] !== '' && selectedTools.length ? ( // Verifica se toolsData existe e não está vazio
           <Autocomplete
             multiple
             options={programsData}
@@ -126,13 +136,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             }
           />
         ) : (
-          <TextField
-            select
-            label={t('results.programs')}
-            variant="outlined"
-            // value='Programa não encontrado'
-            fullWidth
-          >
+          <TextField select label={t('results.programs')} variant="outlined" fullWidth>
             <MenuItem>Programa não encontrado</MenuItem>
           </TextField>
         )}
@@ -189,15 +193,16 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Datas */}
       <Grid size={{ xs: 5, sm: 5, md: 3 }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-BR">
           <TextField
-            id="datetime-local"
+            id="datetime-local-initial"
             label={t('results.startDate')}
             type="datetime-local"
             name="initialDateTime"
             value={filters.initialDateTime}
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ max: '2123-10-31T23:59' }}
             sx={{ width: '100%' }}
           />
         </LocalizationProvider>
@@ -206,17 +211,30 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       <Grid size={{ xs: 5, sm: 5, md: 3 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
-            id="datetime-local"
+            id="datetime-local-final"
             label={t('results.endDate')}
             type="datetime-local"
             name="finalDateTime"
             value={filters.finalDateTime}
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ max: '2123-10-31T23:59' }}
             sx={{ width: '100%' }}
           />
         </LocalizationProvider>
       </Grid>
+
+      {openStack && (
+        <Stack sx={{ width: '100%' }} spacing={2}>
+          <Alert
+            variant="filled"
+            severity="error"
+            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          >
+            Data inválida
+          </Alert>
+        </Stack>
+      )}
 
       {/* Botões */}
       <Grid size={{ xs: 12 }} display="flex" justifyContent="flex-end" gap={2}>

@@ -151,13 +151,15 @@ export default function ResultPage() {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
   const handleNavigation = (path: string) => {
     navigate(path);
   };
   const [selectedPeriod, setSelectedPeriod] = useState('');
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [openStack, setOpenStack] = useState(false);
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -222,6 +224,20 @@ export default function ResultPage() {
     }
   }, [fetchToolsData, queryProgramsData]);
 
+  // verifica se a data final precede a inicial
+  useEffect(() => {
+    setPage(0);
+    if (filters.initialDateTime !== '' && filters.finalDateTime !== '') {
+      const iDate = dayjs(filters.initialDateTime);
+      const fDate = dayjs(filters.finalDateTime);
+      if (fDate.isBefore(iDate)) {
+        setOpenStack(true);
+      } else {
+        setOpenStack(false);
+      }
+    }
+  }, [filters.initialDateTime, filters.finalDateTime]);
+
   // Atualiza o número de itens totais
   useEffect(() => {
     if (resultPgDataAmount) {
@@ -283,9 +299,17 @@ export default function ResultPage() {
   // Gerencia o filtro de data
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+    // console.log(name, value);
+    setOpenStack(false);
 
-    setFilters({ ...filters, [name]: formattedDate, blockSearch: true });
+    // faz avalidação da data
+    const date = dayjs(value);
+    if (!date.isValid()) {
+      setOpenStack(true);
+      // return;
+    }
+    // const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+    setFilters({ ...filters, [name]: value, blockSearch: true });
   };
 
   // Gerencia o filtro de data por periodo
@@ -367,6 +391,8 @@ export default function ResultPage() {
     setSelectedTools([]);
     setSelectedPrograms([]);
     setSelectedPeriod('');
+    setProgramsData(['']);
+    setOpenStack(false);
   };
 
   // Faz a pesquisa
@@ -377,9 +403,15 @@ export default function ResultPage() {
   };
 
   // Gerencia a mudança de página
-  const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+  // const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
+  //   setPage(newPage);
+  // };
+  const handleChangePage = useCallback((event: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage);
-  };
+    if (tableContainerRef.current) {
+      tableContainerRef.current.scrollTop = 0; // Rola para o topo ao mudar a página
+    }
+  }, []);
 
   //  Gerencia as linhas por página
   const handleChangeRowsPerPage = (event: { target: { value: string } }) => {
@@ -399,6 +431,7 @@ export default function ResultPage() {
 
   return (
     <>
+      {/* ================================================================== titulo da pagina ============================================= */}
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
         {t('results.results')}
       </Typography>
@@ -421,10 +454,11 @@ export default function ResultPage() {
         handleSearch={handleSearch}
         selectedPeriod={selectedPeriod}
         setSelectedPeriod={setSelectedPeriod}
+        openStack={openStack}
       />
 
       {/* Tabela de Dados */}
-      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef}>
         <Toolbar
           sx={{
             height: 50,
@@ -446,6 +480,15 @@ export default function ResultPage() {
             </Tooltip>
           </div>
         </Toolbar>
+        <TablePagination
+          component="div"
+          page={page}
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[25, 50, 100, 200]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
             {/* Head da tabela */}
@@ -455,123 +498,136 @@ export default function ResultPage() {
                   <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
                     <CircularProgress />
                   </TableCell>
-                ) : totalCount === 0 && !filters.blockSearch && !resultData ? (
+                ) : !filters.blockSearch && resultData.length === 0 ? (
                   <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
                     Não foram encontrados registros.
                   </TableCell>
                 ) : (
                   <>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'dateTime'}
-                        direction={orderBy === 'dateTime' ? order : 'asc'}
-                        onClick={() => handleRequestSort('dateTime')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.date')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'tid'}
-                        direction={orderBy === 'tid' ? order : 'asc'}
-                        onClick={() => handleRequestSort('tid')}
-                        sx={{ display: 'flex', justifyContent: 'right' }}
-                      >
-                        Id
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'toolName'}
-                        direction={orderBy === 'toolName' ? order : 'asc'}
-                        onClick={() => handleRequestSort('toolName')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.tools')}
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'job'}
-                        direction={orderBy === 'job' ? order : 'asc'}
-                        onClick={() => handleRequestSort('job')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.job')}
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'programName'}
-                        direction={orderBy === 'programName' ? order : 'asc'}
-                        onClick={() => handleRequestSort('programName')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.programs')}
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'fuso'}
-                        direction={orderBy === 'fuso' ? order : 'asc'}
-                        onClick={() => handleRequestSort('fuso')}
-                        sx={{ display: 'flex', justifyContent: 'right' }}
-                      >
-                        {t('results.spindle')}
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'generalStatus'}
-                        direction={orderBy === 'generalStatus' ? order : 'asc'}
-                        onClick={() => handleRequestSort('generalStatus')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.generalStatus')}
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'torque'}
-                        direction={orderBy === 'torque' ? order : 'asc'}
-                        onClick={() => handleRequestSort('torque')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        Torque
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'angle'}
-                        direction={orderBy === 'angle' ? order : 'asc'}
-                        onClick={() => handleRequestSort('angle')}
-                        sx={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        {t('results.angle')}
-                      </TableSortLabel>
-                    </TableCell>
+                    <TableCell align="center">{t('results.date')}</TableCell>
+                    <TableCell align="center">Id</TableCell>
+                    <TableCell align="center">{t('results.tools')}</TableCell>
+                    <TableCell align="center">{t('results.job')}</TableCell>
+                    <TableCell align="center">{t('results.programs')}</TableCell>
+                    <TableCell align="center">{t('results.spindle')}</TableCell>
+                    <TableCell align="center">{t('results.generalStatus')}</TableCell>
+                    <TableCell align="center">Torque</TableCell>
+                    <TableCell align="center">{t('results.angle')}</TableCell>
                   </>
+                  // orderBy temporariamente desativado, precisa implementar na API
+                  // <>
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'dateTime'}
+                  //       direction={orderBy === 'dateTime' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('dateTime')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.date')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'tid'}
+                  //       direction={orderBy === 'tid' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('tid')}
+                  //       sx={{ display: 'flex', justifyContent: 'right' }}
+                  //     >
+                  //       Id
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'toolName'}
+                  //       direction={orderBy === 'toolName' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('toolName')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.tools')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'job'}
+                  //       direction={orderBy === 'job' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('job')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.job')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'programName'}
+                  //       direction={orderBy === 'programName' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('programName')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.programs')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'fuso'}
+                  //       direction={orderBy === 'fuso' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('fuso')}
+                  //       sx={{ display: 'flex', justifyContent: 'right' }}
+                  //     >
+                  //       {t('results.spindle')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'generalStatus'}
+                  //       direction={orderBy === 'generalStatus' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('generalStatus')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.generalStatus')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'torque'}
+                  //       direction={orderBy === 'torque' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('torque')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       Torque
+                  //     </TableSortLabel>
+                  //   </TableCell>
+                  //   <TableCell>
+                  //     <TableSortLabel
+                  //       active={orderBy === 'angle'}
+                  //       direction={orderBy === 'angle' ? order : 'asc'}
+                  //       onClick={() => handleRequestSort('angle')}
+                  //       sx={{ display: 'flex', justifyContent: 'center' }}
+                  //     >
+                  //       {t('results.angle')}
+                  //     </TableSortLabel>
+                  //   </TableCell>
+                  //   </>
                 )}
               </TableRow>
             </TableHead>
             {/* Corpo da tabela */}
-
-            <TableBody>
-              {data.map((row, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
-                >
-                  {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
-                  <TableCell sx={{ textAlign: 'left' }}>
-                    <Box
+            {!isLoadingResult && (
+              <TableBody>
+                {data.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
+                  >
+                    {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
+                    <TableCell sx={{ textAlign: 'left' }}>
+                      {/* link para a pagina de detalhes
+                  <Box
                       sx={{
                         display: 'inline-block',
                         padding: '2px 8px',
@@ -583,64 +639,64 @@ export default function ResultPage() {
                       onClick={() => handleNavigation('/detail')}
                     >
                       <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
-                    </Box>
-                    {row.dateTime}
-                  </TableCell>
+                    </Box> */}
+                      {row.dateTime}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{row.programName}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{row.fuso}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>
+                      <Box
+                        sx={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          color: 'white',
+                          backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {row.generalStatus}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          color: 'white',
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {getStatusIcon(row.torqueStatus)}
+                      </Box>
+                      {row.torque}
+                    </TableCell>
 
-                  <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{row.programName}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{row.fuso}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {row.generalStatus}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {getStatusIcon(row.torqueStatus)}
-                    </Box>
-                    {row.torque}
-                  </TableCell>
-
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {getStatusIcon(row.angleStatus)}
-                    </Box>
-                    {row.angle}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          color: 'white',
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {getStatusIcon(row.angleStatus)}
+                      </Box>
+                      {row.angle}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </div>
         <TablePagination
@@ -722,9 +778,3 @@ export function useTable() {
     onChangeRowsPerPage,
   };
 }
-
-// const getCurrentDateTime = () => {
-//   const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
-//   const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
-//   return isoString;
-// };
