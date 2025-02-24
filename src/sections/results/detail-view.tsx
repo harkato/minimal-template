@@ -13,8 +13,8 @@ import {
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useTranslation } from 'react-i18next';
-import { useDetailData } from 'src/routes/hooks/useToolData';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
+import { useFetchToolsData } from 'src/routes/hooks/api';
 
 // Define o tipo do valor
 interface DataDetail {
@@ -63,7 +63,7 @@ export default function DetailsPage() {
     isError: isErrorDetail,
     data: detailData,
     error: errorDetail,
-  } = useDetailData();
+  } = useFetchToolsData();
   const tableRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (detailData && detailData.length > 0) {
