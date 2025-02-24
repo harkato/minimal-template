@@ -40,10 +40,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [toolData]);
 
-  const [pendingValue, setPendingValue] = useState<string[]>([]);
-  // (() =>
-  //   JSON.parse(localStorage.getItem('pendingValue') || '[]')
-  // );
+  const [pendingValue, setPendingValue] = useState<string[]>(() =>
+    JSON.parse(localStorage.getItem('pendingValue') || '[]')
+  );
 
   const handleDeleteCard = (id: string) => {
     setPendingValue((prevPending) => prevPending.filter((item) => item !== id));
@@ -64,9 +63,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [cardData, pendingValue, selectedCards] // Dependências que afetam o valor do contexto
   );
 
-  // useEffect(() => {
-  //   localStorage.setItem('pendingValue', JSON.stringify(pendingValue));
-  // }, [pendingValue]);
+  useEffect(() => {
+    localStorage.setItem('pendingValue', JSON.stringify(pendingValue));
+  }, [pendingValue]);
 
   return <DashboardContext.Provider value={contextValue}>{children}</DashboardContext.Provider>;
 };

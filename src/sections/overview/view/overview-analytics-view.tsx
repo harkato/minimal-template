@@ -36,6 +36,7 @@ import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
 import { useQuery } from '@tanstack/react-query';
 import { Pending } from '@mui/icons-material';
+import { SkeletonTools, SkeletonTopFive } from '../loading-card';
 
 interface DataTopNokOk {
   title: string; // toolName
@@ -123,11 +124,13 @@ export function OverviewAnalyticsView() {
     return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];
   });
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
-  const [filters, setFilters] = useState<ToolFilters>(initialFilters);
   const [tools, setTools] = useState<ToolData[]>([]);
   const [toolsWithRevisions, setToolsWithRevisions] = useState<
     { toolId: number; toolRevision: number }[]
-  >([]);
+  >(() => {
+    const storedFilters = localStorage.getItem('selectedTools');
+    return storedFilters ? JSON.parse(storedFilters) : [];
+  });
   const openLabels = Boolean(anchorEl);
   const id = openLabels ? 'github-label' : undefined;
 
@@ -148,7 +151,7 @@ export function OverviewAnalyticsView() {
   //  TOP 5 QUARKUS
   const finalDateTime = '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
-    isLoading: isLoadingTopNokOk,
+    isPending: isLoadingTopNokOk,
     isError: isErrorTopNokOk,
     data: TopNokOkData,
     error: errorTopNokOk,
@@ -204,15 +207,24 @@ export function OverviewAnalyticsView() {
     localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTopFive));
   }, [taxaTopFive]);
 
+  // Salva a seleção do top 5
+  useEffect(() => {
+    localStorage.setItem('topFive', JSON.stringify(topFive));
+  }, [topFive]);
+
   // Dados das ferramentas
   const {
-    isLoading: isLoadingToolList,
+    isPending: isLoadingToolList,
     isError: isErrorToolList,
     data: toolListData,
     error: errorToolList,
   } = useFetchToolsData();
 
   const toolsQueries = useToolsInfo(toolsWithRevisions);
+
+  // Conta quantas queries ainda estão pendentes
+  const pendingCount = toolsQueries.filter((query) => query.isPending).length;
+
   const toolsInfo = toolsQueries.map((query) => query.data).filter(Boolean);
 
   useEffect(() => {
@@ -229,6 +241,7 @@ export function OverviewAnalyticsView() {
     }));
 
     setToolsWithRevisions(transformedData);
+    localStorage.setItem('selectedTools', JSON.stringify(transformedData));
   }, [pendingValue]);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
@@ -525,17 +538,21 @@ export function OverviewAnalyticsView() {
             TOP 5 NOK
           </Typography>
           <Grid container spacing={2}>
-            {sortedTopFiveData.map((item, index) => (
-              <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
-                <AnalyticsWidgetSummary
-                  title={item.title}
-                  total={item.total}
-                  chart={item.chart}
-                  trend={item.trend}
-                  criticality={taxaTopFive}
-                />
-              </Grid>
-            ))}
+            {isLoadingTopNokOk ? (
+              <SkeletonTopFive />
+            ) : (
+              sortedTopFiveData.map((item, index) => (
+                <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
+                  <AnalyticsWidgetSummary
+                    title={item.title}
+                    total={item.total}
+                    chart={item.chart}
+                    trend={item.trend}
+                    criticality={taxaTopFive}
+                  />
+                </Grid>
+              ))
+            )}
           </Grid>
         </div>
       )}
@@ -549,24 +566,34 @@ export function OverviewAnalyticsView() {
             </Typography>
           </Grid>
           <Grid container spacing={2}>
-            {toolsInfo.map((tool) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={tool.toolId}>
-                <AnalyticsDashboardCard
-                  title={tool.toolName}
-                  id={tool.toolId}
-                  vehicles={tool.products}
-                  nokVin={tool.nokOkRate}
-                  nok={tool.nok}
-                  topIssues={tool.topIssues}
-                  targetAlert={toolLimits[0]}
-                  targetCritical={toolLimits[1]}
-                  onDelete={() => {
-                    setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId));
-                    setPendingValue((prev) => prev.filter((t) => t.toolId !== tool.toolId));
-                  }}
-                />
-              </Grid>
-            ))}
+            <>
+              {toolsQueries.map((query, index) =>
+                query.isPending ? (
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                    <SkeletonTools key={`skeleton-${index}`} />
+                  </Grid>
+                ) : query.data ? (
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={query.data.toolId}>
+                    <AnalyticsDashboardCard
+                      title={query.data.toolName}
+                      id={query.data.toolId}
+                      vehicles={query.data.products}
+                      nokVin={query.data.nokOkRate}
+                      nok={query.data.nok}
+                      topIssues={query.data.topIssues}
+                      targetAlert={toolLimits[0]}
+                      targetCritical={toolLimits[1]}
+                      onDelete={() => {
+                        setTools((prev) => prev.filter((t) => t.toolId !== query.data.toolId));
+                        setPendingValue((prev) =>
+                          prev.filter((t) => t.toolId !== query.data.toolId)
+                        );
+                      }}
+                    />
+                  </Grid>
+                ) : null
+              )}
+            </>
           </Grid>
         </div>
       )}
