@@ -193,8 +193,6 @@ export function OverviewAnalyticsView() {
 
   useEffect(() => {
     transformarDados();
-    // console.log('topFiveData',  topFiveData)
-    // console.log('TopNokOkData', TopNokOkData);
     // eslint-disable-next-line
   }, [TopNokOkData]);
 
@@ -221,11 +219,6 @@ export function OverviewAnalyticsView() {
   } = useFetchToolsData();
 
   const toolsQueries = useToolsInfo(toolsWithRevisions);
-
-  // Conta quantas queries ainda estão pendentes
-  const pendingCount = toolsQueries.filter((query) => query.isPending).length;
-
-  const toolsInfo = toolsQueries.map((query) => query.data).filter(Boolean);
 
   useEffect(() => {
     if (toolListData) {
@@ -292,6 +285,10 @@ export function OverviewAnalyticsView() {
     const selectedValues = event.target.value as string[];
     setState(selectedValues);
   };
+
+  console.log('pendingValue', pendingValue);
+  console.log('valueLabel', valueLabel);
+  console.log('selectLabels', selectLabels);
 
   return (
     <DashboardContent maxWidth="xl">
@@ -442,7 +439,9 @@ export function OverviewAnalyticsView() {
                                   handleCloseLabel();
                                 }
                               }}
-                              value={pendingValue}
+                              value={selectLabels.filter((option) =>
+                                pendingValue.some((pv) => pv.toolId === option.toolId)
+                              )}
                               onChange={(_, newValue: string[]) =>
                                 handleSelectionChange(
                                   { target: { value: newValue.map((tool) => tool) } },
@@ -452,7 +451,7 @@ export function OverviewAnalyticsView() {
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
-                              getOptionLabel={(option) => option.toolName}
+                              // getOptionLabel={(option) => option.toolName}
                               getOptionKey={(option) => option.toolId || option.toolName}
                               renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props;
