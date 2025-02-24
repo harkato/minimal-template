@@ -159,6 +159,7 @@ export default function ResultPage() {
   };
   const [selectedPeriod, setSelectedPeriod] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [openStack, setOpenStack] = useState(false);
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -231,6 +232,20 @@ export default function ResultPage() {
     
   }, [fetchToolsData, queryProgramsData]);
 
+  // verifica se a data final precede a inicial
+  useEffect(() => {
+    setPage(0)
+    if (filters.initialDateTime !=='' && filters.finalDateTime !== ''){
+      const iDate = dayjs(filters.initialDateTime);
+      const fDate = dayjs(filters.finalDateTime);     
+      if (fDate.isBefore(iDate)) {    
+        setOpenStack(true);
+      } else {
+        setOpenStack(false);
+      }
+    }
+  }, [filters.initialDateTime, filters.finalDateTime])
+
   // Atualiza o número de itens totais
   useEffect(() => {
     if (resultPgDataAmount) {
@@ -291,10 +306,18 @@ export default function ResultPage() {
 
   // Gerencia o filtro de data
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
-
-    setFilters({ ...filters, [name]: formattedDate, blockSearch: true });
+    const { name, value } = event.target;    
+    // console.log(name, value);
+    setOpenStack(false);
+    
+    // faz avalidação da data
+  const date = dayjs(value);        
+    if (!date.isValid()) {
+      setOpenStack(true);
+      // return;
+    }
+    // const formattedDate = dayjs(value).format('YYYY-MM-DDTHH:mm:ss');
+    setFilters({ ...filters, [name]: value, blockSearch: true });          
   };
 
   // Gerencia o filtro de data por periodo
@@ -351,6 +374,7 @@ export default function ResultPage() {
     setSelectedPrograms([]);
     setSelectedPeriod('');
     setProgramsData(['']);
+    setOpenStack(false)
   };
 
   // Faz a pesquisa
@@ -390,9 +414,9 @@ export default function ResultPage() {
   return (
     <>
       {/* ================================================================== titulo da pagina ============================================= */}
-      {/* <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>  
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>  
         {t('results.results')}
-      </Typography> */}
+      </Typography>
 
       {/* Menu de Filtros */}
       <FiltersMenu
@@ -412,6 +436,7 @@ export default function ResultPage() {
         handleSearch={handleSearch}
         selectedPeriod={selectedPeriod}
         setSelectedPeriod={setSelectedPeriod}
+        openStack={openStack}
       />
 
       {/* Tabela de Dados */}
@@ -583,6 +608,7 @@ export default function ResultPage() {
                 >
                   {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
                   <TableCell sx={{ textAlign: 'left' }} >
+                  {/* link para a pagina de detalhes
                   <Box
                       sx={{
                         display: 'inline-block',
@@ -595,10 +621,9 @@ export default function ResultPage() {
                       onClick={() => handleNavigation('/detail')}
                     >
                       <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
-                    </Box>
+                    </Box> */}
                     {row.dateTime}
-                  </TableCell>
-                  
+                  </TableCell>                  
                   <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>
@@ -737,8 +762,3 @@ export function useTable() {
   };
 }
 
-// const getCurrentDateTime = () => {
-//   const now = dayjs(); // Utiliza o Dayjs para obter a data e hora atual
-//   const isoString = now.format('YYYY-MM-DDTHH:mm'); // Formata para o padrão datetime-local
-//   return isoString;
-// };

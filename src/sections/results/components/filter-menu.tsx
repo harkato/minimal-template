@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField, MenuItem, Chip, Button, Autocomplete } from '@mui/material';
+import { Grid, TextField, MenuItem, Chip, Button, Autocomplete, Alert, Snackbar, Stack } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +19,12 @@ interface FiltersMenuProps {
   ) => void;
   handleStatusChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDateChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleDateChangePeriod: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDateChangePeriod: (event: React.ChangeEvent<HTMLInputElement>) => void; 
   handleResetFilters: () => void;
   handleSearch: () => void;
   selectedPeriod: string;
   setSelectedPeriod: React.Dispatch<React.SetStateAction<string>>;
+  openStack: boolean;
 }
 
 const FiltersMenu: React.FC<FiltersMenuProps> = ({
@@ -41,8 +42,8 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
   handleDateChangePeriod,
   handleResetFilters,
   handleSearch,
-  setSelectedPeriod,
   selectedPeriod,
+  openStack,
 }) => {
   const { t } = useTranslation();
 
@@ -136,7 +137,6 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           select
             label={t('results.programs')}
             variant="outlined"
-            // value='Programa não encontrado'
             fullWidth
           >
             <MenuItem>Programa não encontrado</MenuItem>
@@ -169,7 +169,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         </TextField>
       </Grid>
 
-      {/* Periodo */}
+      {/* Período */}
       <Grid item xs={12} sm={6} md={6}>
         <TextField
           select
@@ -193,15 +193,16 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
 
       {/* Datas */}
       <Grid item xs={5} sm={5} md={3}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-BR">
           <TextField
-            id="datetime-local"
+            id="datetime-local-initial"
             label={t('results.startDate')}
             type="datetime-local"
             name="initialDateTime"
-            value={filters.initialDateTime}
+            value={filters.initialDateTime} 
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ max: "2123-10-31T23:59" }}
             sx={{ width: '100%' }}
           />
         </LocalizationProvider>
@@ -210,18 +211,27 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       <Grid item xs={5} sm={5} md={3}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
-            id="datetime-local"
+            id="datetime-local-final"
             label={t('results.endDate')}
             type="datetime-local"
             name="finalDateTime"
             value={filters.finalDateTime}
             onChange={handleDateChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ max: "2123-10-31T23:59" }}
             sx={{ width: '100%' }}
           />
         </LocalizationProvider>
       </Grid>
 
+      {openStack && (
+        <Stack sx={{ width: '100%' }} spacing={2}>
+        <Alert variant="filled" severity="error" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> 
+          Data inválida
+        </Alert>
+      </Stack>
+      )}
+      
       {/* Botões */}
       <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
         <Button variant="contained" onClick={handleResetFilters}>
