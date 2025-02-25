@@ -1,12 +1,20 @@
-export const printAllPages = (data: any[]) => {
+export const printAllPages = (data: any[], filters: Record<string, string>) => {
   const fullTable = document.createElement('div');
+
+  const filterText = Object.entries(filters)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return `${key}: ${value.map((item) => JSON.stringify(item)).join(', ')}`;
+      }
+      return `${key}: ${value}`;
+    })
+    .join(', ');
 
   fullTable.innerHTML = `
     <html>
       <head>
         <title>Resultados</title>
         <style>
-          @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
           @page {
             size: landscape;
             margin: 20mm;
@@ -28,8 +36,8 @@ export const printAllPages = (data: any[]) => {
             background-color: #f2f2f2;
           }
           .status-icon {
-            align-items: center;
-            justify-content: center;
+            align-items: left;
+            justify-content: left;
             gap: 4px;
           }
           .status-ok {
@@ -42,12 +50,17 @@ export const printAllPages = (data: any[]) => {
             color: #f9a825;
           }
           .torque-angle-col {
-            text-align: center;
+            text-align: left;
             width: 60px;
+          }
+          .icon-svg {
+            width: 24px;
+            height: 24px;
           }
         </style>
       </head>
       <body>
+      <h4>Resultados para ${filterText}</h4>
         <table style="width: 100%; border-collapse: collapse;">
           <thead>
             <tr>
@@ -66,39 +79,57 @@ export const printAllPages = (data: any[]) => {
             ${data
               .map(
                 (row, index) => `
-                <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
-                  <td>${row.dateTime}</td>
-                  <td>${row.tid}</td>
-                  <td>${row.toolName}</td>
-                  <td>${row.job}</td>
-                  <td>${row.programName}</td>
-                  <td>${row.fuso}</td>
-                  <td class="status-icon">
-                      <span class="material-icons ${
+                  <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f5f5f5'};">
+                    <td>${row.dateTime}</td>
+                    <td>${row.tid}</td>
+                    <td>${row.toolName}</td>
+                    <td>${row.job}</td>
+                    <td>${row.programName}</td>
+                    <td>${row.fuso}</td>
+                    <td class="status-icon">
+                      <img src="../assets/icons/printtable/${
+                        row.generalStatus === 'OK' ? 'check_circle.svg' : 'cancel.svg'
+                      }" class="icon-svg ${
                         row.generalStatus === 'OK' ? 'status-ok' : 'status-error'
-                      }">
-                        ${row.generalStatus === 'OK' ? 'check_circle' : 'cancel'}
-                      </span>
+                      }" />                      
                       ${row.generalStatus}
                     </td>
-                  <td class="torque-angle-col status-icon">
-                      ${row.torque}
-                      <span class="material-icons ${
-                        row.torqueStatus === 1 ? 'status-ok' : 'status-warning'
-                      }">
-                        ${row.torqueStatus === 1 ? 'check_circle' : 'arrow_downward'}
-                      </span>
-                    </td>
                     <td class="torque-angle-col status-icon">
-                      ${row.angle}
-                      <span class="material-icons ${
-                        row.angleStatus === 1 ? 'status-ok' : 'status-warning'
-                      }">
-                        ${row.angleStatus === 1 ? 'check_circle' : 'arrow_downward'}
-                      </span>
+                      <img src="../assets/icons/printtable/${
+                        row.torqueStatus === 0
+                          ? 'check_circle.svg'
+                          : row.torqueStatus === 2
+                            ? 'arrow_downward.svg'
+                            : 'arrow_upward.svg'
+                      }
+                      " class="icon-svg ${
+                        row.torqueStatus === 0
+                          ? 'status-ok'
+                          : row.torqueStatus === 2
+                            ? 'status-warning'
+                            : 'status-error'
+                      }" />
+                      ${row.torque}                      
                     </td>
-                </tr>
-              `
+                    <td class="torque-angle-col status-icon">                      
+                      <img src="../assets/icons/printtable/${
+                        row.angleStatus === 0
+                          ? 'check_circle.svg'
+                          : row.torqueStatus === 2
+                            ? 'arrow_downward.svg'
+                            : 'arrow_upward.svg'
+                      }
+                      " class="icon-svg ${
+                        row.angleStatus === 0
+                          ? 'status-ok'
+                          : row.torqueStatus === 2
+                            ? 'status-warning'
+                            : 'status-error'
+                      }" />
+                      ${row.angle}
+                    </td>
+                  </tr>
+                `
               )
               .join('')}
           </tbody>
@@ -107,11 +138,12 @@ export const printAllPages = (data: any[]) => {
     </html>
   `;
 
-  // Cria a janela de impressão com os dados completos
-  const printWindow = window.open('', '_blank');
-  if (printWindow) {
-    printWindow.document.write(fullTable.innerHTML);
-    printWindow.document.close();
-    printWindow.print();
-  }
+  setTimeout(() => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(fullTable.innerHTML);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  }, 1000);
 };

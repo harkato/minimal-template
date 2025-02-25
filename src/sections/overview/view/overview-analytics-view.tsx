@@ -286,10 +286,6 @@ export function OverviewAnalyticsView() {
     setState(selectedValues);
   };
 
-  console.log('pendingValue', pendingValue);
-  console.log('valueLabel', valueLabel);
-  console.log('selectLabels', selectLabels);
-
   return (
     <DashboardContent maxWidth="xl">
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>

@@ -60,7 +60,7 @@ enum Status {
   HIGH = 3,
 }
 
-interface Filters {
+export interface Filters {
   identifier: string;
   toolList: any;
   programList: any;
@@ -424,9 +424,28 @@ export default function ResultPage() {
     }));
   };
 
+  const cleanObject = (obj: Filters) =>
+    Object.fromEntries(
+      Object.entries(obj).filter(([key, value]) => {
+        // Remove valores vazios, nulos, undefined e arrays vazios
+        if (
+          key === 'blockSearch' ||
+          value === null ||
+          value === undefined ||
+          value === '' ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          return false;
+        }
+
+        return true;
+      })
+    );
+
   // Função de impressão da tabela
   const handlePrintAllPages = () => {
-    printAllPages(data);
+    const cleanedFilters = cleanObject(filters);
+    printAllPages(data, cleanedFilters);
   };
 
   return (
