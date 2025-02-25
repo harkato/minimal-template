@@ -51,7 +51,7 @@ export  function AreaChartNew({ grip }) {
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
           {/* Botão para voltar a pagina */}
-          {/* <Button
+          <Button
             size="small"
             onClick={() => handleGoBack()}
           >
@@ -67,7 +67,7 @@ export  function AreaChartNew({ grip }) {
             >
               <ArrowBackOutlinedIcon color='primary' />
             </Box>              
-          </Button> */}
+          </Button>
         </Grid>
         <Grid item>
           <Stack direction="row" alignItems="center" margin= '20px 20px 0px 0px' spacing={5}>

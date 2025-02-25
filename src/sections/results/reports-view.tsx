@@ -371,7 +371,8 @@ export default function ResultPage() {
     setSelectedPrograms([]);
     setSelectedPeriod('');
     setProgramsData(['']);
-    setOpenStack(false)
+    setOpenStack(false);
+    setPage(0);
   };
 
   // Faz a pesquisa

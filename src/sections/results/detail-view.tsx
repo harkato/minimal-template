@@ -9,13 +9,17 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   Stack,
+  Box,
+  Button,
 } from '@mui/material';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import { useDetailData } from 'src/routes/hooks/useToolData';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 
 // Define o tipo do valor
 interface DataDetail {
@@ -55,25 +59,29 @@ function getStatusIcon(status: string, i: number) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
-}));
+// const useStyles = makeStyles((theme) => ({
+//   container: {
+//     display: 'flex',
+//     flexWrap: 'wrap',
+//   },
+//   textField: {
+//     marginLeft: theme.spacing(1),
+//     marginRight: theme.spacing(1),
+//     width: 200,
+//   },
+// }));
 
 export default function DetailsPage() {
   const [data, setData] = useState<DataDetail| null>(null);
   const { t, i18n } = useTranslation();
   // Recebe os dados da API
   const { isLoading: isLoadingDetail, isError: isErrorDetail, data: detailData, error: errorDetail } = useDetailData();
-  const classes = useStyles();
+  // const classes = useStyles();
   const tableRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate(); // Inicializa o useNavigate
+  const handleGoBack = () => {
+    navigate(-1); // Navega para a página anterior no histórico
+  };
   useEffect(() => {
     if (detailData && detailData.length > 0) { // Verifica se há dados
         setData(detailData[0]);
@@ -83,18 +91,82 @@ export default function DetailsPage() {
   }, [detailData]);
 
   if (isLoadingDetail) {
-    return <Typography>Carregando...</Typography>;
-  }
+    return (
+    <>
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Button
+            size="small"
+            onClick={() => handleGoBack()}
+          >
+            <Box
+              sx={{
+                display: 'inline-block',
+                padding: '2px 8px',
+                borderRadius: '8px',
+                color: 'white',
+                textAlign: 'center',
+                fontWeight: 'bold',
+              }}
+            >
+              <ArrowBackOutlinedIcon color='primary' />
+            </Box>              
+          </Button> 
+        </Grid> 
+      <Typography>Carregando...</Typography>
+    </>
+  )}
 
   if (isErrorDetail || !data) { // Verifica erro ou dados nulos
-    return <Typography>Erro ao carregar os dados.</Typography>;
-  }
+    return (
+      <>
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Button
+              size="small"
+              onClick={() => handleGoBack()}
+            >
+              <Box
+                sx={{
+                  display: 'inline-block',
+                  padding: '2px 8px',
+                  borderRadius: '8px',
+                  color: 'white',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                }}
+              >
+                <ArrowBackOutlinedIcon color='primary' />
+              </Box>              
+            </Button> 
+          </Grid> 
+        <Typography>Erro ao carregar os dados.</Typography>
+      </>
+  )}
 
   return (
     <>     
-      {/* Renderiza os dados */}      
+      {/* Renderiza os dados */} 
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        {/* <Button
+          size="small"
+          onClick={() => handleGoBack()}
+        >
+          <Box
+            sx={{
+              display: 'inline-block',
+              padding: '2px 8px',
+              borderRadius: '8px',
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: 'bold',
+            }}
+          >
+            <ArrowBackOutlinedIcon color='primary' />
+          </Box>              
+        </Button>  */}
+      </Grid>     
       <Grid container spacing={2} sx={{ mt: 2 }}> {/* Container principal com espaçamento */}
       <Grid item xs={12} md={9}> {/* Grid para o gráfico (ocupa 8 colunas em telas médias e maiores, 12 em telas menores) */}
+        
         <Card>
           {data?.grip && <AreaChartNew grip={data.grip} />}
         </Card>
