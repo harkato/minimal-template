@@ -232,9 +232,17 @@ export default function ResultPage() {
     
   }, [fetchToolsData, queryProgramsData]);
 
+  // corrige o erro: Failed prop type: MUI: The page prop of a TablePagination is out of range (0 to 0, but page is 1)
+  useEffect(() => {     
+    if (filters.blockSearch) {
+      setPage(0)
+    }  
+    
+  }, [filters.blockSearch]);
+
   // verifica se a data final precede a inicial
   useEffect(() => {
-    setPage(0)
+    // setPage(0)
     if (filters.initialDateTime !=='' && filters.finalDateTime !== ''){
       const iDate = dayjs(filters.initialDateTime);
       const fDate = dayjs(filters.finalDateTime);     
@@ -466,7 +474,7 @@ export default function ResultPage() {
           rowsPerPageOptions={[25, 50, 100, 200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t('results.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('results.of')} ${count}`}
         />
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
@@ -687,7 +695,7 @@ export default function ResultPage() {
           rowsPerPageOptions={[25, 50, 100, 200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t('results.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('results.of')} ${count}`}
         />
       </TableContainer>
     </>

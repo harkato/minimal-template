@@ -11,6 +11,9 @@ import {
   Stack,
   Box,
   Button,
+  CircularProgress,
+  TableCell,
+  Alert,
 } from '@mui/material';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -112,7 +115,10 @@ export default function DetailsPage() {
             </Box>              
           </Button> 
         </Grid> 
-      <Typography>Carregando...</Typography>
+        <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
+          <CircularProgress />
+        </TableCell>
+      {/* <Typography>Carregando...</Typography> */}
     </>
   )}
 
@@ -138,7 +144,10 @@ export default function DetailsPage() {
               </Box>              
             </Button> 
           </Grid> 
-        <Typography>Erro ao carregar os dados.</Typography>
+          <Alert variant="filled" severity="error" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> 
+            falha ao carregar os dados
+          </Alert>
+        {/* <Typography>Erro ao carregar os dados.</Typography> */}
       </>
   )}
 
