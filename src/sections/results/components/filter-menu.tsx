@@ -103,7 +103,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           />
         ) : (
           <TextField select label={t('results.tools')} variant="outlined" fullWidth>
-            <MenuItem>Ferramenta não encontrada</MenuItem>
+            <MenuItem>{t('results.ToolNotFound')}</MenuItem>
           </TextField>
         )}
       </Grid>
@@ -137,7 +137,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           />
         ) : (
           <TextField select label={t('results.programs')} variant="outlined" fullWidth>
-            <MenuItem>Programa não encontrado</MenuItem>
+            <MenuItem>{t('results.ProgramNotFound')}</MenuItem>
           </TextField>
         )}
       </Grid>
@@ -162,10 +162,10 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           <MenuItem value="">{t('results.all')}</MenuItem>
           <MenuItem value="0">OK</MenuItem>
           <MenuItem value="1">NOK</MenuItem>
-          <MenuItem value="2">Ângulo Baixo</MenuItem>
-          <MenuItem value="3">Ângulo Alto</MenuItem>
-          <MenuItem value="4">Torque Baixo</MenuItem>
-          <MenuItem value="5">Torque Alto</MenuItem>
+          <MenuItem value="2">{t('results.lowAngle')}</MenuItem>
+          <MenuItem value="3">{t('results.highAngle')}</MenuItem>
+          <MenuItem value="4">{t('results.lowTorque')}</MenuItem>
+          <MenuItem value="5">{t('results.highTorque')}</MenuItem>
         </TextField>
       </Grid>
 
@@ -173,7 +173,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         <TextField
           select
-          label="Período"
+          label={t('results.Period')}
           name="periodo"
           variant="outlined"
           value={selectedPeriod}
@@ -181,19 +181,19 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           fullWidth
         >
           <MenuItem value="">_ </MenuItem>
-          <MenuItem value="yesterday">ontem e hoje</MenuItem>
-          <MenuItem value="3days">útimos 3 dias</MenuItem>
-          <MenuItem value="7days">útimos 7 dias</MenuItem>
-          <MenuItem value="30days">útimos 30 dias</MenuItem>
-          <MenuItem value="3months">útimos 3 meses</MenuItem>
-          <MenuItem value="6months">útimos 6 meses</MenuItem>
-          <MenuItem value="1year">último ano</MenuItem>
+          <MenuItem value="yesterday">{t('results.yesterdayAndToday')}</MenuItem>
+          <MenuItem value="3days">{t('results.last3Days')}</MenuItem>
+          <MenuItem value="7days">{t('results.last7Days')}</MenuItem>
+          <MenuItem value="30days">{t('results.last30Days')}</MenuItem>
+          <MenuItem value="3months">{t('results.last3Months')}</MenuItem>
+          <MenuItem value="6months">{t('results.last6Months')}</MenuItem>
+          <MenuItem value="1year">{t('results.lastYear')}</MenuItem>
         </TextField>
       </Grid>
 
       {/* Datas */}
       <Grid size={{ xs: 5, sm: 5, md: 3 }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-BR">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
             id="datetime-local-initial"
             label={t('results.startDate')}
@@ -231,7 +231,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             severity="error"
             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
-            Data inválida
+            {t('results.invalidDate')}
           </Alert>
         </Stack>
       )}

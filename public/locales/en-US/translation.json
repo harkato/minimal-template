@@ -90,6 +90,24 @@
       "angle": "Angle",
       "statusAngle": "Angle Status",
       "saveExport": "Save or Export",
-      "print": "Print"
+      "print": "Print",
+      "ToolNotFound": "Tool not found",
+      "ProgramNotFound": "Program not found",
+      "lowAngle": "Low Angle",
+      "highAngle": "High Angle",
+      "lowTorque": "Low Torque",
+      "highTorque": "High Torque",
+      "Period": "Period",
+      "yesterdayAndToday": "yesterday and today",
+      "last3Days": "last 3 days",
+      "last7Days": "last 7 days",
+      "last30Days": "last 30 days",
+      "last3Months": "last 3 months",
+      "last6Months": "last 6 months",
+      "lastYear": "last year",
+      "invalidDate": "Invalid date",
+      "noRecords": "No records found.",
+      "rowsPerPage": "Rows per page:",
+      "of": "of"
     }
    }

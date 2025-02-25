@@ -52,22 +52,22 @@ export  function AreaChartNew({ grip }) {
         <Grid item>
           {/* Botão para voltar a pagina */}
           <Button
-              size="small"
-              onClick={() => handleGoBack()}
+            size="small"
+            onClick={() => handleGoBack()}
+          >
+            <Box
+              sx={{
+                display: 'inline-block',
+                padding: '2px 8px',
+                borderRadius: '8px',
+                color: 'white',
+                textAlign: 'center',
+                fontWeight: 'bold',
+              }}
             >
-              <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      <ArrowBackOutlinedIcon color='primary' />
-                    </Box>              
-            </Button>
+              <ArrowBackOutlinedIcon color='primary' />
+            </Box>              
+          </Button>
         </Grid>
         <Grid item>
           <Stack direction="row" alignItems="center" margin= '20px 20px 0px 0px' spacing={5}>
@@ -94,24 +94,7 @@ export  function AreaChartNew({ grip }) {
               variant={slot === 'TORQUE X ÂNGULO' ? 'outlined' : 'text'}
             >
               TORQUE X ÂNGULO
-            </Button>            
-            {/* <Button
-              size="small"
-              onClick={() => window.print()}
-            >
-              <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      <LocalPrintshopOutlinedIcon color='primary' />
-                    </Box>              
-            </Button> */}
+            </Button> 
           </Stack>
         </Grid>
       </Grid>

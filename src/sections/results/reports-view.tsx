@@ -299,9 +299,7 @@ export default function ResultPage() {
   // Gerencia o filtro de data
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    // console.log(name, value);
     setOpenStack(false);
-
     // faz avalidação da data
     const date = dayjs(value);
     if (!date.isValid()) {
@@ -393,6 +391,7 @@ export default function ResultPage() {
     setSelectedPeriod('');
     setProgramsData(['']);
     setOpenStack(false);
+    setPage(0);
   };
 
   // Faz a pesquisa
@@ -403,9 +402,6 @@ export default function ResultPage() {
   };
 
   // Gerencia a mudança de página
-  // const handleChangePage = (event: any, newPage: React.SetStateAction<number>) => {
-  //   setPage(newPage);
-  // };
   const handleChangePage = useCallback((event: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage);
     if (tableContainerRef.current) {
@@ -507,6 +503,8 @@ export default function ResultPage() {
           onPageChange={handleChangePage}
           rowsPerPageOptions={[25, 50, 100, 200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t('results.rowsPerPage')}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
         />
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
@@ -519,7 +517,7 @@ export default function ResultPage() {
                   </TableCell>
                 ) : !filters.blockSearch && resultData.length === 0 ? (
                   <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
-                    Não foram encontrados registros.
+                    {t('results.noRecords')}
                   </TableCell>
                 ) : (
                   <>
@@ -726,6 +724,8 @@ export default function ResultPage() {
           onPageChange={handleChangePage}
           rowsPerPageOptions={[25, 50, 100, 200]}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t('results.rowsPerPage')}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
         />
       </TableContainer>
     </>
