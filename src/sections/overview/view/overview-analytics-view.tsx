@@ -6,7 +6,6 @@ import {
   AutocompleteCloseReason,
   Box,
   Button,
-  Chip,
   ClickAwayListener,
   Collapse,
   FormControlLabel,
@@ -16,11 +15,9 @@ import {
   ListItemText,
   Modal,
   Popper,
-  SelectChangeEvent,
   Slider,
   styled,
   Switch,
-  TextField,
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,17 +31,14 @@ import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
-import { useQuery } from '@tanstack/react-query';
-import { Pending } from '@mui/icons-material';
 import { SkeletonTools, SkeletonTopFive } from '../loading-card';
 
 interface DataTopNokOk {
   title: string; // toolName
   trend: string; // trend
   total: number; // nokOkRate
-  // color: string; // campo em branco
+  // last results
   chart: {
-    // lastResults
     categories: string[]; // apenas a hora do finalTimestamp
     series: number[]; // nok
   };
@@ -64,7 +58,7 @@ interface TopNokOkItem {
   nokOkRate: number;
   trend: string;
   topIssues: null;
-  lastResults: LastResultItem[] | null; // Adicionei a tipagem para lastResults
+  lastResults: LastResultItem[] | null;
 }
 
 // Interface para os itens de lastResults
@@ -85,77 +79,47 @@ interface LastResultItem {
   lastResults: null;
 }
 
-interface ToolFilters {
-  toolId: number;
-  toolRevision: number;
-}
-
-interface ToolData {
-  toolName: string;
-  products: number;
-  toolId: string;
-  nok: number;
-  nokOkRate: number;
-  topIssues: any[];
-}
-const initialFilters = {
-  toolId: 0,
-  toolRevision: 0,
-};
-
 export function OverviewAnalyticsView() {
   const { t } = useTranslation();
   const theme = useTheme();
   const isLargeScreen = window.innerWidth > 768;
+  const finalDateTime = '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra (usado pra fazer query top 5)
 
-  // MENU DE SELEÇÃO DE CARDS
+  // MENU TOP 5 E FERRAMENTAS
   const [openModal, setOpenModal] = React.useState(false); // Abertura do modal de seleção de cards
   const [openListTopFive, setOpenListTopFive] = React.useState(false); // Abre a categoria do Top 5
   const [openListAperto, setOpenListAperto] = React.useState(false); // Abre a categoria das apertadeiras
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // Define a posição do popover
   const [valueLabel, setValueLabel] = React.useState<string[]>([]); // Valor de referência para ordenação das ferramentas selecionadas
-  const [valueSliderTopFive, setValueSliderTopFive] = React.useState<number[]>(() => {
-    // Limites de referência para o top 5
-    const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
-    return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.0, 1.0];
-  });
   const [taxaTopFive, setTaxaTopFive] = React.useState<number[]>(() => {
+    // Limites de criticidade topFive
     const storedTaxaTop5 = localStorage.getItem('taxaTop5Slider');
     return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];
   });
-  const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]);
-  const [tools, setTools] = useState<ToolData[]>([]);
+  const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]); // VERIFICAR O USO
   const [toolsWithRevisions, setToolsWithRevisions] = useState<
+    // Usado para fazer a query dos cards de apertadeiras
     { toolId: number; toolRevision: number }[]
   >(() => {
     const storedFilters = localStorage.getItem('selectedTools');
     return storedFilters ? JSON.parse(storedFilters) : [];
   });
-  const openLabels = Boolean(anchorEl);
+  const openLabels = Boolean(anchorEl); // Armazena informações do modal, abertura do modal
   const id = openLabels ? 'github-label' : undefined;
+  const [selectLabels, setLabels] = useState<any[]>([]); // Ferramentas selecionadas no menu
 
-  // Usa o context do Dashboard, pegando estados globais
-  const { cardData, pendingValue, setPendingValue, selectedCards, handleDeleteCard } =
-    useDashboard();
-
-  const [selectLabels, setLabels] = useState<any[]>([]);
-
-  // MOSTRA TOP 5 E FERRAMENTAS
+  // ESTADOS DO TOP 5 E FERRAMENTAS
+  const { pendingValue, setPendingValue } = useDashboard(); // Usa o context do Dashboard, pegando estados globais
   const [topFive, setTopFive] = useState(() => {
+    // Mostra Top 5
     const localData = localStorage.getItem('topFive');
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
+  const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
 
-  const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]);
-
-  //  TOP 5 QUARKUS
-  const finalDateTime = '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
-  const {
-    isPending: isLoadingTopNokOk,
-    isError: isErrorTopNokOk,
-    data: TopNokOkData,
-    error: errorTopNokOk,
-  } = useTopNokOk(finalDateTime, topFive);
+  const { isPending: isLoadingTopNokOk, data: TopNokOkData } = useTopNokOk(finalDateTime, topFive); // Query top 5
+  const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
+  const toolsQueries = useToolsInfo(toolsWithRevisions); // Query do card de ferramentas
 
   const transformarDados = () => {
     if (!TopNokOkData) {
@@ -191,17 +155,10 @@ export function OverviewAnalyticsView() {
     setTopFiveData(novosDados);
   };
 
-  useEffect(() => {
-    transformarDados();
-    // eslint-disable-next-line
-  }, [TopNokOkData]);
+  const sortedTopFiveData = [...(topFiveData || [])].sort((a, b) => a.title.localeCompare(b.title)); // Ordena o Top 5 por ordem alfabética
 
-  // Garante que `data` está definido antes de usar
-  // const sortedTopFiveData = [...(TopFiveData || [])].sort((a, b) =>
-  const sortedTopFiveData = [...(topFiveData || [])].sort((a, b) => a.title.localeCompare(b.title));
-
+  // Salva a taxa do top 5 no localStorage
   useEffect(() => {
-    // Sempre que o valor do slider mudar, salva no localStorage
     localStorage.setItem('taxaTop5Slider', JSON.stringify(taxaTopFive));
   }, [taxaTopFive]);
 
@@ -210,23 +167,20 @@ export function OverviewAnalyticsView() {
     localStorage.setItem('topFive', JSON.stringify(topFive));
   }, [topFive]);
 
-  // Dados das ferramentas
-  const {
-    isPending: isLoadingToolList,
-    isError: isErrorToolList,
-    data: toolListData,
-    error: errorToolList,
-  } = useFetchToolsData();
+  // Tratamento de dados do top 5
+  useEffect(() => {
+    transformarDados();
+    // eslint-disable-next-line
+  }, [TopNokOkData]);
 
-  const toolsQueries = useToolsInfo(toolsWithRevisions);
-
+  // Define a lista de ferramentas no menu
   useEffect(() => {
     if (toolListData) {
       setLabels(toolListData);
     }
   }, [toolListData]);
 
-  // Atualiza o filtro de ferramentas
+  // Atualiza o filtro usado para query de ferramentas
   useEffect(() => {
     const transformedData = pendingValue.map((tool: any) => ({
       toolId: tool.toolId,
@@ -237,8 +191,8 @@ export function OverviewAnalyticsView() {
     localStorage.setItem('selectedTools', JSON.stringify(transformedData));
   }, [pendingValue]);
 
-  const handleChange = (event: Event, newValue: number | number[]) => {
-    setValueSliderTopFive(newValue as number[]); // Atualiza o estado do slider
+  // Gerencia o valor do slider e taxa de criticidade
+  const handleTaxaTopFive = (event: Event, newValue: number | number[]) => {
     setTaxaTopFive(newValue as number[]); // Atualiza o estado do top 5
     localStorage.setItem('taxaTopFiveSlider', JSON.stringify(taxaTopFive));
   };
@@ -255,7 +209,6 @@ export function OverviewAnalyticsView() {
 
   // Gerencia o menu de Apertadeiras disponíveis
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    // setPendingValue(valueLabel);
     setAnchorEl(event.currentTarget);
   };
 
@@ -299,6 +252,7 @@ export function OverviewAnalyticsView() {
           {t('dashboard.newProcess')}
         </Button>
 
+        {/* ================================ MENU TOP 5 E APERTADEIRAS ===================================== */}
         <Modal
           open={openModal}
           onClose={() => {
@@ -338,8 +292,8 @@ export function OverviewAnalyticsView() {
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
                       <Slider
                         getAriaLabel={() => 'Criticidade'}
-                        value={valueSliderTopFive}
-                        onChange={handleChange}
+                        value={taxaTopFive}
+                        onChange={handleTaxaTopFive}
                         valueLabelDisplay="auto"
                         getAriaValueText={valuetext}
                         disabled={!topFive}
@@ -390,7 +344,6 @@ export function OverviewAnalyticsView() {
                         >
                           {t('dashboard.selectTools')}
                         </Typography>
-                        {/* </Button> */}
                         <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
                           {pendingValue.map(
                             (
@@ -447,7 +400,6 @@ export function OverviewAnalyticsView() {
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
-                              // getOptionLabel={(option) => option.toolName}
                               getOptionKey={(option) => option.toolId || option.toolName}
                               renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props;
@@ -498,7 +450,7 @@ export function OverviewAnalyticsView() {
                                 );
                               }}
                               options={[...selectLabels].sort((a, b) => {
-                                // Display the selected labels first.
+                                // Ordena pelas ferramentas selecionadas primeiro
                                 let ai = valueLabel.indexOf(a);
                                 ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
                                 let bi = valueLabel.indexOf(b);
@@ -526,7 +478,7 @@ export function OverviewAnalyticsView() {
         </Modal>
       </Grid>
 
-      {/* ================================TP 5===================================== */}
+      {/* ================================TOP 5===================================== */}
       {topFive && (
         <div id="topFive">
           <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
@@ -553,45 +505,40 @@ export function OverviewAnalyticsView() {
       )}
 
       {/* ======================================CARDS APERTADEIRAS============================ */}
-      {tools && (
-        <div id="ferramentas">
-          <Grid container sx={{ mt: 4 }}>
-            <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
-              {t('dashboard.process')}
-            </Typography>
-          </Grid>
-          <Grid container spacing={2}>
-            <>
-              {toolsQueries.map((query, index) =>
-                query.isPending ? (
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                    <SkeletonTools key={`skeleton-${index}`} />
-                  </Grid>
-                ) : query.data ? (
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={query.data.toolId}>
-                    <AnalyticsDashboardCard
-                      title={query.data.toolName}
-                      id={query.data.toolId}
-                      vehicles={query.data.products}
-                      nokVin={query.data.nokOkRate}
-                      nok={query.data.nok}
-                      topIssues={query.data.topIssues}
-                      targetAlert={toolLimits[0]}
-                      targetCritical={toolLimits[1]}
-                      onDelete={() => {
-                        setTools((prev) => prev.filter((t) => t.toolId !== query.data.toolId));
-                        setPendingValue((prev) =>
-                          prev.filter((t) => t.toolId !== query.data.toolId)
-                        );
-                      }}
-                    />
-                  </Grid>
-                ) : null
-              )}
-            </>
-          </Grid>
-        </div>
-      )}
+      <div id="ferramentas">
+        <Grid container sx={{ mt: 4 }}>
+          <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
+            {t('dashboard.process')}
+          </Typography>
+        </Grid>
+        <Grid container spacing={2}>
+          <>
+            {toolsQueries.map((query, index) =>
+              query.isPending ? (
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                  <SkeletonTools key={`skeleton-${index}`} />
+                </Grid>
+              ) : query.data ? (
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={query.data.toolId}>
+                  <AnalyticsDashboardCard
+                    title={query.data.toolName}
+                    id={query.data.toolId}
+                    vehicles={query.data.products}
+                    nokVin={query.data.nokOkRate}
+                    nok={query.data.nok}
+                    topIssues={query.data.topIssues}
+                    targetAlert={toolLimits[0]}
+                    targetCritical={toolLimits[1]}
+                    onDelete={() => {
+                      setPendingValue((prev) => prev.filter((t) => t.toolId !== query.data.toolId));
+                    }}
+                  />
+                </Grid>
+              ) : null
+            )}
+          </>
+        </Grid>
+      </div>
     </DashboardContent>
   );
 }
