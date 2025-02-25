@@ -147,7 +147,6 @@ export function OverviewAnalyticsView() {
         title: item.toolName || 'N/A',
         trend: item.trend,
         total: item.nokOkRate,
-        // color: "",
         chart: chartData,
       };
     }).filter((item: null) => item !== null); // Remove itens nulos que possam ter sido retornados

@@ -23,6 +23,8 @@ import { blue } from '@mui/material/colors';
 
 // ----------------------------------------------------------------------
 
+/* ================================ COMPONENTE DO TOP 5===================================== */
+
 type Props = CardProps & {
   title: string;
   total: number;
@@ -52,9 +54,9 @@ export function AnalyticsWidgetSummary({
 }: Props) {
   const theme = useTheme();
   // const cor: ColorType = (getColor(total) as ColorType)
-  const cor = getColor(total)
+  const cor = getColor(total);
   // const bgColor = [theme.palette[color as ColorType].light]; // lighter
-  
+
   const chartColors = ['white']; // dark
   // tabela do Card
   const chartOptions = useChart({
@@ -89,13 +91,13 @@ export function AnalyticsWidgetSummary({
     if (taxaAtual >= criticality[1]) {
       // return "error";
       return '#f24f4f';
-    } if (taxaAtual >= criticality[0]) {
+    }
+    if (taxaAtual >= criticality[0]) {
       // return "warning";
       return '#FFB300';
     }
     // return "success";
     return '#20878b';
-    
   }
 
   // function getIcon(taxaAtual: number){
@@ -104,16 +106,17 @@ export function AnalyticsWidgetSummary({
   //   } if (taxaAtual >= criticality[0]) {
   //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
   //   }
-  //     return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
+  //     return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
   // }
 
-  function getIcon(trend: string){
+  function getIcon(trend: string) {
     if (trend === 'Up') {
       return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-    } if (trend === 'Steady') {
+    }
+    if (trend === 'Steady') {
       return <img alt="icon" src="/assets/icons/glass/dash.png" />;
     }
-      return <img alt="icon" src="/assets/icons/glass/down_green.png" />;  
+    return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
   }
 
   // % do Card lado superior direito
@@ -145,11 +148,11 @@ export function AnalyticsWidgetSummary({
         color: `${'white'}`, // darker
         backgroundColor: `${cor}`,
         ...sx,
-        }}
-        {...other}
-      >
+      }}
+      {...other}
+    >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Box sx={{ width: 40, height: 40 }}>{getIcon(trend)}</Box>
+        <Box sx={{ width: 40, height: 40 }}>{getIcon(trend)}</Box>
         <Chart
           type="bar"
           series={[{ data: chart.series, color: '#FFFFFF' }]}
@@ -172,19 +175,19 @@ export function AnalyticsWidgetSummary({
         <Box sx={{ flexGrow: 1, minWidth: 112 }}>
           {/* <Box sx={{ mb: 1, typography: 'h6' }}>{title}</Box> */}
           {/* Nome da tarefa */}
-          <Box 
-            sx={{ 
-              mb: 1, 
-              typography: 'h6', 
-              overflow: 'hidden', 
-              textOverflow: 'ellipsis', 
-              whiteSpace: 'nowrap' 
+          <Box
+            sx={{
+              mb: 1,
+              typography: 'h6',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {title}
           </Box>
           {/* taxa de  NOK/OK */}
-          <Box sx={{ typography: 'h3', textAlign: 'center'}}>{fShortenNumber(total)}</Box>
+          <Box sx={{ typography: 'h3', textAlign: 'center' }}>{fShortenNumber(total)}</Box>
         </Box>
 
         {/* <Chart

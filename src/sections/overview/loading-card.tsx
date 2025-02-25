@@ -1,3 +1,5 @@
+// Utilizado como fallback de loading dos componentes dependentes da API
+
 import { Skeleton, Stack } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
