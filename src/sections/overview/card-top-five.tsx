@@ -100,15 +100,6 @@ export function AnalyticsWidgetSummary({
     return '#20878b';
   }
 
-  // function getIcon(taxaAtual: number){
-  //   if (taxaAtual >= criticality[1]) {
-  //     return <img alt="icon" src="/assets/icons/glass/up_red.png" />;
-  //   } if (taxaAtual >= criticality[0]) {
-  //     return <img alt="icon" src="/assets/icons/glass/dash.png" />;
-  //   }
-  //     return <img alt="icon" src="/assets/icons/glass/down_green.png" />;
-  // }
-
   function getIcon(trend: string) {
     if (trend === 'Up') {
       return <img alt="icon" src="/assets/icons/glass/up_red.png" />;

@@ -32,6 +32,7 @@ import { AnalyticsDashboardCard } from '../card-tools';
 import { AnalyticsWidgetSummary } from '../card-top-five';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
 import { SkeletonTools, SkeletonTopFive } from '../card-loading';
+import dayjs from 'dayjs';
 
 interface DataTopNokOk {
   title: string; // toolName
@@ -487,7 +488,8 @@ export function OverviewAnalyticsView() {
             {isLoadingTopNokOk ? (
               <SkeletonTopFive />
             ) : (
-              sortedTopFiveData.map((item, index) => (
+              // sortedTopFiveData -- ordem alfabética
+              topFiveData.map((item, index) => (
                 <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
                   <AnalyticsWidgetSummary
                     title={item.title}
@@ -518,7 +520,7 @@ export function OverviewAnalyticsView() {
                   <SkeletonTools key={`skeleton-${index}`} />
                 </Grid>
               ) : query.data ? (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={query.data.toolId}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                   <AnalyticsDashboardCard
                     title={query.data.toolName}
                     id={query.data.toolId}
