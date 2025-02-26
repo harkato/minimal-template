@@ -11,7 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
   Toolbar,
   Tooltip,
@@ -31,13 +30,10 @@ import {
   fetchProgramsData,
   useResultAmount,
 } from 'src/routes/hooks/api';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
 import { printAllPages } from 'src/utils/print-table';
 import { useNavigate } from 'react-router-dom';
-
-type Order = 'asc' | 'desc';
 
 interface DataRow {
   dateTime: string;
@@ -145,8 +141,6 @@ export default function ResultPage() {
   const [data, setData] = useState<DataRow[]>([]); // Resultados
   const [toolsData, setToolsData] = useState(['']); // Lista de ferramentas
   const [programsData, setProgramsData] = useState(['']); // Lista de programas
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof DataRow>('dateTime');
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
@@ -264,21 +258,6 @@ export default function ResultPage() {
       setData(transformedData);
     }
   }, [resultData]);
-
-  // Função para ordenar os dados
-  const handleRequestSort = (property: keyof DataRow) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-    const sortedData = [...data].sort((a, b) => {
-      const aVal = a[property];
-      const bVal = b[property];
-      if (aVal < bVal) return isAsc ? -1 : 1;
-      if (aVal > bVal) return isAsc ? 1 : -1;
-      return 0;
-    });
-    setData(sortedData);
-  };
 
   // Função para aplicar filtros
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -531,105 +510,6 @@ export default function ResultPage() {
                     <TableCell align="center">Torque</TableCell>
                     <TableCell align="center">{t('results.angle')}</TableCell>
                   </>
-                  // orderBy temporariamente desativado, precisa implementar na API
-                  // <>
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'dateTime'}
-                  //       direction={orderBy === 'dateTime' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('dateTime')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.date')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'tid'}
-                  //       direction={orderBy === 'tid' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('tid')}
-                  //       sx={{ display: 'flex', justifyContent: 'right' }}
-                  //     >
-                  //       Id
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'toolName'}
-                  //       direction={orderBy === 'toolName' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('toolName')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.tools')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'job'}
-                  //       direction={orderBy === 'job' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('job')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.job')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'programName'}
-                  //       direction={orderBy === 'programName' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('programName')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.programs')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'fuso'}
-                  //       direction={orderBy === 'fuso' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('fuso')}
-                  //       sx={{ display: 'flex', justifyContent: 'right' }}
-                  //     >
-                  //       {t('results.spindle')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'generalStatus'}
-                  //       direction={orderBy === 'generalStatus' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('generalStatus')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.generalStatus')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'torque'}
-                  //       direction={orderBy === 'torque' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('torque')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       Torque
-                  //     </TableSortLabel>
-                  //   </TableCell>
-                  //   <TableCell>
-                  //     <TableSortLabel
-                  //       active={orderBy === 'angle'}
-                  //       direction={orderBy === 'angle' ? order : 'asc'}
-                  //       onClick={() => handleRequestSort('angle')}
-                  //       sx={{ display: 'flex', justifyContent: 'center' }}
-                  //     >
-                  //       {t('results.angle')}
-                  //     </TableSortLabel>
-                  //   </TableCell>
-                  //   </>
                 )}
               </TableRow>
             </TableHead>
