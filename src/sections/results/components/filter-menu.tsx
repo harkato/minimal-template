@@ -14,6 +14,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useTranslation } from 'react-i18next';
 
+/* -------------------------------------- MENU DE FILTROS ---------------------------------------------------------*/
 interface FiltersMenuProps {
   filters: any;
   selectedTools: string[];
