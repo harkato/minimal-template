@@ -28,10 +28,10 @@ import { useDashboard } from 'src/context/DashboardContext';
 import { _tasks, _posts, _timeline } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
-import { AnalyticsDashboardCard } from '../analytics-dashboard-card';
-import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
+import { AnalyticsDashboardCard } from '../card-tools';
+import { AnalyticsWidgetSummary } from '../card-top-five';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
-import { SkeletonTools, SkeletonTopFive } from '../loading-card';
+import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 
 interface DataTopNokOk {
   title: string; // toolName

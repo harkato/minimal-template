@@ -23,9 +23,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useTheme } from '@mui/material/styles';
-import { varAlpha, bgGradient } from 'src/theme/styles';
 import { useTranslation } from 'react-i18next';
+
+/* ================================ COMPONENTE DO CARD FERRAMENTAS ===================================== */
 
 export type Props = CardProps & {
   id: string;
@@ -52,7 +52,6 @@ export function AnalyticsDashboardCard({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  // const handleExpandClick = () => setExpanded(!expanded);
   const handleExpandClick = (event: any) => {
     // Verifica se o Popover NÃO está aberto antes de expandir/recolher
     if (!open) {
@@ -72,9 +71,6 @@ export function AnalyticsDashboardCard({
   const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
   const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
   const newColor = getColor();
-  const handleSliderClick = (event: { stopPropagation: () => void }) => {
-    event.stopPropagation(); // Impede a propagação do evento
-  };
   const handleChangeTarget = (event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
