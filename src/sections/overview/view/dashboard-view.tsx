@@ -243,6 +243,7 @@ export function OverviewAnalyticsView() {
     <DashboardContent maxWidth="xl">
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
         <Button
+          data-testid="novo processo"
           variant="contained"
           size="large"
           color="primary"
@@ -254,6 +255,7 @@ export function OverviewAnalyticsView() {
 
         {/* ================================ MENU TOP 5 E APERTADEIRAS ===================================== */}
         <Modal
+          data-testid="modal-dashboard"
           open={openModal}
           onClose={() => {
             handleClose();
@@ -400,6 +402,7 @@ export function OverviewAnalyticsView() {
                               disableCloseOnSelect
                               renderTags={() => null}
                               noOptionsText="Sem ferramentas"
+                              getOptionLabel={(option) => option.toolName}
                               getOptionKey={(option) => option.toolId || option.toolName}
                               renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props;
@@ -423,7 +426,7 @@ export function OverviewAnalyticsView() {
                                         },
                                       })}
                                     >
-                                      S{option.toolName}
+                                      {option.toolName}
                                       <br />
                                     </Box>
                                     <Box

@@ -154,7 +154,7 @@ export function AnalyticsDashboardCard({
                       {t('dashboard.criticalityRate')}
                     </Typography>
                     <Slider
-                      defaultValue={[newTargetAlert, newTargetCritical]}
+                      value={[newTargetAlert, newTargetCritical]}
                       aria-labelledby="continuous-slider"
                       valueLabelDisplay="auto"
                       min={0.0}

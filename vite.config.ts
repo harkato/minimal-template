@@ -27,7 +27,6 @@ export default defineConfig({
   test: {
     globals: true, // Permite usar `describe`, `test`, `expect` sem importar
     environment: 'jsdom', // Simula o navegador para testar React
-    setupFiles: './src/test/setup.ts', // (Opcional) Arquivo de setup global
   },
   resolve: {
     alias: [

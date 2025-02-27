@@ -423,6 +423,8 @@ export default function ResultPage() {
     printAllPages(data, cleanedFilters);
   };
 
+  console.log(programsData);
+
   return (
     <>
       {/* ================================================================== titulo da pagina ============================================= */}
