@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -18,7 +18,6 @@ import {
   Slider,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import type { CardProps } from '@mui/material/Card';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 
 /* ================================ COMPONENTE DO CARD FERRAMENTAS ===================================== */
 
-export type Props = CardProps & {
+export type Props = {
   id: string;
   title: string;
   vehicles: number;
@@ -50,17 +49,16 @@ export function AnalyticsDashboardCard({
   topIssues,
   onDelete,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const handleExpandClick = (event: any) => {
-    // Verifica se o Popover NÃO está aberto antes de expandir/recolher
     if (!open) {
       setExpanded(!expanded);
     }
   };
   const { t } = useTranslation();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation(); // Impede a propagação do evento para o CardHeader
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -68,16 +66,23 @@ export function AnalyticsDashboardCard({
   };
   const open = Boolean(anchorEl);
   const idPopover = open ? 'simple-popover' : undefined;
-  const [newTargetAlert, setNewTargetAlert] = useState(targetAlert); // Valor inicial para targetAlert
-  const [newTargetCritical, setNewTargetCritical] = useState(targetCritical); // Valor inicial para targetCritical
+  const [newTargetAlert, setNewTargetAlert] = useState(targetAlert);
+  const [newTargetCritical, setNewTargetCritical] = useState(targetCritical);
   const newColor = getColor();
+  const handleSliderClick = (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+  };
   const handleChangeTarget = (event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
       setNewTargetAlert(newValue[0]);
       setNewTargetCritical(newValue[1]);
+      localStorage.setItem(`targetAlert-${id}`, JSON.stringify(newValue[0]));
+      localStorage.setItem(`targetCritical-${id}`, JSON.stringify(newValue[1]));
     } else {
       setNewTargetAlert(newValue);
       setNewTargetCritical(newValue);
+      localStorage.setItem(`targetAlert-${id}`, JSON.stringify(newValue));
+      localStorage.setItem(`targetCritical-${id}`, JSON.stringify(newValue));
     }
   };
   function getColor(): string {
@@ -89,6 +94,18 @@ export function AnalyticsDashboardCard({
     }
     return '#20878B';
   }
+
+  useEffect(() => {
+    const storedAlert = localStorage.getItem(`targetAlert-${id}`);
+    const storedCritical = localStorage.getItem(`targetCritical-${id}`);
+    if (storedAlert) {
+      setNewTargetAlert(JSON.parse(storedAlert));
+    }
+    if (storedCritical) {
+      setNewTargetCritical(JSON.parse(storedCritical));
+    }
+  }, [id]);
+
   return (
     <Card sx={{ bgcolor: `white` }}>
       <Box>
@@ -103,6 +120,9 @@ export function AnalyticsDashboardCard({
             cursor: 'pointer',
             color: `white`,
             backgroundColor: `${newColor}`,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
           onClick={handleExpandClick}
           action={

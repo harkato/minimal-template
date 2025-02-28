@@ -3,25 +3,20 @@ import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import {
   Autocomplete,
-  AutocompleteCloseReason,
   Box,
   Button,
-  ClickAwayListener,
+  Chip,
   Collapse,
   FormControlLabel,
-  InputBase,
   List,
   ListItemButton,
   ListItemText,
   Modal,
-  Popper,
   Slider,
-  styled,
   Switch,
+  TextField,
   useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import DoneIcon from '@mui/icons-material/Done';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { useDashboard } from 'src/context/DashboardContext';
@@ -35,10 +30,9 @@ import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 import dayjs from 'dayjs';
 
 interface DataTopNokOk {
-  title: string; // toolName
-  trend: string; // trend
-  total: number; // nokOkRate
-  // last results
+  title: string;
+  trend: string;
+  total: number;
   chart: {
     categories: string[]; // apenas a hora do finalTimestamp
     series: number[]; // nok
@@ -82,9 +76,6 @@ interface LastResultItem {
 
 export function OverviewAnalyticsView() {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isLargeScreen = window.innerWidth > 768;
-  const finalDateTime = '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra (usado pra fazer query top 5)
 
   // MENU TOP 5 E FERRAMENTAS
   const [openModal, setOpenModal] = React.useState(false); // Abertura do modal de seleção de cards
@@ -118,6 +109,8 @@ export function OverviewAnalyticsView() {
   });
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
 
+  const finalDateTime = dayjs().subtract(29, 'month').format('YYYY-MM-DDTHH:mm:ss');
+  // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const { isPending: isLoadingTopNokOk, data: TopNokOkData } = useTopNokOk(finalDateTime, topFive); // Query top 5
   const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
   const toolsQueries = useToolsInfo(toolsWithRevisions); // Query do card de ferramentas
@@ -201,17 +194,6 @@ export function OverviewAnalyticsView() {
   const handleClickTopFive = () => {
     setOpenListTopFive(!openListTopFive);
   };
-
-  // Gerencia a abertura do Card Apertadeira no modal
-  const handleClickAperto = () => {
-    setOpenListAperto(!openListAperto);
-  };
-
-  // Gerencia o menu de Apertadeiras disponíveis
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   // Abre o menu
   const handleOpen = () => setOpenModal(true);
   const handleClose = () => {
@@ -288,7 +270,7 @@ export function OverviewAnalyticsView() {
                 </ListItemButton>
                 <Collapse in={openListTopFive} timeout="auto" unmountOnExit>
                   <Typography variant="h5" sx={{ textAlign: 'center' }}>
-                    Taxa de criticidade
+                    {t('dashboard.criticalityRate')}
                   </Typography>
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4, flexDirection: 'column' }}>
@@ -297,7 +279,7 @@ export function OverviewAnalyticsView() {
                         value={taxaTopFive}
                         onChange={handleTaxaTopFive}
                         valueLabelDisplay="auto"
-                        getAriaValueText={valuetext}
+                        // getAriaValueText={valuetext}
                         disabled={!topFive}
                         min={0.0}
                         step={0.01}
@@ -306,168 +288,52 @@ export function OverviewAnalyticsView() {
                     </ListItemButton>
                   </List>
                 </Collapse>
-                <ListItemButton onClick={handleClickAperto}>
-                  <ListItemText primary={t('dashboard.process')} />
-                  {openListAperto ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse in={openListAperto} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    <ListItemButton
-                      sx={{
-                        pl: 4,
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Box
-                        onClick={handleClick}
-                        sx={{
-                          width: 600,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          fontSize: 13,
-                          '@media (max-width: 768px)': {
-                            // Estilo para telas com largura máxima de 768px (ajuste conforme necessário)
-                            columnCount: 1, // Ocupa 90% da largura da tela
-                          },
-                        }}
-                      >
-                        <Typography
-                          variant="button"
-                          sx={{
-                            textAlign: 'center',
-                            alignSelf: 'center',
-                            width: '85%',
-                            color: 'black',
-                            marginBottom: '10px',
-                            '@media (max-width: 768px)': {
-                              alignSelf: 'center',
-                            },
+                <Grid container spacing={2}>
+                  <Grid sx={{ width: '100%' }}>
+                    <Autocomplete
+                      multiple
+                      options={selectLabels}
+                      getOptionLabel={(option) => option.toolName || ''}
+                      getOptionKey={(option) => option.toolId || option.toolName}
+                      value={selectLabels.filter((option) =>
+                        pendingValue.some((pv) => pv.toolId === option.toolId)
+                      )}
+                      onChange={(_, newValue: string[]) =>
+                        handleSelectionChange(
+                          { target: { value: newValue.map((tool) => tool) } },
+                          setPendingValue
+                        )
+                      }
+                      disableCloseOnSelect
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t('dashboard.selectTools')}
+                          variant="outlined"
+                          InputLabelProps={{
+                            style: { color: 'black' }, // Cor do rótulo
                           }}
-                        >
-                          {t('dashboard.selectTools')}
-                        </Typography>
-                        <div style={{ columnCount: isLargeScreen ? 3 : 1, alignSelf: 'center' }}>
-                          {pendingValue.map(
-                            (
-                              tool,
-                              id // Mostra as ferramentas selecionadas
-                            ) => (
-                              <Box
-                                key={id}
-                                sx={{
-                                  mb: '20px',
-                                  height: 20,
-                                  padding: '.15em 4px',
-                                  fontWeight: 400,
-                                  lineHeight: '15px',
-                                  borderRadius: '2px',
-                                  width: '100%',
-                                }}
-                              >
-                                {tool.toolName}
-                              </Box>
-                            )
-                          )}
-                        </div>
-                      </Box>
-                      <StyledPopper
-                        id={id}
-                        open={openLabels}
-                        anchorEl={anchorEl}
-                        placement="bottom"
-                      >
-                        <ClickAwayListener onClickAway={handleCloseLabel}>
-                          <div>
-                            <Autocomplete
-                              open
-                              multiple
-                              key={openLabels ? pendingValue.length : 0}
-                              onClose={(
-                                event: React.ChangeEvent<{}>,
-                                reason: AutocompleteCloseReason
-                              ) => {
-                                if (reason === 'escape') {
-                                  handleCloseLabel();
-                                }
-                              }}
-                              value={selectLabels.filter((option) =>
-                                pendingValue.some((pv) => pv.toolId === option.toolId)
-                              )}
-                              onChange={(_, newValue: string[]) =>
-                                handleSelectionChange(
-                                  { target: { value: newValue.map((tool) => tool) } },
-                                  setPendingValue
-                                )
-                              }
-                              disableCloseOnSelect
-                              renderTags={() => null}
-                              noOptionsText="Sem ferramentas"
-                              getOptionLabel={(option) => option.toolName}
-                              getOptionKey={(option) => option.toolId || option.toolName}
-                              renderOption={(props, option, { selected }) => {
-                                const { key, ...optionProps } = props;
-                                return (
-                                  <li key={key} {...optionProps}>
-                                    <Box
-                                      component={DoneIcon}
-                                      sx={{ width: 17, height: 17, mr: '5px', ml: '-2px' }}
-                                      style={{
-                                        visibility: selected ? 'visible' : 'hidden',
-                                      }}
-                                    />
-                                    <Box
-                                      sx={() => ({
-                                        flexGrow: 1,
-                                        '& span': {
-                                          color: '#8b949e',
-                                          ...theme.applyStyles('light', {
-                                            color: '#586069',
-                                          }),
-                                        },
-                                      })}
-                                    >
-                                      {option.toolName}
-                                      <br />
-                                    </Box>
-                                    <Box
-                                      component={CloseIcon}
-                                      sx={{ opacity: 0.6, width: 18, height: 18 }}
-                                      style={{
-                                        visibility: selected ? 'visible' : 'hidden',
-                                      }}
-                                    />
-                                  </li>
-                                );
-                              }}
-                              options={[...selectLabels].sort((a, b) => {
-                                // Ordena pelas ferramentas selecionadas primeiro
-                                let ai = valueLabel.indexOf(a);
-                                ai = ai === -1 ? valueLabel.length + selectLabels.indexOf(a) : ai;
-                                let bi = valueLabel.indexOf(b);
-                                bi = bi === -1 ? valueLabel.length + selectLabels.indexOf(b) : bi;
-                                return ai - bi;
-                              })}
-                              renderInput={(params) => (
-                                <StyledInput
-                                  ref={params.InputProps.ref}
-                                  inputProps={params.inputProps}
-                                  autoFocus
-                                  placeholder={t('dashboard.filterTools')}
-                                />
-                              )}
-                            />
-                          </div>
-                        </ClickAwayListener>
-                      </StyledPopper>
-                    </ListItemButton>
-                  </List>
-                </Collapse>
+                          InputProps={{
+                            ...params.InputProps,
+                            style: { color: 'black' }, // Cor do texto de entrada
+                          }}
+                        />
+                      )}
+                      renderTags={(selected, getTagProps) =>
+                        selected.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index });
+                          return <Chip key={key} label={option.toolName} {...tagProps} />;
+                        })
+                      }
+                      sx={{ width: '100%' }}
+                    />
+                  </Grid>
+                </Grid>
               </List>
             </Typography>
           </Box>
         </Modal>
       </Grid>
-
       {/* ================================TOP 5===================================== */}
       {topFive && (
         <div id="topFive">
@@ -551,53 +417,3 @@ const style = {
     width: '90%', // Ocupa 90% da largura da tela
   },
 };
-
-function valuetext(value: number) {
-  return `${value}°C`;
-}
-
-const StyledPopper = styled(Popper)(({ theme }) => ({
-  border: `1px solid ${'#e1e4e8'}`,
-  boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
-  color: '#24292e',
-  backgroundColor: '#fff',
-  borderRadius: 6,
-  width: 300,
-  zIndex: theme.zIndex.modal,
-  fontSize: 13,
-  ...theme.applyStyles('dark', {
-    border: `1px solid ${'#30363d'}`,
-    boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
-    color: '#c9d1d9',
-    backgroundColor: '#1c2128',
-  }),
-}));
-
-const StyledInput = styled(InputBase)(({ theme }) => ({
-  padding: 10,
-  width: '100%',
-  borderBottom: `1px solid ${'#30363d'}`,
-  '& input': {
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    border: `1px solid ${'#30363d'}`,
-    padding: 8,
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
-    fontSize: 14,
-    '&:focus': {
-      boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
-      borderColor: '#0366d6',
-      ...theme.applyStyles('dark', {
-        boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
-        borderColor: '#388bfd',
-      }),
-    },
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#0d1117',
-      border: `1px solid ${'#eaecef'}`,
-    }),
-  },
-  ...theme.applyStyles('dark', {
-    borderBottom: `1px solid ${'#eaecef'}`,
-  }),
-}));
