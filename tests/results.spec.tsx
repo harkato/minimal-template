@@ -6,7 +6,7 @@ import ResultPage from '../src/sections/results/reports-view';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('Verifica o funcionamento do menu de filtros', () => {
-  it('Deve abrir o modal ao clicar', () => {
+  it('Campo de identificador muda', () => {
     const client = new QueryClient();
     render(
       <BrowserRouter>
@@ -21,5 +21,22 @@ describe('Verifica o funcionamento do menu de filtros', () => {
     fireEvent.change(inputIdentificador, { target: { value: '7' } });
 
     expect(inputIdentificador).toHaveValue('7');
+  });
+
+  it('Seleciona a ferramenta correta', () => {
+    const client = new QueryClient();
+    render(
+      <BrowserRouter>
+        <QueryClientProvider client={client}>
+          <ResultPage />
+        </QueryClientProvider>
+      </BrowserRouter>
+    );
+
+    const inputFerramenta = screen.getByLabelText('results.identifier');
+    expect(inputFerramenta).toBeInTheDocument();
+    fireEvent.change(inputFerramenta, { target: { value: '7' } });
+
+    expect(inputFerramenta).toHaveValue('7');
   });
 });

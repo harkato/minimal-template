@@ -5,7 +5,13 @@ module.exports = {
   root: true,
   env: { browser: true, es2020: true },
   plugins: ['perfectionist', 'unused-imports', '@typescript-eslint', 'prettier'],
-  extends: ['airbnb', 'airbnb-typescript', 'airbnb/hooks', 'prettier'],
+  extends: [
+    'airbnb',
+    'airbnb-typescript',
+    'airbnb/hooks',
+    'prettier',
+    'plugin:storybook/recommended',
+  ],
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 'latest',
@@ -28,6 +34,7 @@ module.exports = {
     // general
     'no-alert': 0,
     camelcase: 0,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'no-console': 0,
     'no-unused-vars': 0,
     'no-nested-ternary': 0,
