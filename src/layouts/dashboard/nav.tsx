@@ -22,7 +22,6 @@ import { WorkspacesPopover } from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
 
-
 // ----------------------------------------------------------------------
 
 export type NavContentProps = {
@@ -89,7 +88,6 @@ export function NavDesktop({
       >
         {isExpanded ? <Logo /> : <MiniLogo />}
       </Box>
-      
 
       {slots?.topArea}
 
@@ -110,7 +108,7 @@ export function NavDesktop({
                     component={RouterLink}
                     href={item.path}
                     sx={{
-                      justifyContent:'center',
+                      justifyContent: 'center',
                       pl: isExpanded ? 2 : 1.5,
                       py: 1,
                       gap: isExpanded ? 2 : 0,
@@ -144,9 +142,15 @@ export function NavDesktop({
                     </Box>
 
                     {isExpanded && (
-                      <Box component="span" flexGrow={1} sx={{transition: theme.transitions.create('width', {
-                        duration: theme.transitions.duration.standard,
-                      })}}>
+                      <Box
+                        component="span"
+                        flexGrow={1}
+                        sx={{
+                          transition: theme.transitions.create('width', {
+                            duration: theme.transitions.duration.standard,
+                          }),
+                        }}
+                      >
                         {item.title}
                       </Box>
                     )}
@@ -211,11 +215,11 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
+      <Logo sx={{ mb: 2 }} />
 
       {slots?.topArea}
 
-      <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />
+      {/* <WorkspacesPopover data={workspaces} sx={{ my: 2 }} /> */}
 
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>

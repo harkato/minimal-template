@@ -193,7 +193,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       </Grid>
 
       {/* Datas */}
-      <Grid size={{ xs: 5, sm: 5, md: 3 }}>
+      <Grid size={{ xs: 12, sm: 5, md: 3 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
             id="datetime-local-initial"
@@ -209,7 +209,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
         </LocalizationProvider>
       </Grid>
 
-      <Grid size={{ xs: 5, sm: 5, md: 3 }}>
+      <Grid size={{ xs: 12, sm: 5, md: 3 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <TextField
             id="datetime-local-final"
