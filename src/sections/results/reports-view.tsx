@@ -34,6 +34,8 @@ import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
 import { printAllPages } from 'src/utils/print-table';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
 
 interface DataRow {
   dateTime: string;
@@ -168,13 +170,19 @@ export default function ResultPage() {
   } = useResultPaginate(page, rowsPerPage, resultPgDataAmount?.total || 0, filters);
 
   // Lista de ferramentas
-  const { data: fetchToolsData } = useFetchToolsData();
+  const { 
+    data: fetchToolsData,
+    error: errorFetchToolsData,
+    isError: isErrorFetchToolsData,
+    isLoading: isLoadingFetchToolsData
+  } = useFetchToolsData();
 
   // Lista dos programas das ferramentas
   const {
     data: queryProgramsData,
     error: errorProgramsData,
     isError: isErrorProgramsData,
+    isLoading: isLoadingProgramsData
   } = useQuery({
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
@@ -259,6 +267,38 @@ export default function ResultPage() {
     }
   }, [resultData]);
 
+  useEffect(() => { // erro lista de ferramentas
+    if (isErrorFetchToolsData) {
+    toast.error(`Erro ao carregar a lista de ferramentas. ${errorFetchToolsData.message}`);
+    }
+  }, [isErrorFetchToolsData, errorFetchToolsData, isLoadingFetchToolsData]);
+
+  useEffect(() => { // erro lista de programas
+    if (isErrorProgramsData) {
+    toast.error(`Erro ao carregar a lista de programas. ${errorProgramsData.message}`);
+    }
+  }, [isErrorProgramsData, errorProgramsData, isLoadingProgramsData]);
+
+  useEffect(() => { // erro resultados filtrados
+    if (isErrorResult) {
+    toast.error(`Erro ao carregar os resutados. ${errorResult.message}`);
+    }
+  }, [isErrorResult, errorResult, isLoadingResult]);
+
+  useEffect(() => { // Conexão perdida
+    const handleOffline = () => toast.error('Conexão perdida. Verifique sua conexão com a rede.');
+  
+    window.addEventListener('offline', handleOffline);
+  
+    return () => window.removeEventListener('offline', handleOffline);
+  }, []);
+  
+  useEffect(() => { // Conexão restaurada
+    const handleOnline = () => toast.success('Conexão restaurada');
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+  
   // Função para aplicar filtros
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -423,10 +463,23 @@ export default function ResultPage() {
     printAllPages(data, cleanedFilters);
   };
 
-  console.log(programsData);
+  // console.log(programsData);
 
   return (
     <>
+      <ToastContainer
+        position="bottom-left"
+        theme="light"
+        autoClose={7000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={5}
+      />
       {/* ================================================================== titulo da pagina ============================================= */}
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
         {t('results.results')}
