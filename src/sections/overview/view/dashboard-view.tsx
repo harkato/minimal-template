@@ -110,7 +110,7 @@ export function OverviewAnalyticsView() {
   });
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
 
-  const finalDateTime = '2025-03-04T17:00:00';
+  const finalDateTime = dayjs().format('YYYY-MM-DDTHH:mm:ss');
   // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
     isPending: isLoadingTopNokOk,

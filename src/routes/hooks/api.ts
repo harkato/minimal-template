@@ -225,7 +225,7 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   return useQuery({
     queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
     queryKey: ['topNokOk_data'],
-    refetchInterval: 30000, // Refetch a cada 60 segundos (1 minuto)
+    refetchInterval: 30000, // Refetch a cada 30 segundos
     enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
   });
 }
