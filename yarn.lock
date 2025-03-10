@@ -5720,7 +5720,7 @@ ms@2.0.0:
   resolved "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz"
   integrity sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==
 
-msw@^2.4.9, msw@^2.7.0:
+msw@^2.4.9, msw@^2.7.0, msw@^2.7.3:
   version "2.7.3"
   resolved "https://registry.npmjs.org/msw/-/msw-2.7.3.tgz"
   integrity sha512-+mycXv8l2fEAjFZ5sjrtjJDmm2ceKGjrNbBr1durRg6VkU9fNUE/gsmQ51hWbHqs+l35W1iM+ZsmOD9Fd6lspw==

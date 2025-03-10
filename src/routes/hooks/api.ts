@@ -235,8 +235,8 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
   try {
     const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
       params: {
-        finalDateTime: '2023-09-24T10:00:00',
-        initialDateTime: '2020-09-24T06:00:00',
+        finalDateTime: '2025-12-24T10:00:00',
+        initialDateTime: '2022-01-04T06:00:00',
         amount: 5,
       },
     });

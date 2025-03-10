@@ -63,6 +63,7 @@ export function AnalyticsWidgetSummary({
     chart: { sparkline: { enabled: true } },
     colors: chartColors,
     xaxis: { categories: chart.categories },
+    yaxis: { min: 0, max: 1, showForNullSeries: true },
     // stroke: {
     // // curve: 'straight',
     // colors: ['#FFFFFF'] // Define a cor da linha para vermelho (#FF0000)

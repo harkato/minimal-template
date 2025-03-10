@@ -110,13 +110,13 @@ export function OverviewAnalyticsView() {
   });
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
 
-  const finalDateTime = dayjs().subtract(29, 'month').format('YYYY-MM-DDTHH:mm:ss');
+  const finalDateTime = '2025-03-04T17:00:00';
   // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
-  const { 
-    isPending: isLoadingTopNokOk, 
-    data: TopNokOkData, 
-    error: TopNokOkError, 
-    isError: TopNokOkIsError 
+  const {
+    isPending: isLoadingTopNokOk,
+    data: TopNokOkData,
+    error: TopNokOkError,
+    isError: TopNokOkIsError,
   } = useTopNokOk(finalDateTime, topFive); // Query top 5
   const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
   const toolsQueries = useToolsInfo(toolsWithRevisions); // Query do card de ferramentas
@@ -133,21 +133,34 @@ export function OverviewAnalyticsView() {
         return null;
       }
 
-      const chartData = {
-        categories:
-          item.lastResults?.map((result) => {
-            // Tratamento para lastResults null/undefined
-            const finalTimestamp = new Date(result.finalTimestamp);
-            return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          }) || [],
-        series: item.lastResults?.map((result) => result.nokOkRate) || 0,
-      };
+      // Criar categorias e séries baseadas nos resultados passados
+      const baseCategories =
+        item.lastResults?.map((result) => {
+          const finalTimestamp = new Date(result.finalTimestamp);
+          return finalTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }) || [];
+
+      const baseSeries = item.lastResults?.map((result) => result.nokOkRate) || [];
+
+      // Adicionar o próprio item principal ao final dos arrays
+      if (item.finalTimestamp && item.nokOkRate !== undefined) {
+        baseCategories.push(
+          new Date(item.finalTimestamp).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        );
+        baseSeries.push(item.nokOkRate);
+      }
 
       return {
         title: item.toolName || 'N/A',
         trend: item.trend,
         total: item.nokOkRate,
-        chart: chartData,
+        chart: {
+          categories: baseCategories,
+          series: baseSeries,
+        },
       };
     }).filter((item: null) => item !== null); // Remove itens nulos que possam ter sido retornados
 
@@ -189,51 +202,61 @@ export function OverviewAnalyticsView() {
     localStorage.setItem('selectedTools', JSON.stringify(transformedData));
   }, [pendingValue]);
 
-  useEffect(() => { // erro TOP 5
+  useEffect(() => {
+    // erro TOP 5
     if (TopNokOkIsError) {
-    toast.error(`Erro ao carregar dados do TOP 5. ${TopNokOkError.message}`);
+      toast.error(`Erro ao carregar dados do TOP 5. ${TopNokOkError.message}`);
     }
-  }, [TopNokOkIsError, TopNokOkError, isLoadingTopNokOk]);
-  
-  useEffect(() => { // erro card apertadeira
-      toolsQueries.forEach((query) => {
-          if(query.isError){
-              toast.error(`Erro ao carregar dados da ferramenta ${query?.data?.toolName || ''}. ${query.error.message}`)
-          }
-      })
-  }) // , [toolsQueries])
+  }, [TopNokOkIsError, TopNokOkError]);
 
-  useEffect(() => { // teste loading TOP 5
-    if(isLoadingTopNokOk){
-        toast.loading('Carregando dados do Top 5', {toastId: 'loadingTop5'})
-    } else {
-        toast.dismiss('loadingTop5')
-    }
-}, [isLoadingTopNokOk])
+  useEffect(() => {
+    // erro card apertadeira
+    toolsQueries.forEach((query) => {
+      if (query.isError) {
+        toast.error(
+          `Erro ao carregar dados da ferramenta ${query?.data?.toolName || ''}. ${query.error.message}`
+        );
+      }
+    });
+  }, [toolsQueries]);
 
-useEffect(() => { // teste loading apertadeira
-    toolsQueries.forEach((query, index) => {
-        if(query.isPending){
-            toast.loading(`Carregando dados da ferramenta ${selectLabels[index]?.toolName || ''}.`, {toastId: `loadingTool-${index}`})
-        } else {
-            toast.dismiss(`loadingTool-${index}`)
-        }
-    })
-}, [toolsQueries, selectLabels])
+  // useEffect(() => {
+  //   // teste loading TOP 5
+  //   if (isLoadingTopNokOk) {
+  //     toast.loading('Carregando dados do Top 5', { toastId: 'loadingTop5' });
+  //   } else {
+  //     toast.dismiss('loadingTop5');
+  //   }
+  // }, [isLoadingTopNokOk]);
 
-useEffect(() => { // Conexão perdida
-  const handleOffline = () => toast.error('Conexão perdida. Verifique sua conexão com a rede.');
+  // useEffect(() => {
+  //   // teste loading apertadeira
+  //   toolsQueries.forEach((query, index) => {
+  //     if (query.isPending) {
+  //       toast.loading(`Carregando dados da ferramenta ${selectLabels[index]?.toolName || ''}.`, {
+  //         toastId: `loadingTool-${index}`,
+  //       });
+  //     } else {
+  //       toast.dismiss(`loadingTool-${index}`);
+  //     }
+  //   });
+  // }, [toolsQueries, selectLabels]);
 
-  window.addEventListener('offline', handleOffline);
+  useEffect(() => {
+    // Conexão perdida
+    const handleOffline = () => toast.error('Conexão perdida. Verifique sua conexão com a rede.');
 
-  return () => window.removeEventListener('offline', handleOffline);
-}, []);
+    window.addEventListener('offline', handleOffline);
 
-useEffect(() => { // Conexão restaurada
-  const handleOnline = () => toast.success('Conexão restaurada');
-  window.addEventListener('online', handleOnline);
-  return () => window.removeEventListener('online', handleOnline);
-}, []);
+    return () => window.removeEventListener('offline', handleOffline);
+  }, []);
+
+  useEffect(() => {
+    // Conexão restaurada
+    const handleOnline = () => toast.success('Conexão restaurada');
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   // Gerencia o valor do slider e taxa de criticidade
   const handleTaxaTopFive = (event: Event, newValue: number | number[]) => {
@@ -401,10 +424,10 @@ useEffect(() => { // Conexão restaurada
       {/* ================================TOP 5===================================== */}
       {topFive && (
         <div id="topFive">
-          <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
+          <Typography variant="h4" sx={{ mb: { xs: 3, md: 2, color: '#035590' } }}>
             TOP 5 NOK
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} sx={{ mb: { xs: 5, md: 5 } }}>
             {isLoadingTopNokOk ? (
               <SkeletonTopFive />
             ) : (
@@ -428,11 +451,11 @@ useEffect(() => { // Conexão restaurada
       {/* ======================================CARDS APERTADEIRAS============================ */}
       <div id="ferramentas">
         <Grid container sx={{ mt: 4 }}>
-          <Typography variant="h4" sx={{ mb: { xs: 3, md: 5, color: '#035590' } }}>
+          <Typography variant="h4" sx={{ mb: { xs: 3, md: 2, color: '#035590' } }}>
             {t('dashboard.process')}
           </Typography>
         </Grid>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ mb: { xs: 5, md: 5 } }}>
           <>
             {toolsQueries.map((query, index) =>
               query.isPending ? (
