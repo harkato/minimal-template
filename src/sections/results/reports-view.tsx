@@ -170,11 +170,11 @@ export default function ResultPage() {
   } = useResultPaginate(page, rowsPerPage, resultPgDataAmount?.total || 0, filters);
 
   // Lista de ferramentas
-  const { 
+  const {
     data: fetchToolsData,
     error: errorFetchToolsData,
     isError: isErrorFetchToolsData,
-    isLoading: isLoadingFetchToolsData
+    isLoading: isLoadingFetchToolsData,
   } = useFetchToolsData();
 
   // Lista dos programas das ferramentas
@@ -182,7 +182,7 @@ export default function ResultPage() {
     data: queryProgramsData,
     error: errorProgramsData,
     isError: isErrorProgramsData,
-    isLoading: isLoadingProgramsData
+    isLoading: isLoadingProgramsData,
   } = useQuery({
     queryFn: () => fetchProgramsData('programs/tools', filters.toolList),
     queryKey: ['programs', JSON.stringify(filters)],
@@ -207,8 +207,8 @@ export default function ResultPage() {
   // Atualiza o filtro de programas
   useEffect(() => {
     const programNumbers = programsData
-      .filter((program: any) => selectedPrograms.includes(program.programName))
-      .map((program: any) => program.programNumber);
+      .filter((program: any) => selectedPrograms.includes(program.programId))
+      .map((program: any) => program.programId);
 
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -267,38 +267,43 @@ export default function ResultPage() {
     }
   }, [resultData]);
 
-  useEffect(() => { // erro lista de ferramentas
+  useEffect(() => {
+    // erro lista de ferramentas
     if (isErrorFetchToolsData) {
-    toast.error(`Erro ao carregar a lista de ferramentas. ${errorFetchToolsData.message}`);
+      toast.error(`Erro ao carregar a lista de ferramentas. ${errorFetchToolsData.message}`);
     }
   }, [isErrorFetchToolsData, errorFetchToolsData, isLoadingFetchToolsData]);
 
-  useEffect(() => { // erro lista de programas
+  useEffect(() => {
+    // erro lista de programas
     if (isErrorProgramsData) {
-    toast.error(`Erro ao carregar a lista de programas. ${errorProgramsData.message}`);
+      toast.error(`Erro ao carregar a lista de programas. ${errorProgramsData.message}`);
     }
   }, [isErrorProgramsData, errorProgramsData, isLoadingProgramsData]);
 
-  useEffect(() => { // erro resultados filtrados
+  useEffect(() => {
+    // erro resultados filtrados
     if (isErrorResult) {
-    toast.error(`Erro ao carregar os resutados. ${errorResult.message}`);
+      toast.error(`Erro ao carregar os resutados. ${errorResult.message}`);
     }
   }, [isErrorResult, errorResult, isLoadingResult]);
 
-  useEffect(() => { // Conexão perdida
+  useEffect(() => {
+    // Conexão perdida
     const handleOffline = () => toast.error('Conexão perdida. Verifique sua conexão com a rede.');
-  
+
     window.addEventListener('offline', handleOffline);
-  
+
     return () => window.removeEventListener('offline', handleOffline);
   }, []);
-  
-  useEffect(() => { // Conexão restaurada
+
+  useEffect(() => {
+    // Conexão restaurada
     const handleOnline = () => toast.success('Conexão restaurada');
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
   }, []);
-  
+
   // Função para aplicar filtros
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
