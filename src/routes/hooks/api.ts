@@ -223,7 +223,7 @@ const fetchDataTop5 = async (endpoint: string) => {
 export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   // Lista do TOP5 QUARKUS
   return useQuery({
-    queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
+    queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryKey: ['topNokOk_data'],
     refetchInterval: 30000, // Refetch a cada 30 segundos
     enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
