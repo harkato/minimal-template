@@ -209,16 +209,16 @@ export function OverviewAnalyticsView() {
     }
   }, [TopNokOkIsError, TopNokOkError]);
 
-  useEffect(() => {
-    // erro card apertadeira
-    toolsQueries.forEach((query) => {
-      if (query.isError) {
-        toast.error(
-          `Erro ao carregar dados da ferramenta ${query?.data?.toolName || ''}. ${query.error.message}`
-        );
-      }
-    });
-  }, [toolsQueries]);
+  // useEffect(() => {
+  //   // erro card apertadeira
+  //   toolsQueries.forEach((query) => {
+  //     if (query.isError) {
+  //       toast.error(
+  //         `Erro ao carregar dados da ferramenta ${query?.data?.toolName || ''}. ${query.error.message}`
+  //       );
+  //     }
+  //   });
+  // }, [toolsQueries]);
 
   // useEffect(() => {
   //   // teste loading TOP 5
