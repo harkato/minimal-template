@@ -225,7 +225,7 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   return useQuery({
     queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryKey: ['topNokOk_data'],
-    refetchInterval: 30000, // Refetch a cada 30 segundos
+    refetchInterval: 15000, // Refetch a cada 30 segundos
     enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
   });
 }
@@ -246,6 +246,7 @@ export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision:
     queries: toolsWithRevisions.map((tool) => ({
       queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
       queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
+      refetchInterval: 15000,
       staleTime: 1000 * 60 * 5,
     })),
   });
