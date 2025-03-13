@@ -1,14 +1,12 @@
+import apiConfig from 'src/config/api-config';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'material-react-toastify';
 import qs from 'qs';
 
-const API_URL = 'http://localhost:8080/msh/spc/v1';
-const DASHBOARD_URL = 'http://localhost:8080/msh/spc/v1/dashboard';
+const displayedToasts: Record<string, NodeJS.Timeout> = {};
 
-const displayedToasts: Record<string, boolean> = {};
-
-const handleApiError = (error: AxiosError | any, endpoint: string) => {
+const handleApiError = (error: AxiosError | any, endpoint: string, toolName?: boolean) => {
   let errorMessage = 'Ocorreu um erro inesperado.';
 
   if (axios.isAxiosError(error)) {
@@ -40,9 +38,12 @@ const handleApiError = (error: AxiosError | any, endpoint: string) => {
   const cacheKey = `${endpoint}:${errorMessage}`;
 
   if (!displayedToasts[cacheKey]) {
+    const toastMessage = toolName
+      ? `Erro ao carregar dados da ferramenta. ${errorMessage}`
+      : `${errorMessage}`;
     // Exibe o toast com a mensagem de erro
-    toast.error(errorMessage, {
-      position: 'top-right',
+    toast.error(toastMessage, {
+      position: 'bottom-left',
       autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -50,7 +51,9 @@ const handleApiError = (error: AxiosError | any, endpoint: string) => {
       draggable: true,
     });
 
-    displayedToasts[cacheKey] = true;
+    displayedToasts[cacheKey] = setTimeout(() => {
+      delete displayedToasts[cacheKey];
+    }, 60000);
   }
   // Lança o erro para que ele possa ser tratado por quem chamou a função, se necessário
   throw new Error(errorMessage);
@@ -59,7 +62,7 @@ const handleApiError = (error: AxiosError | any, endpoint: string) => {
 // Usado no GET do menu de ferramentas
 const fetchData = async (endpoint: string) => {
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}`);
+    const response = await axios.get(`${apiConfig.API_URL}/${endpoint}`);
     return response.data;
   } catch (error: any) {
     handleApiError(error, endpoint); // Exibe o toast e lança o erro
@@ -100,9 +103,12 @@ export const fetchDataFilters = async (
 
   try {
     // Faz a requisição com os filtros formatados
-    const response = await axios.get(`${API_URL}/${endpoint}?${programListQuery}${toolListQuery}`, {
-      params: { ...cleanParams, page: page + 1, pageSize },
-    });
+    const response = await axios.get(
+      `${apiConfig.API_URL}/${endpoint}?${programListQuery}${toolListQuery}`,
+      {
+        params: { ...cleanParams, page: page + 1, pageSize },
+      }
+    );
     return response.data;
   } catch (error) {
     handleApiError(error, endpoint);
@@ -130,7 +136,7 @@ export const fetchDataTotal = async (filters: any) => {
     : '';
   try {
     // Faz a requisição com os filtros formatados
-    const response = await axios.get(`${API_URL}/results/amount?${programListQuery}`, {
+    const response = await axios.get(`${apiConfig.API_URL}/results/amount?${programListQuery}`, {
       params: { ...cleanParams },
     });
     return response.data;
@@ -148,7 +154,10 @@ export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
     )
     .join('');
   try {
-    const response = await axios.get(`${API_URL}/${endpoint}?${queryString.slice(1)}`, {});
+    const response = await axios.get(
+      `${apiConfig.API_URL}/${endpoint}?${queryString.slice(1)}`,
+      {}
+    );
     return response.data;
   } catch (error) {
     handleApiError(error, endpoint);
@@ -161,6 +170,7 @@ export function useFetchToolsData() {
   const query = useQuery({
     queryFn: () => fetchData('tools'),
     queryKey: ['tools'],
+    retry: false,
   });
   return query;
 }
@@ -198,7 +208,7 @@ export function useResultPaginate(page: number, limit: number, amount: number, f
 
 const fetchDataTop5 = async (endpoint: string) => {
   try {
-    const response = await axios.get(`${DASHBOARD_URL}/${endpoint}`);
+    const response = await axios.get(`${apiConfig.DASHBOARD_URL}/${endpoint}`);
     return response.data;
   } catch (error) {
     handleApiError(error, endpoint);
@@ -209,10 +219,10 @@ const fetchDataTop5 = async (endpoint: string) => {
 export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   // Lista do TOP5 QUARKUS
   return useQuery({
-    queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
-    // queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
+    queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryKey: ['topNokOk_data'],
     refetchInterval: 15000, // Refetch a cada 30 segundos
+    retry: false,
     enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
   });
 }
@@ -220,65 +230,35 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
 // Busca os resultados de uma apertadeira
 const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
-    // const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`);
-    const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-      params: {
-        finalDateTime: '2022-10-24T10:00:00',
-        initialDateTime: '2022-09-24T06:00:00',
-        amount: 5,
-      },
-    });
+    const response = await axios.get(
+      `${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`
+    );
     return response.data;
   } catch (error) {
-    handleApiError(error, endpoint);
+    const toolIdentifier = `${endpoint}-${toolId}-${toolRevision}`;
+    handleApiError(error, toolIdentifier, true);
     return Promise.resolve([]);
   }
 };
 
-// export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
-//   const toolQueries = useQueries({
-//     queries: toolsWithRevisions.map((tool) => {
-//       // Cria uma string única combinando toolId e toolRevision
-//       const toolIdentifier = `tool_${tool.toolId}_rev_${tool.toolRevision}`;
-
-//       return {
-//         queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
-//         queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
-//         refetchInterval: 15000,
-//         staleTime: 1000 * 60 * 5,
-//         onError: (error: any) => {
-//           // Passa a string única como identificador
-//           handleApiError(error, toolIdentifier);
-//         },
-//       };
-//     }),
-//   });
-
-//   return toolQueries;
-// }
-
 export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
   const toolQueries = useQueries({
-    queries: toolsWithRevisions.map((tool) => ({
-      queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
-      queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
-      staleTime: 1000 * 60 * 5,
-      // retry: 1 // false,       
-      retry: (failureCount: number, error: any) => {      
-        if (error.status === 404) {
-            console.log('não fazer retry ', tool);          
-            return false; // Não tentar se for um erro 404
-        }
-        if (failureCount < 3) {
-            return true; // tentar até 3 vezes para outros erros
-        }
-        return false;
-      },  
-      onError: (error: any) => {
-        // Passa a string única como identificador
-        handleApiError(error, `tool_${tool.toolId}_rev_${tool.toolRevision}`);
-      },    
-    })),
+    queries: toolsWithRevisions.map((tool) => {
+      // Cria uma string única combinando toolId e toolRevision
+      const toolIdentifier = `tool_${tool.toolId}_rev_${tool.toolRevision}`;
+
+      return {
+        queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
+        queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
+        refetchInterval: 15000,
+        staleTime: 1000 * 60 * 5,
+        retry: false,
+        onError: (error: any) => {
+          // Passa a string única e o nome da ferramenta como identificador
+          handleApiError(error, toolIdentifier, true);
+        },
+      };
+    }),
   });
   return toolQueries;
 }

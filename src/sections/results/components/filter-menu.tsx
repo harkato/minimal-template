@@ -116,13 +116,11 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             multiple
             options={programsData}
             getOptionLabel={(option) => option.programName}
-            getOptionKey={(option) => option.programId || option.programName}
-            value={selectedPrograms.map(
-              (name) => programsData.find((p) => p.programName === name) || null
-            )}
+            getOptionKey={(option) => option.programId}
+            value={programsData.filter((program) => selectedPrograms.includes(program.programId))}
             onChange={(_, newValue) =>
               handleSelectionChange(
-                { target: { value: newValue.map((p) => p?.programName) } },
+                { target: { value: newValue.map((p) => p?.programId) } },
                 setSelectedPrograms
               )
             }
@@ -132,7 +130,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             renderTags={(selected, getTagProps) =>
               selected.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
-                return <Chip key={key} label={option.programName} {...getTagProps} />;
+                return <Chip key={key} label={option.programName} {...tagProps} />;
               })
             }
           />
