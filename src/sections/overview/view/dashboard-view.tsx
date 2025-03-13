@@ -15,7 +15,6 @@ import {
   Slider,
   Switch,
   TextField,
-  useTheme,
 } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -28,6 +27,10 @@ import { AnalyticsWidgetSummary } from '../card-top-five';
 import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
 import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 import dayjs from 'dayjs';
+import { toast, ToastContainer } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
+import { Query } from '@tanstack/react-query';
+import { log } from 'console';
 
 interface DataTopNokOk {
   title: string;
@@ -111,9 +114,15 @@ export function OverviewAnalyticsView() {
 
   const finalDateTime = dayjs().subtract(29, 'month').format('YYYY-MM-DDTHH:mm:ss');
   // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
-  const { isPending: isLoadingTopNokOk, data: TopNokOkData } = useTopNokOk(finalDateTime, topFive); // Query top 5
+  const { 
+    isPending: isLoadingTopNokOk, 
+    data: TopNokOkData, 
+    error: TopNokOkError, 
+    isError: TopNokOkIsError 
+  } = useTopNokOk(finalDateTime, topFive); // Query top 5
   const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
   const toolsQueries = useToolsInfo(toolsWithRevisions); // Query do card de ferramentas
+  
 
   const transformarDados = () => {
     if (!TopNokOkData) {
@@ -179,10 +188,71 @@ export function OverviewAnalyticsView() {
       toolId: tool.toolId,
       toolRevision: tool.revision,
     }));
-
+    // console.log('pedingValue');
+    
     setToolsWithRevisions(transformedData);
     localStorage.setItem('selectedTools', JSON.stringify(transformedData));
   }, [pendingValue]);
+
+  // useEffect(() => { // erro TOP 5
+  //   if (TopNokOkIsError) {
+  //   // toast.error(`Erro ao carregar dados do TOP 5. ${TopNokOkError.message}`);
+  //   toast.error(t('message.errorTop5'));
+  //   }
+  // }, [TopNokOkIsError, TopNokOkError, isLoadingTopNokOk, t]);
+  
+  // useEffect(() => { // erro card apertadeira
+  //     toolsQueries.forEach((query) => {
+  //         if(query.isError){
+  //           // console.log('query', query );            
+  //             // toast.error(`Erro ao carregar dados da ferramenta ${query?.data?.toolName || ''}. ${query.error.message}`) (${query?.error?.status?})
+  //             toast.error(`${t('message.errorCardTools')}.`) // ${query?.error?.status || ''}`)
+  //         }
+  //     })
+  // // eslint-disable-next-line
+  // } , [ t])
+
+//   useEffect(() => {
+//     const hasError = toolsQueries.some((query) => query.isError);
+//     if (hasError) {
+//       console.log('toolsQueries: ', toolsQueries);
+      
+//         toast.error(t('message.errorCardTools'));
+//     }
+//      // eslint-disable-next-line
+// }, []);
+
+//   useEffect(() => { // teste loading TOP 5
+//     if(isLoadingTopNokOk){
+//         toast.loading('Carregando dados do Top 5', {toastId: 'loadingTop5'})
+//     } else {
+//         toast.dismiss('loadingTop5')
+//     }
+// }, [isLoadingTopNokOk])
+
+// useEffect(() => { // teste loading apertadeira
+//     toolsQueries.forEach((query, index) => {
+//         if(query.isPending){
+//             toast.loading(`Carregando dados da ferramenta ${selectLabels[index]?.toolName || ''}.`, {toastId: `loadingTool-${index}`})
+//         } else {
+//             toast.dismiss(`loadingTool-${index}`)
+//         }
+//     })
+// }, [toolsQueries, selectLabels])
+
+useEffect(() => { // Conexão perdida
+  const handleOffline = () => toast.error(t('message.lostConnection'));
+
+  window.addEventListener('offline', handleOffline);
+
+  return () => window.removeEventListener('offline', handleOffline);
+}, [t]);
+
+useEffect(() => { // Conexão restaurada
+  const handleOnline = () => toast.success(t('message.connectionRestored'));
+  window.addEventListener('online', handleOnline);
+  return () => window.removeEventListener('online', handleOnline);
+}, [t]);
 
   // Gerencia o valor do slider e taxa de criticidade
   const handleTaxaTopFive = (event: Event, newValue: number | number[]) => {
@@ -223,6 +293,19 @@ export function OverviewAnalyticsView() {
 
   return (
     <DashboardContent maxWidth="xl">
+      <ToastContainer
+        position="bottom-left"
+        theme="light"
+        autoClose={7000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={5}
+      />
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
         <Button
           data-testid="novo processo"
@@ -261,6 +344,7 @@ export function OverviewAnalyticsView() {
                         <Switch
                           checked={topFive}
                           onChange={(event) => setTopFive(event.target.checked)}
+                          onClick={(event) => event.stopPropagation()}
                         />
                       }
                       label=""
@@ -372,11 +456,11 @@ export function OverviewAnalyticsView() {
           <>
             {toolsQueries.map((query, index) =>
               query.isPending ? (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                   <SkeletonTools key={`skeleton-${index}`} />
                 </Grid>
               ) : query.data ? (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                <Grid size={{ xs: 12, sm: 6, md: 4}} key={index}>
                   <AnalyticsDashboardCard
                     title={query.data.toolName}
                     id={query.data.toolId}

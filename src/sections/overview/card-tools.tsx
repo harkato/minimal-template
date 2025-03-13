@@ -110,19 +110,28 @@ export function AnalyticsDashboardCard({
     <Card sx={{ bgcolor: `white` }}>
       <Box>
         <CardHeader
-          title={title}
+          title={
+            <Typography
+              noWrap
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '150px', 
+                whiteSpace: 'nowrap',
+                color: 'white',
+              }}
+            >
+              {title}
+            </Typography>
+          }
           sx={{
             p: 3,
-            boxShadow: 'none',
-            // bgcolor: color,
+            boxShadow: 'none', 
             bgcolor: newColor,
             padding: '20px',
             cursor: 'pointer',
             color: `white`,
             backgroundColor: `${newColor}`,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
           }}
           onClick={handleExpandClick}
           action={

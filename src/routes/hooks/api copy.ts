@@ -1,60 +1,10 @@
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { toast } from 'material-react-toastify';
 import qs from 'qs';
 
 const API_URL = 'http://localhost:8080/msh/spc/v1';
 const DASHBOARD_URL = 'http://localhost:8080/msh/spc/v1/dashboard';
-
-const displayedToasts: Record<string, boolean> = {};
-
-const handleApiError = (error: AxiosError | any, endpoint: string) => {
-  let errorMessage = 'Ocorreu um erro inesperado.';
-
-  if (axios.isAxiosError(error)) {
-    if (error.response) {
-      console.error('Erro Axios - Resposta:', error.response.status, error.response.data);
-      switch (error.response.status) {
-        case 404:
-          errorMessage = 'Recurso não encontrado.';
-          break;
-        case 500:
-          errorMessage = 'Erro Interno do Servidor. Tente novamente mais tarde.';
-          break;
-        default:
-          errorMessage = `Erro na requisição: ${error.response.status}`;
-          break;
-      }
-    } else if (error.request) {
-      console.error('Erro Axios - Requisição:', error.request);
-      errorMessage = 'Nenhuma resposta do servidor. Verifique sua conexão com a internet.';
-    } else {
-      console.error('Erro Axios - Configuração:', error.message);
-      errorMessage = 'Falha na configuração da requisição.';
-    }
-  } else {
-    console.error('Erro Genérico:', error.message);
-    errorMessage = error.message || 'Ocorreu um erro inesperado.';
-  }
-
-  const cacheKey = `${endpoint}:${errorMessage}`;
-
-  if (!displayedToasts[cacheKey]) {
-    // Exibe o toast com a mensagem de erro
-    toast.error(errorMessage, {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    displayedToasts[cacheKey] = true;
-  }
-  // Lança o erro para que ele possa ser tratado por quem chamou a função, se necessário
-  throw new Error(errorMessage);
-};
 
 // Usado no GET do menu de ferramentas
 const fetchData = async (endpoint: string) => {
@@ -62,8 +12,34 @@ const fetchData = async (endpoint: string) => {
     const response = await axios.get(`${API_URL}/${endpoint}`);
     return response.data;
   } catch (error: any) {
-    handleApiError(error, endpoint); // Exibe o toast e lança o erro
-    return Promise.resolve([]);
+    // Tipagem do erro para melhor tratamento
+    // Tratamento de erro mais específico baseado no tipo de erro
+    if (axios.isAxiosError(error)) {
+      // Erros específicos do Axios (ex: erro de rede, erro do servidor)
+      console.error('Erro Axios:', error.message);
+      if (error.response) {
+        // console.error("Dados da Resposta:", error.response.data);
+        console.error('Status da Resposta:', error.response.status);
+        // Exemplo: Lançar um erro customizado baseado no código de status
+        if (error.response.status === 404) {
+          throw new Error('Ferramentas não encontradas.'); // Ou uma mensagem mais amigável
+        }
+        if (error.response.status === 500) {
+          throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
+        }
+      } else if (error.request) {
+        console.error('Erro de Requisição:', error.request); // A requisição foi feita mas não houve resposta
+        throw new Error('Nenhuma resposta do servidor.');
+      } else {
+        console.error('Erro de Configuração:', error.message); // Algo aconteceu na configuração da requisição
+        throw new Error('Falha na configuração da requisição.');
+      }
+    } else {
+      // Erro genérico
+      console.error('Erro Genérico:', error.message);
+      throw new Error('Ocorreu um erro inesperado.'); // Ou uma mensagem mais genérica
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
   }
 };
 
@@ -104,9 +80,14 @@ export const fetchDataFilters = async (
       params: { ...cleanParams, page: page + 1, pageSize },
     });
     return response.data;
-  } catch (error) {
-    handleApiError(error, endpoint);
-    return Promise.resolve([]);
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
   }
 };
 
@@ -134,9 +115,14 @@ export const fetchDataTotal = async (filters: any) => {
       params: { ...cleanParams },
     });
     return response.data;
-  } catch (error) {
-    handleApiError(error, 'totalItems');
-    return Promise.resolve([]);
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
   }
 };
 
@@ -150,9 +136,32 @@ export const fetchProgramsData = async (endpoint: string, toolList: any[]) => {
   try {
     const response = await axios.get(`${API_URL}/${endpoint}?${queryString.slice(1)}`, {});
     return response.data;
-  } catch (error) {
-    handleApiError(error, endpoint);
-    return Promise.resolve([]);
+  } catch (error: any) {
+    // Tipagem do erro
+    // Tratamento de erro mais específico baseado no tipo de erro
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // console.error("Dados da Resposta:", error.response.data);
+        // console.error('Status da Resposta:', error.response.status);
+        // if (error.response.status === 404) {
+        //   // Exemplo de um erro customizado baseado no código de status
+        //   throw new Error('Programas não encontrados.');
+        // }
+        if (error.response.status === 500) {
+          throw new Error('Erro Interno do Servidor. Tente novamente mais tarde.');
+        }
+      } else if (error.request) {
+        console.error('Erro de Requisição:', error.request); // A requisição foi feita mas não houve resposta
+        throw new Error('Nenhuma resposta do servidor.');
+      } else {
+        console.error('Erro de Configuração:', error.message); // Algo aconteceu na configuração da requisição
+        throw new Error('Falha na configuração da requisição.');
+      }
+    } else {
+      console.error('Erro Genérico:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
+    return Promise.resolve([]); // Retorna um array vazio em caso de erro
   }
 };
 
@@ -200,8 +209,13 @@ const fetchDataTop5 = async (endpoint: string) => {
   try {
     const response = await axios.get(`${DASHBOARD_URL}/${endpoint}`);
     return response.data;
-  } catch (error) {
-    handleApiError(error, endpoint);
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error('Erro Axios:', error.message);
+    } else {
+      console.error('Erro:', error.message); // Erro genérico
+      throw new Error('Ocorreu um erro inesperado.');
+    }
     return Promise.resolve([]);
   }
 };
@@ -210,9 +224,8 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   // Lista do TOP5 QUARKUS
   return useQuery({
     queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
-    // queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryKey: ['topNokOk_data'],
-    refetchInterval: 15000, // Refetch a cada 30 segundos
+    refetchInterval: 30000, // Refetch a cada 60 segundos (1 minuto)
     enabled: !!switchTop5, // Garante que a query só execute se switchTop5 for true
   });
 }
@@ -220,7 +233,6 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
 // Busca os resultados de uma apertadeira
 const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
-    // const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`);
     const response = await axios.get(`${API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
       params: {
         finalDateTime: '2022-10-24T10:00:00',
@@ -230,32 +242,19 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
     });
     return response.data;
   } catch (error) {
-    handleApiError(error, endpoint);
-    return Promise.resolve([]);
+    console.error('Erro ao buscar informações das ferramentas:', error);
+    if (error.response) {
+      if (error.response.status >= 500) {
+        toast.error('Erro ao comunicar com o servidor .');
+      }
+    } else if (error.request) {
+      toast.error('Sem resposta do servidor.');
+    } else {
+      toast.error('Erro ao configurar requisição.');
+    }
+    throw error;
   }
 };
-
-// export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
-//   const toolQueries = useQueries({
-//     queries: toolsWithRevisions.map((tool) => {
-//       // Cria uma string única combinando toolId e toolRevision
-//       const toolIdentifier = `tool_${tool.toolId}_rev_${tool.toolRevision}`;
-
-//       return {
-//         queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
-//         queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
-//         refetchInterval: 15000,
-//         staleTime: 1000 * 60 * 5,
-//         onError: (error: any) => {
-//           // Passa a string única como identificador
-//           handleApiError(error, toolIdentifier);
-//         },
-//       };
-//     }),
-//   });
-
-//   return toolQueries;
-// }
 
 export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
   const toolQueries = useQueries({
@@ -273,12 +272,10 @@ export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision:
             return true; // tentar até 3 vezes para outros erros
         }
         return false;
-      },  
-      onError: (error: any) => {
-        // Passa a string única como identificador
-        handleApiError(error, `tool_${tool.toolId}_rev_${tool.toolRevision}`);
-      },    
+      }  
+          
     })),
   });
+
   return toolQueries;
 }
