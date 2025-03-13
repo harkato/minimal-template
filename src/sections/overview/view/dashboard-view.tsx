@@ -202,12 +202,12 @@ export function OverviewAnalyticsView() {
     localStorage.setItem('selectedTools', JSON.stringify(transformedData));
   }, [pendingValue]);
 
-  useEffect(() => {
-    // erro TOP 5
-    if (TopNokOkIsError) {
-      toast.error(`Erro ao carregar dados do TOP 5. ${TopNokOkError.message}`);
-    }
-  }, [TopNokOkIsError, TopNokOkError]);
+  // useEffect(() => {
+  //   // erro TOP 5
+  //   if (TopNokOkIsError) {
+  //     toast.error(`Erro ao carregar dados do TOP 5. ${TopNokOkError.message}`);
+  //   }
+  // }, [TopNokOkIsError, TopNokOkError]);
 
   // useEffect(() => {
   //   // erro card apertadeira
@@ -219,28 +219,6 @@ export function OverviewAnalyticsView() {
   //     }
   //   });
   // }, [toolsQueries]);
-
-  // useEffect(() => {
-  //   // teste loading TOP 5
-  //   if (isLoadingTopNokOk) {
-  //     toast.loading('Carregando dados do Top 5', { toastId: 'loadingTop5' });
-  //   } else {
-  //     toast.dismiss('loadingTop5');
-  //   }
-  // }, [isLoadingTopNokOk]);
-
-  // useEffect(() => {
-  //   // teste loading apertadeira
-  //   toolsQueries.forEach((query, index) => {
-  //     if (query.isPending) {
-  //       toast.loading(`Carregando dados da ferramenta ${selectLabels[index]?.toolName || ''}.`, {
-  //         toastId: `loadingTool-${index}`,
-  //       });
-  //     } else {
-  //       toast.dismiss(`loadingTool-${index}`);
-  //     }
-  //   });
-  // }, [toolsQueries, selectLabels]);
 
   useEffect(() => {
     // Conexão perdida
@@ -297,19 +275,6 @@ export function OverviewAnalyticsView() {
 
   return (
     <DashboardContent maxWidth="xl">
-      <ToastContainer
-        position="bottom-left"
-        theme="light"
-        autoClose={7000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        limit={5}
-      />
       <Grid container sx={{ justifyContent: 'flex-end', mt: 4 }}>
         <Button
           data-testid="novo processo"
@@ -348,6 +313,7 @@ export function OverviewAnalyticsView() {
                         <Switch
                           checked={topFive}
                           onChange={(event) => setTopFive(event.target.checked)}
+                          onClick={(event) => event.stopPropagation()}
                         />
                       }
                       label=""
