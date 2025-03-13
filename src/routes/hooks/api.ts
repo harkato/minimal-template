@@ -244,6 +244,9 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
 export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision: number }[]) {
   const toolQueries = useQueries({
     queries: toolsWithRevisions.map((tool) => {
+      // Cria uma string única combinando toolId e toolRevision
+      const toolIdentifier = `tool_${tool.toolId}_rev_${tool.toolRevision}`;
+
       return {
         queryKey: ['toolInfo', tool.toolId, tool.toolRevision],
         queryFn: () => fetchToolsInfo('dashboard/tools', tool.toolId, tool.toolRevision),
