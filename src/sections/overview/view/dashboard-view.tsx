@@ -28,7 +28,7 @@ import { useFetchToolsData, useTopNokOk } from 'src/routes/hooks/api';
 import SSEComponent from 'src/routes/hooks/sse';
 import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 import dayjs from 'dayjs';
-import { toast, ToastContainer } from 'material-react-toastify';
+import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 
 interface DataTopNokOk {
@@ -102,7 +102,7 @@ export function OverviewAnalyticsView() {
     return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];
   });
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]); // VERIFICAR O USO
-  const [selectedTools, setselectedTools] = useState<string[]>(() => {
+  const [selectedTools, setSelectedTools] = useState<string[]>(() => {
     const storedFilters = localStorage.getItem('selectedTools');
     return storedFilters ? JSON.parse(storedFilters) : [];
   });
@@ -118,7 +118,6 @@ export function OverviewAnalyticsView() {
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
-  const [tools, setTools] = useState<ToolData[]>([]);
   const finalDateTime = dayjs().format('YYYY-MM-DDTHH:mm:ss');
   // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
@@ -204,7 +203,7 @@ export function OverviewAnalyticsView() {
   // Atualiza o filtro usado para query de ferramentas
   useEffect(() => {
     const toolIds = pendingValue.map((tool: any) => tool.toolId);
-    setselectedTools(toolIds);
+    setSelectedTools(toolIds);
     localStorage.setItem('selectedTools', JSON.stringify(toolIds));
   }, [pendingValue]);
 
@@ -240,6 +239,11 @@ export function OverviewAnalyticsView() {
   //     }
   //   });
   // }, [toolsQueries]);
+
+  useEffect(() => {
+    console.log('Updated toolsInfoData:', toolsInfoData);
+    console.log('Updated selectedTools: ', selectedTools);
+  }, [toolsInfoData, selectedTools]);
 
   useEffect(() => {
     // Conexão perdida
@@ -295,6 +299,7 @@ export function OverviewAnalyticsView() {
   };
 
   const handleNewToolData = (newTool: any) => {
+    console.log('New tool added:', newTool);
     setToolsInfoData((prevTools) => {
       // Verifica se a ferramenta já existe na lista para evitar duplicação
       const exists = prevTools.some((tool) => tool.toolId === newTool.toolId);
@@ -457,7 +462,7 @@ export function OverviewAnalyticsView() {
         </Grid>
         <Grid container spacing={2} sx={{ mb: { xs: 5, md: 5 } }}>
           <>
-            <SSEComponent toolIds={['1', '2']} onData={handleNewToolData} />
+            <SSEComponent toolIds={selectedTools} onData={handleNewToolData} />
             {toolsInfoData.map((tool) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.toolId}>
                 <AnalyticsDashboardCard
@@ -470,7 +475,8 @@ export function OverviewAnalyticsView() {
                   targetAlert={toolLimits[0]}
                   targetCritical={toolLimits[1]}
                   onDelete={() => {
-                    setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId));
+                    setSelectedTools((prev) => prev.filter((t) => t !== tool.toolId));
+                    setToolsInfoData((prev) => prev.filter((t) => t.toolId !== tool.toolId));
                     setPendingValue((prev) => prev.filter((t) => t.toolId !== tool.toolId));
                   }}
                 />

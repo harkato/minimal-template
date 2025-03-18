@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { startSSE, addSSEListener, removeSSEListener, updateSSEUrl } from './sse-service';
 
-const BASE_URL = 'http://192.168.1.156:8082/results?toolIds='; // Base da URL SSE
+const BASE_URL = 'http://192.168.1.139:8082/results?toolIds='; // Base da URL SSE
 
 interface SSEComponentProps {
   toolIds: string[];
@@ -24,7 +24,8 @@ export default function SSEComponent({ toolIds, onData }: SSEComponentProps) {
     return () => {
       removeSSEListener(onData); // Remove o listener ao desmontar
     };
-  }, [toolIds, onData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toolIds]);
 
   return null; // Nenhuma renderização necessária
 }
