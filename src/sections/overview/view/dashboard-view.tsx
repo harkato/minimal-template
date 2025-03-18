@@ -24,7 +24,8 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useTranslation } from 'react-i18next';
 import { AnalyticsDashboardCard } from '../card-tools';
 import { AnalyticsWidgetSummary } from '../card-top-five';
-import { useFetchToolsData, useToolsInfo, useTopNokOk } from 'src/routes/hooks/api';
+import { useFetchToolsData, useTopNokOk } from 'src/routes/hooks/api';
+import SSEComponent from 'src/routes/hooks/sse';
 import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 import dayjs from 'dayjs';
 import { toast, ToastContainer } from 'material-react-toastify';
@@ -38,6 +39,17 @@ interface DataTopNokOk {
     categories: string[]; // apenas a hora do finalTimestamp
     series: number[]; // nok
   };
+}
+
+interface ToolData {
+  toolName: string;
+  toolId: string;
+  toolRevision: number;
+  products: number;
+  ok: number;
+  nok: number;
+  nokOkRate: number;
+  topIssues: any[];
 }
 
 interface TopNokOkItem {
@@ -90,10 +102,7 @@ export function OverviewAnalyticsView() {
     return storedTaxaTop5 ? JSON.parse(storedTaxaTop5) : [0.6, 0.8];
   });
   const [toolLimits, setToolLimits] = React.useState<number[]>([0.7, 0.8]); // VERIFICAR O USO
-  const [toolsWithRevisions, setToolsWithRevisions] = useState<
-    // Usado para fazer a query dos cards de apertadeiras
-    { toolId: number; toolRevision: number }[]
-  >(() => {
+  const [selectedTools, setselectedTools] = useState<string[]>(() => {
     const storedFilters = localStorage.getItem('selectedTools');
     return storedFilters ? JSON.parse(storedFilters) : [];
   });
@@ -109,7 +118,7 @@ export function OverviewAnalyticsView() {
     return localData ? JSON.parse(localData) : true; // Retorna o valor do localStorage ou `true` como fallback
   });
   const [topFiveData, setTopFiveData] = useState<DataTopNokOk[]>([]); // Dados do Top 5
-
+  const [tools, setTools] = useState<ToolData[]>([]);
   const finalDateTime = dayjs().format('YYYY-MM-DDTHH:mm:ss');
   // '2022-10-03T16:00:00'; // Precisa alterar para a hora do sistema e/ou criar alguma regra
   const {
@@ -119,7 +128,7 @@ export function OverviewAnalyticsView() {
     isError: TopNokOkIsError,
   } = useTopNokOk(finalDateTime, topFive); // Query top 5
   const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
-  const toolsQueries = useToolsInfo(toolsWithRevisions); // Query do card de ferramentas
+  const [toolsInfoData, setToolsInfoData] = useState<any[]>([]);
 
   const transformarDados = () => {
     if (!TopNokOkData) {
@@ -194,13 +203,25 @@ export function OverviewAnalyticsView() {
 
   // Atualiza o filtro usado para query de ferramentas
   useEffect(() => {
-    const transformedData = pendingValue.map((tool: any) => ({
-      toolId: tool.toolId,
-      toolRevision: tool.revision,
-    }));
-    setToolsWithRevisions(transformedData);
-    localStorage.setItem('selectedTools', JSON.stringify(transformedData));
+    const toolIds = pendingValue.map((tool: any) => tool.toolId);
+    setselectedTools(toolIds);
+    localStorage.setItem('selectedTools', JSON.stringify(toolIds));
   }, [pendingValue]);
+
+  // SSE APERTADEIRA
+  // useEffect(() => {
+  //   if (toolsInfoData) {
+  //     const transformedData = toolsInfoData.map((tool: any) => ({
+  //       toolName: tool.toolName,
+  //       products: tool.products,
+  //       toolId: tool.toolId,
+  //       nok: tool.nok,
+  //       nokOkRate: tool.nokOkRate,
+  //       topIssues: tool.topIssues,
+  //     }));
+  //     setTools(transformedData);
+  //   }
+  // }, [toolsInfoData]);
 
   // useEffect(() => {
   //   // erro TOP 5
@@ -271,6 +292,19 @@ export function OverviewAnalyticsView() {
   ) => {
     const selectedValues = event.target.value as string[];
     setState(selectedValues);
+  };
+
+  const handleNewToolData = (newTool: any) => {
+    setToolsInfoData((prevTools) => {
+      // Verifica se a ferramenta já existe na lista para evitar duplicação
+      const exists = prevTools.some((tool) => tool.toolId === newTool.toolId);
+      if (exists) {
+        return prevTools.map((tool) =>
+          tool.toolId === newTool.toolId ? { ...tool, ...newTool } : tool
+        );
+      }
+      return [...prevTools, newTool]; // Adiciona se não existir
+    });
   };
 
   return (
@@ -423,29 +457,46 @@ export function OverviewAnalyticsView() {
         </Grid>
         <Grid container spacing={2} sx={{ mb: { xs: 5, md: 5 } }}>
           <>
-            {toolsQueries.map((query, index) =>
-              query.isPending ? (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+            <SSEComponent toolIds={['1', '2']} onData={handleNewToolData} />
+            {toolsInfoData.map((tool) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.toolId}>
+                <AnalyticsDashboardCard
+                  title={tool.toolName}
+                  id={tool.toolId}
+                  vehicles={tool.products}
+                  nokVin={tool.nokOkRate}
+                  nok={tool.nok}
+                  topIssues={tool.topIssues}
+                  targetAlert={toolLimits[0]}
+                  targetCritical={toolLimits[1]}
+                  onDelete={() => {
+                    setTools((prev) => prev.filter((t) => t.toolId !== tool.toolId));
+                    setPendingValue((prev) => prev.filter((t) => t.toolId !== tool.toolId));
+                  }}
+                />
+              </Grid>
+            ))}
+            {/* {toolsInfoData?.map((toolData, index) => (
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                {isPending ? (
                   <SkeletonTools key={`skeleton-${index}`} />
-                </Grid>
-              ) : query.data ? (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                ) : toolData ? (
                   <AnalyticsDashboardCard
-                    title={query.data.toolName}
-                    id={query.data.toolId}
-                    vehicles={query.data.products}
-                    nokVin={query.data.nokOkRate}
-                    nok={query.data.nok}
-                    topIssues={query.data.topIssues}
+                    title={toolData.toolName}
+                    id={toolData.toolId}
+                    vehicles={toolData.products}
+                    nokVin={toolData.nokOkRate}
+                    nok={toolData.nok}
+                    topIssues={toolData.topIssues}
                     targetAlert={toolLimits[0]}
                     targetCritical={toolLimits[1]}
                     onDelete={() => {
-                      setPendingValue((prev) => prev.filter((t) => t.toolId !== query.data.toolId));
+                      setPendingValue((prev) => prev.filter((t) => t.toolId !== toolData.toolId));
                     }}
                   />
-                </Grid>
-              ) : null
-            )}
+                ) : null}
+              </Grid>
+            ))} */}
           </>
         </Grid>
       </div>
