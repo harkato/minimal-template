@@ -4,9 +4,9 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'material-react-toastify';
 import qs from 'qs';
 
-const displayedToasts: Record<string, NodeJS.Timeout> = {};
+export const displayedToasts: Record<string, NodeJS.Timeout> = {};
 
-const handleApiError = (error: AxiosError | any, endpoint: string, toolName?: boolean) => {
+export const handleApiError = (error: AxiosError | any, endpoint: string, toolName?: boolean) => {
   let errorMessage = 'Ocorreu um erro inesperado.';
 
   if (axios.isAxiosError(error)) {
@@ -31,7 +31,7 @@ const handleApiError = (error: AxiosError | any, endpoint: string, toolName?: bo
       errorMessage = 'Falha na configuração da requisição.';
     }
   } else {
-    console.error('Erro Genérico:', error.message);
+    console.error('Erro:', error.message);
     errorMessage = error.message || 'Ocorreu um erro inesperado.';
   }
 

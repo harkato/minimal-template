@@ -1,29 +1,29 @@
-import { useEffect } from 'react';
-import { startSSE, addSSEListener, removeSSEListener, updateSSEUrl } from './sse-service';
+import { useEffect, useCallback } from 'react';
+import { startSSE, addSSEListener, removeSSEListener, closeSSE } from './sse-service';
 import apiConfig from 'src/config/api-config';
 
 interface SSEComponentProps {
   toolIds: string[];
-  onData: (newTool: any) => void;
+  onData: (data: any) => void;
 }
 
 export default function SSEComponent({ toolIds, onData }: SSEComponentProps) {
   useEffect(() => {
-    if (toolIds.length === 0) return undefined; // Evita chamadas com lista vazia
+    if (toolIds.length === 0) {
+      closeSSE();
+      return undefined;
+    }
 
-    const toolIdsParam = toolIds.join(','); // Converte para formato toolIds=8,9,12
+    const toolIdsParam = toolIds.join(',');
     const sseUrl = `${apiConfig.SSE_URL}${toolIdsParam}`;
 
-    startSSE(sseUrl); // Garante que a conexão SSE só seja iniciada uma vez
-    addSSEListener(onData); // Adiciona o listener
-
-    updateSSEUrl(sseUrl);
-
+    startSSE(sseUrl);
+    addSSEListener(onData);
 
     return () => {
-      removeSSEListener(onData); // Remove o listener ao desmontar
+      removeSSEListener(onData);
     };
   }, [toolIds, onData]);
 
-  return null; // Nenhuma renderização necessária
+  return null;
 }
