@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import {
@@ -127,7 +127,8 @@ export function OverviewAnalyticsView() {
     isError: TopNokOkIsError,
   } = useTopNokOk(finalDateTime, topFive); // Query top 5
   const { data: toolListData } = useFetchToolsData(); // Query para a lista de ferramentas disponíveis
-  const [toolsInfoData, setToolsInfoData] = useState<any[]>([]);
+  const [toolsInfoData, setToolsInfoData] = useState<ToolData[]>([]);
+  const [loadingTools, setLoadingTools] = useState<Record<string, boolean>>({});
 
   const transformarDados = () => {
     if (!TopNokOkData) {
@@ -241,9 +242,18 @@ export function OverviewAnalyticsView() {
   // }, [toolsQueries]);
 
   useEffect(() => {
-    console.log('Updated toolsInfoData:', toolsInfoData);
-    console.log('Updated selectedTools: ', selectedTools);
-  }, [toolsInfoData, selectedTools]);
+    // Definir ferramentas como carregando quando a requisição for enviada
+    const initialLoadingState = selectedTools.reduce(
+      (acc, toolId) => {
+        acc[toolId] = true;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
+
+    setLoadingTools(initialLoadingState);
+  }, [selectedTools]);
+
 
   useEffect(() => {
     // Conexão perdida
@@ -298,8 +308,7 @@ export function OverviewAnalyticsView() {
     setState(selectedValues);
   };
 
-  const handleNewToolData = (newTool: any) => {
-    console.log('New tool added:', newTool);
+  const handleNewToolData = useCallback((newTool: any) => {
     setToolsInfoData((prevTools) => {
       // Verifica se a ferramenta já existe na lista para evitar duplicação
       const exists = prevTools.some((tool) => tool.toolId === newTool.toolId);
@@ -310,7 +319,9 @@ export function OverviewAnalyticsView() {
       }
       return [...prevTools, newTool]; // Adiciona se não existir
     });
-  };
+
+    setLoadingTools((prev) => ({ ...prev, [newTool.toolId]: false}))
+  }, []);
 
   return (
     <DashboardContent maxWidth="xl">
@@ -463,7 +474,36 @@ export function OverviewAnalyticsView() {
         <Grid container spacing={2} sx={{ mb: { xs: 5, md: 5 } }}>
           <>
             <SSEComponent toolIds={selectedTools} onData={handleNewToolData} />
-            {toolsInfoData.map((tool) => (
+            {selectedTools.map((toolId) => {
+              const tool = toolsInfoData.find((t) => t.toolId === toolId);
+              const isLoading = loadingTools[toolId];
+
+              return (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={toolId}>
+                  {isLoading ? (
+                    <SkeletonTools/>
+                  ) : (
+                    <AnalyticsDashboardCard
+                      title={tool?.toolName ?? 'Desconhecido'}
+                      id={tool?.toolId ?? ''}
+                      vehicles={tool?.products}
+                      nokVin={tool?.nokOkRate ?? 0}
+                      nok={tool?.nok ?? 0}
+                      topIssues={tool?.topIssues ?? []}
+                      targetAlert={toolLimits[0]}
+                      targetCritical={toolLimits[1]}
+                      onDelete={() => {
+                        setSelectedTools((prev) => prev.filter((t) => t !== toolId));
+                        setToolsInfoData((prev) => prev.filter((t) => t.toolId !== toolId));
+                        setPendingValue((prev) => prev.filter((t) => t.toolId !== toolId));
+                      }}
+                    />
+                  )}
+                </Grid>
+              );
+            })}
+
+            {/* {toolsInfoData.map((tool) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.toolId}>
                 <AnalyticsDashboardCard
                   title={tool.toolName}
@@ -481,7 +521,7 @@ export function OverviewAnalyticsView() {
                   }}
                 />
               </Grid>
-            ))}
+            ))} */}
             {/* {toolsInfoData?.map((toolData, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                 {isPending ? (

@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 export type Props = {
   id: string;
   title: string;
-  vehicles: number;
+  vehicles: number | undefined;
   nok: number;
   nokVin: number;
   targetAlert: number;
