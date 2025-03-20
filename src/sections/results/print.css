@@ -1,0 +1,13 @@
+@media print {
+    /* Estilos para impressão */
+    body {
+      font-size: 12pt;
+    }
+    .no-print {
+      display: none;
+    }
+  
+    .MuiBackdrop-root {
+        background-color: #FFFFFF !important;
+    }
+  }

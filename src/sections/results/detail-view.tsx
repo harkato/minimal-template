@@ -1,4 +1,4 @@
-import  {  useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, ReactNode } from 'react';
 import 'dayjs/locale/en-gb';
 import {
   Typography,
@@ -10,318 +10,387 @@ import {
   ListItemText,
   Stack,
   Box,
-  Button,
   CircularProgress,
-  TableCell,
   Alert,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Dialog,
+  Button,
 } from '@mui/material';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
-// import { makeStyles } from '@material-ui/core/styles';
 import { useTranslation } from 'react-i18next';
 import { useDetailData } from 'src/routes/hooks/useToolData';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
-import { useNavigate } from 'react-router-dom';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import { ResultDataRow } from 'src/context/DataRow';
+import { format } from 'date-fns';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useDetailsInfo } from 'src/routes/hooks/api';
+import './print.css';
+import IncomeAreaChart from 'src/components/chart/IncomeAreaChart';
+
+interface DetailsPageProps {
+  dataRow: ResultDataRow;
+  onClose: () => void;
+}
 
 // Define o tipo do valor
-interface DataDetail {
-  resultTime: string;
-  idTool: number;
-  tool: string;
-  programNumber: number;
-  programName: string;
-  programId: number;
-  id: string,
-  idAdic1: string,
-  idAdic2: string,
-  idAdic3: string,
-  toolSerialNumber: string,
-  jobNumber: number,
-  stepJob: number,
-  sizeJob: number,
-  generalStatus: string,
-  torque: number,
-  statusTorque: string,
-  maxTorque: number,
-  minTorque: number,
-  angle: number,
-  statusAngle: string,
-  maxAngle: number,
-  minAngle: number,
-  grip: {Time: number; Torque: number; Angle: number }[];
+interface GraphData {
+  Torque: number[];
+  Angle: number[];
+  Time: number[];
 }
 
-function getStatusIcon(status: string, i: number) {
-  return status === 'OK' ? (
-    <CheckIcon sx={{ color: '#20878b' }} />
-  ) : i % 2 === 0 ? (
-    <ArrowUpward sx={{ color: '#f24f4f' }} />
-  ) : (
-    <ArrowDownward sx={{ color: '#FFB300' }} />
-  );
+function getStatusIcon(status: number) {
+  switch (status) {
+    case 0:
+      return <CheckIcon sx={{ color: '#20878b' }} />;
+    case 1:
+      // return <CancelIcon sx={{ color: 'f24f4f' }} />;
+      return <ClearIcon sx={{ color: '#f24f4f' }} />;
+    case 2:
+      return <ArrowDownward sx={{ color: '#FFB300' }} />;
+    case 3:
+      return <ArrowUpward sx={{ color: '#f24f4f' }} />;
+    default:
+      return null;
+  }
 }
 
-// const useStyles = makeStyles((theme) => ({
-//   container: {
-//     display: 'flex',
-//     flexWrap: 'wrap',
-//   },
-//   textField: {
-//     marginLeft: theme.spacing(1),
-//     marginRight: theme.spacing(1),
-//     width: 200,
-//   },
-// }));
+function getStatus(status: number) {
+  return status ? 'NOK' : 'OK';
+}
 
-export default function DetailsPage() {
-  const [data, setData] = useState<DataDetail| null>(null);
+export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
+  const [data, setData] = useState<GraphData | null>(null); // useState<DataDetail | null>(null);
   const { t, i18n } = useTranslation();
-  // Recebe os dados da API
-  const { isLoading: isLoadingDetail, isError: isErrorDetail, data: detailData, error: errorDetail } = useDetailData();
-  // const classes = useStyles();
-  const tableRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate(); // Inicializa o useNavigate
-  const handleGoBack = () => {
-    navigate(-1); // Navega para a página anterior no histórico
+  const [isPrinting, setIsPrinting] = useState(false);
+  // Gráfico de apertos
+  const {
+    data: fetchDetailsData,
+    error: errorFetchDetailsData,
+    isError: isErrorFetchDetailsData,
+    isLoading: isLoadingFetchDetailsData,
+  } = useDetailsInfo(dataRow.tid);
+  // } = useCombinedDetailsInfo(105953723);
+
+  const transformDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return format(date, 'dd/MM/yyyy HH:mm');
   };
+  const tableRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (detailData && detailData.length > 0) { // Verifica se há dados
-        setData(detailData[0]);
+    if (fetchDetailsData && fetchDetailsData.Torque.length > 0) {
+      setData(fetchDetailsData);
     } else {
-      setData(null); // Define data como null caso não haja dados
+      setData(null);
     }
-  }, [detailData]);
+  }, [fetchDetailsData]);
 
-  if (isLoadingDetail) {
-    return (
-    <>
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-          <Button
-            size="small"
-            onClick={() => handleGoBack()}
-          >
-            <Box
-              sx={{
-                display: 'inline-block',
-                padding: '2px 8px',
-                borderRadius: '8px',
-                color: 'white',
-                textAlign: 'center',
-                fontWeight: 'bold',
-              }}
-            >
-              <ArrowBackOutlinedIcon color='primary' />
-            </Box>              
-          </Button> 
-        </Grid> 
-        <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
-          <CircularProgress />
-        </TableCell>
-      {/* <Typography>Carregando...</Typography> */}
-    </>
-  )}
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('print');
+    const handleChange = (event: any) => setIsPrinting(event.matches);
 
-  if (isErrorDetail || !data) { // Verifica erro ou dados nulos
-    return (
-      <>
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Button
-              size="small"
-              onClick={() => handleGoBack()}
-            >
-              <Box
-                sx={{
-                  display: 'inline-block',
-                  padding: '2px 8px',
-                  borderRadius: '8px',
-                  color: 'white',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                }}
-              >
-                <ArrowBackOutlinedIcon color='primary' />
-              </Box>              
-            </Button> 
-          </Grid> 
-          <Alert variant="filled" severity="error" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> 
-            falha ao carregar os dados
-          </Alert>
-        {/* <Typography>Erro ao carregar os dados.</Typography> */}
-      </>
-  )}
+    mediaQuery.addEventListener('change', handleChange);
+    setIsPrinting(mediaQuery.matches);
+
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+    }, 1000);
+  };
 
   return (
-    <>     
-      {/* Renderiza os dados */} 
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {/* <Button
-          size="small"
-          onClick={() => handleGoBack()}
-        >
-          <Box
-            sx={{
-              display: 'inline-block',
-              padding: '2px 8px',
-              borderRadius: '8px',
-              color: 'white',
-              textAlign: 'center',
-              fontWeight: 'bold',
-            }}
+    // <PrintModal open onClose={onClose}>
+    <>
+      <Dialog open onClose={onClose} fullWidth maxWidth="xl">
+        <DialogTitle sx={{ backgroundColor: '#00477A', color: 'white' }}>
+          {`DETALHES DE RESULTADO -  ${dataRow.toolDTO?.toolName || ''}  ${transformDate(dataRow.dateTime) || ''}`}
+          <IconButton
+            aria-label="close"
+            onClick={onClose}
+            sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+            className="no-print"
           >
-            <ArrowBackOutlinedIcon color='primary' />
-          </Box>              
-        </Button>  */}
-      </Grid>     
-      <Grid container spacing={2} sx={{ mt: 2 }}> {/* Container principal com espaçamento */}
-      <Grid item xs={12} md={9}> {/* Grid para o gráfico (ocupa 8 colunas em telas médias e maiores, 12 em telas menores) */}
-        
-        <Card>
-          {data?.grip && <AreaChartNew grip={data.grip} />}
-        </Card>
-      </Grid>
-      <Grid item xs={12} md={3}> {/* Grid para a lista (ocupa 4 colunas em telas médias e maiores, 12 em telas menores) */}
-        <Card>
-          <List>
-          <ListItem divider>
-              <ListItemText primary={<Typography variant="h5" >
-                {data.resultTime}
-              </Typography>} />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="h4" noWrap>
-                  {getStatusIcon(data.generalStatus,2)}
-                  {data.generalStatus} 
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem divider>
-              <ListItemText 
-              primary={
-                <>
-                  <Typography variant="subtitle1">Ferramenta</Typography>
-                  <Typography variant="body2" color="text.secondary">ID Ferramenta</Typography>
-                  <Typography variant="body2" color="text.secondary">Nº de série</Typography>
-                  <Typography variant="body2" color="text.secondary">Identificador</Typography>
-                  <Typography variant="body2" color="text.secondary">Identificador adic. 1</Typography>
-                  <Typography variant="body2" color="text.secondary">Identificador adic. 2</Typography>
-                  <Typography variant="body2" color="text.secondary">Identificador adic. 3</Typography>
-                </>
-              }
-              />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" noWrap>
-                  {data.tool}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.idTool}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.toolSerialNumber}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.id}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.idAdic1}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.idAdic2}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.idAdic3}
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>              
-            <ListItem divider>
-              <ListItemText 
-              primary={
-                <>
-                  <Typography variant="subtitle1">Programa</Typography>
-                  <Typography variant="body2" color="text.secondary">ID Programa</Typography>
-                  <Typography variant="body2" color="text.secondary">Nº Job</Typography>
-                  <Typography variant="body2" color="text.secondary">Passo Job</Typography>
-                  <Typography variant="body2" color="text.secondary">Tamanho Job</Typography>
-                </>
-              }
-              />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" noWrap>
-                  {data.programName}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.programId}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.jobNumber}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.stepJob}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.sizeJob}
-                  </Typography>                  
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem divider>
-              <ListItemText 
-              primary={
-                <>
-                  <Typography variant="subtitle1">Torque</Typography>
-                  <Typography variant="body2" color="text.secondary">Torque máximo</Typography>
-                  <Typography variant="body2" color="text.secondary">Torque mínimo</Typography>
-                </>
-              }
-              />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" color="primary" noWrap>
-                {getStatusIcon(data.statusTorque,2)}
-                  {data.torque}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.maxTorque}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.minTorque}
-                  </Typography>                
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>
-            <ListItem divider>
-              <ListItemText 
-              primary={
-                <>
-                  <Typography variant="subtitle1">Ângulo</Typography>
-                  <Typography variant="body2" color="text.secondary">Ângulo máximo</Typography>
-                  <Typography variant="body2" color="text.secondary">Ângulo mínimo</Typography>
-                </>
-              }
-              />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                <Typography variant="subtitle1" color="primary" noWrap>
-                {getStatusIcon(data.statusAngle,2)}
-                  {data.angle}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.maxAngle}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {data.minAngle}
-                  </Typography>                
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItem>            
-          </List>
-          </Card>
-      </Grid>
-    </Grid>
-  </>
-);
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent>
+          {/* Renderiza os dados */}
+          <Grid container sx={{ mt: 1 }}>
+            {/* {' '} */}
+            {/* Container principal com espaçamento */}
+            <Grid item xs={12} md={12} lg={8} xl={9}>
+              {/* {' '} */}
+              {/* Grid para o gráfico (ocupa 8 colunas em telas médias e maiores, 12 em telas menores) */}
+              <Card>
+                {isLoadingFetchDetailsData ? (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100px',
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : isErrorFetchDetailsData || !data ? (
+                  (() => {
+                    console.log(errorFetchDetailsData);
+                    return (
+                      <Alert
+                        variant="filled"
+                        severity="error"
+                        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                      >
+                        falha ao carregar os dados
+                      </Alert>
+                    );
+                  })()
+                ) : (
+                  <>
+                    {isPrinting ? (
+                      <>
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                            TORQUE X TEMPO
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="TORQUE" grip={data} />
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                            ÂNGULO X TEMPO
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="ÂNGULO" grip={data} />
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                          TORQUE X ÂNGULO
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="TORQUE X ÂNGULO" grip={data} />
+                      </>
+                    ) : (
+                      <AreaChartNew grip={data} />
+                    )}
+                  </>
+                )}
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={12} lg={4} xl={3}>
+              {' '}
+              {/* Grid para a lista (ocupa 4 colunas em telas médias e maiores, 12 em telas menores) */}
+              <Card>
+                <List>
+                  <ListItem divider>
+                    <ListItemText
+                      primary={
+                        <Typography variant="h5">{transformDate(dataRow.dateTime)}</Typography>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Stack alignItems="flex-end">
+                        <Typography variant="h4" noWrap>
+                          {getStatusIcon(dataRow.generalStatus)}
+                          {getStatus(dataRow.generalStatus)}
+                        </Typography>
+                      </Stack>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem divider>
+                    <ListItemText
+                      primary={
+                        <>
+                          <Typography variant="subtitle1">Ferramenta</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            ID Ferramenta
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Nº de série
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Veículo
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Identificador
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Identificador adic. 1
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Identificador adic. 2
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Identificador adic. 3
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Stack alignItems="flex-end">
+                        {/* <Typography variant="subtitle1" noWrap> */}
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            wordWrap: 'break-word',
+                            // maxWidth: '80%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {dataRow.toolDTO?.toolName || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.toolDTO?.toolId || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.toolDTO?.toolSerialNumber || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.tid || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.identifier || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.addIdentifier1 || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.addIdentifier2 || '*'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.addIdentifier3 || '*'}
+                        </Typography>
+                      </Stack>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem divider>
+                    <ListItemText
+                      primary={
+                        <>
+                          <Typography variant="subtitle1">Programa</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            ID Programa
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Nº Job
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Contagem Job
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Tamanho Job
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Stack alignItems="flex-end">
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            wordWrap: 'break-word',
+                            // maxWidth: '70%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {dataRow.toolProgramDTO?.programName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.toolProgramDTO?.programId}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.jobNumber}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.jobCount}
+                          {/* ver stepJob */}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.jobSize}
+                        </Typography>
+                      </Stack>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem divider>
+                    <ListItemText
+                      primary={
+                        <>
+                          <Typography variant="subtitle1">Torque</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Torque máximo
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Torque mínimo
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Stack alignItems="flex-end">
+                        <Typography variant="subtitle1" color="primary" noWrap>
+                          {getStatusIcon(dataRow.torqueStatus)}
+                          {getStatus(dataRow.torqueStatus)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.torqueHighLimit}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.torqueLowLimit}
+                        </Typography>
+                      </Stack>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem divider>
+                    <ListItemText
+                      primary={
+                        <>
+                          <Typography variant="subtitle1">Ângulo</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Ângulo máximo
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Ângulo mínimo
+                          </Typography>
+                        </>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Stack alignItems="flex-end">
+                        <Typography variant="subtitle1" color="primary" noWrap>
+                          {getStatusIcon(dataRow.angleStatus)}
+                          {getStatus(dataRow.angleStatus)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.angleHighLimit}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {dataRow.angleLowLimit}
+                        </Typography>
+                      </Stack>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </List>
+              </Card>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <Button onClick={handlePrint} className="no-print">
+          Imprimir
+        </Button>
+      </Dialog>
+    </>
+  );
 }

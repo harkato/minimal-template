@@ -3,6 +3,7 @@ import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'material-react-toastify';
 import qs from 'qs';
+import { Time } from 'highcharts';
 
 const displayedToasts: Record<string, NodeJS.Timeout> = {};
 
@@ -65,7 +66,7 @@ const fetchData = async (endpoint: string) => {
     const response = await axios.get(`${apiConfig.API_URL}/${endpoint}`);
     return response.data;
   } catch (error: any) {
-    handleApiError(error, endpoint); // Exibe o toast e lança o erro
+    handleApiError(error, endpoint); // Exibe o toast e lança o erro    
     return Promise.resolve([]);
   }
 };
@@ -111,7 +112,7 @@ export const fetchDataFilters = async (
     );
     return response.data;
   } catch (error) {
-    handleApiError(error, endpoint);
+    handleApiError(error, endpoint);    
     return Promise.resolve([]);
   }
 };
@@ -219,7 +220,8 @@ const fetchDataTop5 = async (endpoint: string) => {
 export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   // Lista do TOP5 QUARKUS
   return useQuery({
-    queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
+    // queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
+    queryFn: () => fetchDataTop5(`tools/topNokOkRate?finalDateTime=${finalDateTime}`),
     queryKey: ['topNokOk_data'],
     refetchInterval: 15000, // Refetch a cada 30 segundos
     retry: false,
@@ -230,9 +232,16 @@ export function useTopNokOk(finalDateTime: string, switchTop5: any) {
 // Busca os resultados de uma apertadeira
 const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: number) => {
   try {
-    const response = await axios.get(
-      `${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`
-    );
+    // const response = await axios.get(
+    //   `${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`
+    // );
+    const response = await axios.get(`${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
+      params: {
+        finalDateTime: '2022-10-24T10:00:00',
+        initialDateTime: '2022-09-24T06:00:00',
+        amount: 5,
+      },
+    });
     return response.data;
   } catch (error) {
     const toolIdentifier = `${endpoint}-${toolId}-${toolRevision}`;
@@ -253,7 +262,7 @@ export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision:
         refetchInterval: 15000,
         staleTime: 1000 * 60 * 5,
         retry: false,
-        onError: (error: any) => {
+        onError: (error: any) => {          
           // Passa a string única e o nome da ferramenta como identificador
           handleApiError(error, toolIdentifier, true);
         },
@@ -261,4 +270,92 @@ export function useToolsInfo(toolsWithRevisions: { toolId: number; toolRevision:
     }),
   });
   return toolQueries;
+}
+
+// ====================================================DETAILS=======================================
+
+const fetchDetailsInfo = async (endpoint: string, tId: number, graphType?: string) => {
+  try {
+    // const response = await axios.get( `${apiConfig.API_URL}/${endpoint}` , {
+    //   params: {
+    //     TID: tId,
+    //     type: graphType,
+    //   },
+    // });
+    const params: { TID: number; type?: string } = {
+      TID: tId,
+    };
+    if (graphType) {
+      params.type = graphType;
+    }
+    const response = await axios.get(`${apiConfig.API_URL}/${endpoint}`, {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    const toolIdentifier = `${endpoint}-${tId}-${graphType}`;
+    handleApiError(error, toolIdentifier, true);
+    return Promise.resolve([]);
+  }
+};
+
+export function useDetailsInfo(tId: number) {
+  const queryTorqueTime = useQuery({
+    queryFn: () => fetchDetailsInfo('resultdetails/all', tId),
+    queryKey: ['details', tId],
+    select: (data) => {
+      if (data) {
+        return {
+          // ...data,
+          // Torque: data.Torque.map((item: { value: number }) => item.value),
+          // Angle: data.Angle.map((item: { value: number }) => item.value),
+          // Time: data.Time.map((item: { value: number }) => item.value),
+          Torque: data.TorquePoints,
+          Angle: data.AnglePoints,
+          Time: data.TimePoints,
+        };
+      }
+      console.log('data ================', data);
+      
+      return data;
+    },
+  });
+  return queryTorqueTime;
+}
+
+export function useCombinedDetailsInfo(tId: number) {
+  const queryResults = useQueries({
+    queries: [
+      {
+        queryKey: ['details', tId, 'torque_x_time'],
+        queryFn: () => fetchDetailsInfo('resultdetails', tId, 'torque_x_time'),
+      },
+      {
+        queryKey: ['details', tId, 'angle_x_time'],
+        queryFn: () => fetchDetailsInfo('resultdetails', tId, 'angle_x_time'),
+      },
+    ],
+  });
+
+  const isLoading = queryResults.some((result) => result.isLoading);
+  const isError = queryResults.some((result) => result.isError);
+  const errors = queryResults.filter((result) => result.error).map((result) => result.error);
+
+  const combinedData = queryResults.every((result) => result.data)
+    ? {
+        TracePoints: {
+          time: queryResults[0].data.TracePoints.map((point: { X: any; }) => point.X),
+          torque: queryResults[0].data.TracePoints.map((point: { Y: any; }) => point.Y),
+          angle: queryResults[1].data.TracePoints.map((point: { Y: any; }) => point.Y),
+        },
+      }
+    : undefined;
+  // console.log('combinedData', combinedData?.TracePoints);
+  
+  return {
+    data: combinedData,
+    isLoading,
+    isError,
+    error: errors.length > 0 ? errors : null,
+  };
 }

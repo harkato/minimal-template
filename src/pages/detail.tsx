@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import DetailsPage from 'src/sections/results/detail-view';
+import DetailsPage from 'src/sections/results/detail-view copy';
 
 // ----------------------------------------------------------------------
 
