@@ -1,17 +1,24 @@
 import apiConfig from 'src/config/api-config';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'material-react-toastify';
 import qs from 'qs';
+import { showToastOnce } from './sse-service';
 
 export const displayedToasts: Record<string, NodeJS.Timeout> = {};
 
-export const handleApiError = (error: AxiosError | any, endpoint: string, toolName?: boolean) => {
+export const handleApiError = (
+  error: AxiosError | any,
+  endpoint: string, 
+  toolName?: boolean,
+  showToast = true
+) => {
   let errorMessage = 'Ocorreu um erro inesperado.';
 
   if (axios.isAxiosError(error)) {
     if (error.response) {
       console.error('Erro Axios - Resposta:', error.response.status, error.response.data);
+
       switch (error.response.status) {
         case 404:
           errorMessage = 'Recurso não encontrado.';
@@ -24,39 +31,28 @@ export const handleApiError = (error: AxiosError | any, endpoint: string, toolNa
           break;
       }
     } else if (error.request) {
-      console.error('Erro Axios - Requisição:', error.request);
+      console.error('Sem resposta do servidor.');
       errorMessage = 'Nenhuma resposta do servidor. Verifique sua conexão com a internet.';
     } else {
-      console.error('Erro Axios - Configuração:', error.message);
+      console.error('Erro na configuração: ', error.message);
       errorMessage = 'Falha na configuração da requisição.';
     }
   } else {
-    console.error('Erro:', error.message);
+    console.error('Erro desconhecido: ', error.message);
     errorMessage = error.message || 'Ocorreu um erro inesperado.';
   }
 
   const cacheKey = `${endpoint}:${errorMessage}`;
 
-  if (!displayedToasts[cacheKey]) {
+  if (showToast && !displayedToasts[cacheKey]) {
     const toastMessage = toolName
       ? `Erro ao carregar dados da ferramenta. ${errorMessage}`
       : `${errorMessage}`;
     // Exibe o toast com a mensagem de erro
-    toast.error(toastMessage, {
-      position: 'bottom-left',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    displayedToasts[cacheKey] = setTimeout(() => {
-      delete displayedToasts[cacheKey];
-    }, 60000);
+    showToastOnce(toastMessage, endpoint);
   }
   // Lança o erro para que ele possa ser tratado por quem chamou a função, se necessário
-  throw new Error(errorMessage);
+  return new Error(errorMessage);
 };
 
 // Usado no GET do menu de ferramentas
@@ -141,7 +137,7 @@ export const fetchDataTotal = async (filters: any) => {
     });
     return response.data;
   } catch (error) {
-    handleApiError(error, 'totalItems');
+    handleApiError(error, 'totalItems', false, false);
     return Promise.resolve([]);
   }
 };

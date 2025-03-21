@@ -1,4 +1,34 @@
 import { handleApiError } from './api';
+import { toast } from 'material-react-toastify';
+
+const displayedToasts: Record<string, NodeJS.Timeout> = {};
+
+/**
+ * Exibe um toast de erro apenas se ainda não tiver sido exibido recentemente.
+ *
+ * @param message - Mensagem do erro a ser exibida
+ * @param context - Identificador do erro (ex: endpoint da API ou URL do SSE)
+ * @param duration - Tempo em milissegundos para reexibir o mesmo erro (padrão: 1 min)
+ */
+export const showToastOnce = (message: string, context: string, duration: number = 60000) => {
+  const cacheKey = `${context}:${message}`;
+
+  if (!displayedToasts[cacheKey]) {
+    toast.error(message, {
+      position: 'bottom-left',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+
+    displayedToasts[cacheKey] = setTimeout(() => {
+      delete displayedToasts[cacheKey]; // Remove do cache após o tempo definido
+    }, duration);
+  }
+};
+
 
 const listeners: Set<(data: any) => void> = new Set();
 let eventSource: EventSource | null = null;
@@ -20,15 +50,18 @@ export const startSSE = (url: string) => {
         try {
           callback(data);
         } catch (error) {
+          handleApiError(error, url);
           console.error('Erro no callback SSE:', error);
         }
       });
     } catch (error) {
+      handleApiError(error, url);
       console.error('Erro ao processar evento tool_info:', error);
     }
   });
 
-  eventSource.onerror = () => {
+  eventSource.onerror = (event) => {
+    handleSSEError(event, url);
     console.error('Erro na conexão SSE. Tentando reconectar...');
 
     if (retryTimeout) clearTimeout(retryTimeout);
@@ -64,4 +97,12 @@ export const closeSSE = () => {
   console.log('Fechando conexão SSE...');
   eventSource?.close();
   eventSource = null;
+};
+
+export const handleSSEError = (event: Event, url: string) => {
+  console.error('Erro na conexão SSE:', event);
+
+  const errorMessage = 'Erro na conexão em tempo real. Tentando reconectar...';
+
+  showToastOnce(errorMessage, url);
 };
