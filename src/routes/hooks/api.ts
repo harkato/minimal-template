@@ -2,9 +2,36 @@ import apiConfig from 'src/config/api-config';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import qs from 'qs';
-import { showToastOnce } from './sse-service';
+import { toast } from 'material-react-toastify';
 
 export const displayedToasts: Record<string, NodeJS.Timeout> = {};
+
+/**
+ * Exibe um toast de erro apenas se ainda não tiver sido exibido recentemente.
+ *
+ * @param message - Mensagem do erro a ser exibida
+ * @param context - Identificador do erro (ex: endpoint da API ou URL do SSE)
+ * @param duration - Tempo em milissegundos para reexibir o mesmo erro (padrão: 1 min)
+ */
+
+const showToastOnce = (message: string, context: string, duration: number = 60000) => {
+  const cacheKey = `${context}:${message}`;
+
+  if (!displayedToasts[cacheKey]) {
+    toast.error(message, {
+      position: 'bottom-left',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+
+    displayedToasts[cacheKey] = setTimeout(() => {
+      delete displayedToasts[cacheKey]; // Remove do cache após o tempo definido
+    }, duration);
+  }
+};
 
 export const handleApiError = (
   error: AxiosError | any,
