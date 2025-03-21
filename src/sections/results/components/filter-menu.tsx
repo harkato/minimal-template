@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import {
   TextField,
   MenuItem,
@@ -63,6 +63,7 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
       container
       spacing={2}
       sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
+      className="no-print"
     >
       {/* ID */}
       <Grid size={{ xs: 12, sm: 6, md: 6 }}>
@@ -72,6 +73,10 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
           variant="outlined"
           value={filters.identifier}
           onChange={handleFilterChange}
+          // onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          //   handleFilterChange(event);
+          //   setSelectedTools([])
+          // }}
           fullWidth
         />
       </Grid>
@@ -94,6 +99,12 @@ const FiltersMenu: React.FC<FiltersMenuProps> = ({
             }
             renderInput={(params) => (
               <TextField {...params} label={t('results.tools')} variant="outlined" />
+              // <TextField
+              //   {...params}
+              //   label={t('results.tools')}
+              //   variant="outlined"
+              //   onFocus={() => { filters.identifier='' }}
+              // />
             )}
             renderTags={(selected, getTagProps) =>
               selected.map((option, index) => {

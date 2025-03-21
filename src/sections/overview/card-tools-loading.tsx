@@ -38,7 +38,7 @@ export type Props = {
   onDelete?: (id: string) => void;
 };
 
-export const AnalyticsDashboardCard = React.memo(
+export const LoadingCardTools = React.memo(
   ({
     id,
     title,
@@ -87,13 +87,8 @@ export const AnalyticsDashboardCard = React.memo(
       }
     };
     function getColor(): string {
-      if (nokVin >= newTargetCritical) {
-        return '#F24F4F';
-      }
-      if (nokVin >= newTargetAlert) {
-        return '#FFB300';
-      }
-      return '#20878B';
+      // return '#cdd1cf';
+      return '#7e807f';
     }
 
     useEffect(() => {
@@ -111,21 +106,7 @@ export const AnalyticsDashboardCard = React.memo(
       <Card sx={{ bgcolor: `white` }}>
         <Box>
           <CardHeader
-            title={
-              <Typography
-                noWrap
-                fontWeight="bold"
-                sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '150px',
-                  whiteSpace: 'nowrap',
-                  color: 'white',
-                }}
-              >
-                {title}
-              </Typography>
-            }
+            title={title}
             sx={{
               p: 3,
               boxShadow: 'none',
@@ -215,18 +196,14 @@ export const AnalyticsDashboardCard = React.memo(
           <CardContent>
             <Grid container sx={{ justifyContent: 'space-between' }}>
               <Grid>
-                <Typography variant="body2">
-                  {t('dashboard.vehicles')} {vehicles}
-                </Typography>
-                <Typography variant="body2">NOK: {nok}</Typography>
+                <Typography variant="body2">{t('dashboard.vehicles')} ------</Typography>
+                <Typography variant="body2">NOK: ------</Typography>
                 <Typography variant="body2">
                   {t('dashboard.limits')} {newTargetAlert} / {newTargetCritical}
                 </Typography>
               </Grid>
               <Grid>
-                <Typography variant="h3">
-                  {t('dashboard.rate')} {nokVin.toFixed(2)}
-                </Typography>
+                <Typography variant="h3">{t('dashboard.rate')} -.--</Typography>
               </Grid>
             </Grid>
             <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
