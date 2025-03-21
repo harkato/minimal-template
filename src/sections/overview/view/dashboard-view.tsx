@@ -30,6 +30,7 @@ import { SkeletonTools, SkeletonTopFive } from '../card-loading';
 import dayjs from 'dayjs';
 import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
+import { LoadingCardTools } from '../card-tools-loading';
 
 interface DataTopNokOk {
   title: string;
@@ -476,12 +477,28 @@ export function OverviewAnalyticsView() {
             <SSEComponent toolIds={selectedTools} onData={handleNewToolData} />
             {selectedTools.map((toolId) => {
               const tool = toolsInfoData.find((t) => t.toolId === toolId);
+              const loadingTool = pendingValue.find((t) => t.toolId === toolId);
               const isLoading = loadingTools[toolId];
 
               return (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={toolId}>
                   {isLoading ? (
-                    <SkeletonTools/>
+                    // <SkeletonTools/>
+                    <LoadingCardTools
+                      title={loadingTool?.toolName ?? 'Desconhecido'}
+                      id={loadingTool?.toolId ?? ''}
+                      vehicles={0}
+                      nokVin={0}
+                      nok={0}
+                      topIssues={[]}
+                      targetAlert={toolLimits[0]}
+                      targetCritical={toolLimits[1]}
+                      onDelete={() => {
+                        setSelectedTools((prev) => prev.filter((t) => t !== toolId));
+                        setToolsInfoData((prev) => prev.filter((t) => t.toolId !== toolId));
+                        setPendingValue((prev) => prev.filter((t) => t.toolId !== toolId));
+                      }}
+                    />
                   ) : (
                     <AnalyticsDashboardCard
                       title={tool?.toolName ?? 'Desconhecido'}
