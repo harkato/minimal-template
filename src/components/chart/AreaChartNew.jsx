@@ -40,18 +40,17 @@ const botaoImprimir = document.getElementById('imprimir');
 
 export  function AreaChartNew({ grip }) {
   const [slot, setSlot] = useState('TORQUE');
-  const navigate = useNavigate(); // Inicializa o useNavigate
-
-  const handleGoBack = () => {
-    navigate(-1); // Navega para a página anterior no histórico
-  };
+  // const navigate = useNavigate(); // Inicializa o useNavigate
+  // const handleGoBack = () => {
+  //   navigate(-1); // Navega para a página anterior no histórico
+  // };
 
   return (
     <>
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
           {/* Botão para voltar a pagina */}
-          <Button
+          {/* <Button
             size="small"
             onClick={() => handleGoBack()}
           >
@@ -67,7 +66,7 @@ export  function AreaChartNew({ grip }) {
             >
               <ArrowBackOutlinedIcon color='primary' />
             </Box>              
-          </Button>
+          </Button> */}
         </Grid>
         <Grid item>
           <Stack direction="row" alignItems="center" margin= '20px 20px 0px 0px' spacing={5}>

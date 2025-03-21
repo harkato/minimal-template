@@ -111,7 +111,21 @@ export const AnalyticsDashboardCard = React.memo(
       <Card sx={{ bgcolor: `white` }}>
         <Box>
           <CardHeader
-            title={title}
+            title={
+              <Typography
+                noWrap
+                fontWeight="bold"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '150px',
+                  whiteSpace: 'nowrap',
+                  color: 'white',
+                }}
+              >
+                {title}
+              </Typography>
+            }
             sx={{
               p: 3,
               boxShadow: 'none',

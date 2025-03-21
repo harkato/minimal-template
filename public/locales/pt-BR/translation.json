@@ -59,7 +59,11 @@
     },
 
     "message": {
-      "invalidName": "Erro ao criar usuário: nome inválido"
+      "invalidName": "Erro ao criar usuário: nome inválido",
+      "connectionRestored": "Conexão restaurada",
+      "lostConnection": "Conexão perdida. Verifique sua conexão.",
+      "errorCardTools": "Erro ao carregar dados da ferramenta",
+      "errorTop5": "Erro ao carregar dados do TOP 5."
     },
 
     "reports": {

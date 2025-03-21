@@ -29,13 +29,19 @@ import {
   useResultPaginate,
   fetchProgramsData,
   useResultAmount,
+  useCombinedDetailsInfo,
+  useDetailsInfo,
 } from 'src/routes/hooks/api';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { useQuery } from '@tanstack/react-query';
 import FiltersMenu from './components/filter-menu';
 import { printAllPages } from 'src/utils/print-table';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
+import Dialog from '@mui/material/Dialog';
+import { DetailsPage } from './detail-view';
+import { ResultDataRow } from 'src/types/DataRow';
 
 interface DataRow {
   dateTime: string;
@@ -134,7 +140,7 @@ const getStatusIcon = (status: Status) => {
 
 const transformDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return format(date, 'dd/MM/yyyy HH:mm');
+  return format(date, 'dd/MM/yyyy HH:mm:ss');
 };
 
 export default function ResultPage() {
@@ -188,6 +194,19 @@ export default function ResultPage() {
     queryKey: ['programs', JSON.stringify(filters)],
     enabled: !!filters.toolList && filters.toolList.length > 0,
   });
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState<ResultDataRow | null>(null);
+
+  const handleOpenDialog = (rowData: ResultDataRow) => {
+    setSelectedRowData(rowData);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedRowData(null);
+  };
 
   // Atualiza o filtro de ferramentas
   useEffect(() => {
@@ -484,9 +503,10 @@ export default function ResultPage() {
         draggable
         pauseOnHover
         limit={5}
+        className="no-print"
       />
       {/* ================================================================== titulo da pagina ============================================= */}
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }}>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }} className="no-print">
         {t('results.results')}
       </Typography>
 
@@ -512,7 +532,7 @@ export default function ResultPage() {
       />
 
       {/* Tabela de Dados */}
-      <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef}>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef} className="no-print">
         <Toolbar
           sx={{
             height: 50,
@@ -583,20 +603,24 @@ export default function ResultPage() {
                   >
                     {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
                     <TableCell sx={{ textAlign: 'left' }}>
-                      {/* link para a pagina de detalhes
-                  <Box
-                      sx={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                      }}
-                      onClick={() => handleNavigation('/detail')}
-                    >
-                      <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
-                    </Box> */}
+                      {/* link para a pagina de detalhes */}
+                      <Box
+                        sx={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          color: 'white',
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                        }}
+                        // onClick={() => handleNavigation('/detail')}
+                        onClick={() => {
+                          // console.log(JSON.stringify(resultData[index]));
+                          handleOpenDialog(resultData[index] as ResultDataRow);
+                        }}
+                      >
+                        <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
+                      </Box>
                       {row.dateTime}
                     </TableCell>
                     <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
@@ -668,6 +692,9 @@ export default function ResultPage() {
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
         />
       </TableContainer>
+      <Dialog fullScreen open={openDialog} onClose={handleCloseDialog}>
+        {selectedRowData && <DetailsPage dataRow={selectedRowData} onClose={handleCloseDialog} />}
+      </Dialog>
     </>
   );
 }
