@@ -6,10 +6,10 @@ import ReactApexChart from 'react-apexcharts';
 const areaChartOptions = {
   chart: {
     height: 450,
-    type: 'area',
+    type: 'line', // mudou de area para line 
     toolbar: {
       tools: {
-        pan: false,
+        pan: true,
         // customIcons: [{
         //     icon: '<img src="/assets/icons/glass/print.png">',
         //     index: 4,
@@ -61,7 +61,7 @@ export default function IncomeAreaChart({ slot, grip }) {
 
     setOptions((prevState) => ({
       ...prevState,
-      colors: [theme.palette.primary.main, theme.palette.primary[700]],
+      // colors: [theme.palette.primary.main, theme.palette.primary[700]],
       xaxis: {
         title: {
           text: slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' : 'TEMPO',
@@ -136,7 +136,7 @@ export default function IncomeAreaChart({ slot, grip }) {
     ]);
   }, [primary, secondary, line, theme, slot, grip]);
 
-  return <ReactApexChart options={options} series={series} type="area" height={450} />;
+  return <ReactApexChart options={options} series={series} type="line" height={450} />;
 }
 
 IncomeAreaChart.propTypes = {

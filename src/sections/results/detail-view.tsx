@@ -24,11 +24,11 @@ import { useTranslation } from 'react-i18next';
 import { useDetailData } from 'src/routes/hooks/useToolData';
 import AreaChartNew from 'src/components/chart/AreaChartNew';
 import CloseIcon from '@mui/icons-material/Close';
-import { ResultDataRow } from 'src/context/DataRow';
+import { ResultDataRow } from 'src/types/DataRow';
 import { format } from 'date-fns';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useDetailsInfo } from 'src/routes/hooks/api';
-import './print.css';
+import 'src/styles/print.css';
 import IncomeAreaChart from 'src/components/chart/IncomeAreaChart';
 
 interface DetailsPageProps {
@@ -78,7 +78,7 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
 
   const transformDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return format(date, 'dd/MM/yyyy HH:mm');
+    return format(date, 'dd/MM/yyyy HH:mm:ss');
   };
   const tableRef = useRef<HTMLDivElement>(null);
 
@@ -144,9 +144,7 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                     <CircularProgress />
                   </Box>
                 ) : isErrorFetchDetailsData || !data ? (
-                  (() => {
-                    console.log(errorFetchDetailsData);
-                    return (
+                  (() => (
                       <Alert
                         variant="filled"
                         severity="error"
@@ -154,34 +152,40 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                       >
                         falha ao carregar os dados
                       </Alert>
-                    );
-                  })()
+                    )
+                  )()
                 ) : (
                   <>
-                    {isPrinting ? (
+                    {/* {isPrinting ? ( */}
                       <>
-                        <Box display="flex" justifyContent="center">
-                          <Typography variant="h4" style={{ color: '#00477A' }}>
-                            TORQUE X TEMPO
-                          </Typography>
-                        </Box>
-                        <IncomeAreaChart slot="TORQUE" grip={data} />
-                        <Box display="flex" justifyContent="center">
-                          <Typography variant="h4" style={{ color: '#00477A' }}>
-                            ÂNGULO X TEMPO
-                          </Typography>
-                        </Box>
-                        <IncomeAreaChart slot="ÂNGULO" grip={data} />
-                        <Box display="flex" justifyContent="center">
-                          <Typography variant="h4" style={{ color: '#00477A' }}>
-                          TORQUE X ÂNGULO
-                          </Typography>
-                        </Box>
-                        <IncomeAreaChart slot="TORQUE X ÂNGULO" grip={data} />
+                        <div style={{ pageBreakInside: 'avoid' }}>
+                          <Box display="flex" justifyContent="center">
+                            <Typography variant="h4" style={{ color: '#00477A' }}>
+                              TORQUE X TEMPO
+                            </Typography>
+                          </Box>
+                          <IncomeAreaChart slot="TORQUE" grip={data} />
+                        </div>
+                        <div style={{ pageBreakInside: 'avoid' }}>
+                          <Box display="flex" justifyContent="center">
+                            <Typography variant="h4" style={{ color: '#00477A' }}>
+                              ÂNGULO X TEMPO
+                            </Typography>
+                          </Box>
+                          <IncomeAreaChart slot="ÂNGULO" grip={data} />
+                        </div>
+                        <div style={{ pageBreakInside: 'avoid' }}>
+                          <Box display="flex" justifyContent="center">
+                            <Typography variant="h4" style={{ color: '#00477A' }}>
+                              TORQUE X ÂNGULO
+                            </Typography>
+                          </Box>
+                          <IncomeAreaChart slot="TORQUE X ÂNGULO" grip={data} />
+                        </div>
                       </>
-                    ) : (
+                    {/* ) : (
                       <AreaChartNew grip={data} />
-                    )}
+                    )} */}
                   </>
                 )}
               </Card>
@@ -189,7 +193,7 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
             <Grid item xs={12} md={12} lg={4} xl={3}>
               {' '}
               {/* Grid para a lista (ocupa 4 colunas em telas médias e maiores, 12 em telas menores) */}
-              <Card>
+              <Card style={{ pageBreakBefore: 'always' }} >
                 <List>
                   <ListItem divider>
                     <ListItemText

@@ -10,4 +10,12 @@
     .MuiBackdrop-root {
         background-color: #FFFFFF !important;
     }
+
+    .avoid-page-break {
+      page-break-inside: avoid;
+    }
+
+    @page {
+      size: landscape;
+    }
   }

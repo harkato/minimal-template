@@ -41,7 +41,7 @@ import { toast, ToastContainer } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 import Dialog from '@mui/material/Dialog';
 import { DetailsPage } from './detail-view';
-import { ResultDataRow } from 'src/context/DataRow';
+import { ResultDataRow } from 'src/types/DataRow';
 
 interface DataRow {
   dateTime: string;
@@ -140,7 +140,7 @@ const getStatusIcon = (status: Status) => {
 
 const transformDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return format(date, 'dd/MM/yyyy HH:mm');
+  return format(date, 'dd/MM/yyyy HH:mm:ss');
 };
 
 export default function ResultPage() {
