@@ -292,6 +292,8 @@ const fetchDetailsInfo = async (endpoint: string, tId: number, graphType?: strin
     });
     return response.data;
   } catch (error) {
+    console.log("Details error");
+    
     const toolIdentifier = `${endpoint}-${tId}-${graphType}`;
     handleApiError(error, toolIdentifier, true);
     return Promise.resolve([]);
@@ -303,7 +305,7 @@ export function useDetailsInfo(tId: number) {
     queryFn: () => fetchDetailsInfo('resultdetails/all', tId),
     queryKey: ['details', tId],
     select: (data) => {
-      if (data) {
+      if (data.AnglePoints) {
         return {
           // ...data,
           // Torque: data.Torque.map((item: { value: number }) => item.value),
@@ -313,9 +315,7 @@ export function useDetailsInfo(tId: number) {
           Angle: data.AnglePoints,
           Time: data.TimePoints,
         };
-      }
-      console.log('data ================', data);
-      
+      }      
       return data;
     },
   });

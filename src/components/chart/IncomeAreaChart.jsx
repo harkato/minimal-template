@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactApexChart from 'react-apexcharts';
+import { useTranslation } from 'react-i18next';
 
 const areaChartOptions = {
   chart: {
@@ -40,6 +41,7 @@ const areaChartOptions = {
 };
 
 export default function IncomeAreaChart({ slot, grip }) {
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
@@ -61,10 +63,10 @@ export default function IncomeAreaChart({ slot, grip }) {
 
     setOptions((prevState) => ({
       ...prevState,
-      // colors: [theme.palette.primary.main, theme.palette.primary[700]],
+      // colors: [theme.palette.primary.main, theme.palette.primary[700]], 
       xaxis: {
         title: {
-          text: slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' : 'TEMPO',
+          text: slot === 'TORQUE X ÂNGULO' ? t('charts.angle') : t('charts.times'),
         },
         // categories: slot === 'TORQUE X ÂNGULO' ? angles : times, // Usa os valores de tempo do grip
         labels:
@@ -84,7 +86,7 @@ export default function IncomeAreaChart({ slot, grip }) {
       },
       yaxis: {
         title: {
-          text: slot === 'ÂNGULO' ? 'ÂNGULO' : 'TORQUE',
+          text: slot === 'ÂNGULO' ? t('charts.angle') : t('charts.torque'),
         },
         labels: {
           style: {
@@ -98,14 +100,17 @@ export default function IncomeAreaChart({ slot, grip }) {
       /* eslint-disable */
       tooltip: {
         custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-          const yAxisLabel = slot === 'ÂNGULO' ? 'ÂNGULO' : 'TORQUE';
-          const xAxisLabel = slot === 'TORQUE X ÂNGULO' ? 'ÂNGULO' : 'TEMPO';
+          const yAxisLabel = slot === 'ÂNGULO' ? t('charts.angle') : t('charts.torque');
+          const xAxisLabel = slot === 'TORQUE X ÂNGULO' ? t('charts.angle') : t('charts.times');
           const eixoX = slot === 'TORQUE X ÂNGULO' ? angles : times;
           const suffixY = slot === 'ÂNGULO' ? 'º' : 'Nm ';
           const suffixX = slot === 'TORQUE X ÂNGULO' ? 'º' : 'ms ';
+          const labelTooltip = slot === 'ÂNGULO' ? t('charts.angle') 
+          : slot === 'TORQUE X ÂNGULO' ? t('charts.torqueAngle')
+          :t('charts.torque');
           return (
             '<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color:#01548F">' +
-            slot +
+            labelTooltip +
             '</div>' + // Título (slot)
             // Label e valor do eixo Y
             '<span class="apexcharts-tooltip-text">' +
@@ -134,7 +139,7 @@ export default function IncomeAreaChart({ slot, grip }) {
         data:  slot === 'ÂNGULO' ? angleTime : slot === 'TORQUE' ? torqueTime : torqueAngle,
       },
     ]);
-  }, [primary, secondary, line, theme, slot, grip]);
+  }, [primary, secondary, line, theme, slot, grip, t]);
 
   return <ReactApexChart options={options} series={series} type="line" height={450} />;
 }

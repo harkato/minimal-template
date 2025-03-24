@@ -31,7 +31,13 @@
     "charts": {
       "title": "Seats - Failure Rate",
       "time": "Time",
-      "rate": "Rate"
+      "rate": "Rate",
+      "angle": "Angle",
+      "torque": "Torque",
+      "times": "Time",
+      "torqueTime": "Torque X Time",
+      "angleTime": "Angle X Time",
+      "torqueAngle": "Torque X Angle"
     },
     
     "navigation": {
@@ -109,5 +115,31 @@
       "noRecords": "No records found.",
       "rowsPerPage": "Rows per page:",
       "of": "of"
-    }
-   }
+    },
+    "details": {
+      "resultDetails": "RESULT DETAILS",
+      "failedToLoadData": "Failed to load data",
+      "torqueTime": "TORQUE X TIME",
+      "angleTime": "ANGLE X TIME",
+      "torqueAngle": "TORQUE X ANGLE",
+      "tool": "Tool",
+      "toolID": "Tool ID",
+      "serialNumber": "Serial Number",
+      "Identifier": "Identifier",
+      "additionalID1": "Additional ID 1",
+      "additionalID2": "Additional ID 2",
+      "additionalID3": "Additional ID 3",
+      "program": "Program",
+      "programID": "Program ID",
+      "jobNumber": "Job Number",
+      "jobCount": "Job Count",
+      "jobSize": "Job Size",
+      "torque": "Torque",
+      "torqueHighLimit": "Torque High Limit",
+      "torqueLowLimit": "Torque Low Limit",
+      "angle": "Angle",
+      "angleHighLimit": "Angle High Limit",
+      "angleLowLimit": "Angle Low Limit",
+      "print": "Print"
+  }
+}

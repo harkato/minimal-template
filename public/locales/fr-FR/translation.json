@@ -31,7 +31,13 @@
     "charts": {
       "seatsFailureRate": "Sièges - Taux de Défaillance",
       "time": "Heure",
-      "rate": "Taux"
+      "rate": "Taux",
+      "angle": "Angle",
+      "torque": "Couple",
+      "times": "Temps",
+      "torqueTime": "Couple X Temps",
+      "angleTime": "Angle X Temps",
+      "torqueAngle": "Couple X Angle"
     },
 
     "navigation": {
@@ -109,5 +115,31 @@
       "noRecords": "Aucun enregistrement trouvé.",
       "rowsPerPage": "Lignes par page :",
       "of": "de"
-      }
+    },
+    "details": {
+      "resultDetails": "DÉTAILS DU RÉSULTAT",
+      "failedToLoadData": "Échec du chargement des données",
+      "torqueTime": "COUPLE X TEMPS",
+      "angleTime": "ANGLE X TEMPS",
+      "torqueAngle": "COUPLE X ANGLE",
+      "tool": "Outil",
+      "toolID": "ID de l'outil",
+      "serialNumber": "Numéro de série",
+      "Identifier": "Identifiant",
+      "additionalID1": "Identifiant additionnel 1",
+      "additionalID2": "Identifiant additionnel 2",
+      "additionalID3": "Identifiant additionnel 3",
+      "program": "Programme",
+      "programID": "ID du programme",
+      "jobNumber": "Numéro de travail",
+      "jobCount": "Nombre de travaux",
+      "jobSize": "Taille du travail",
+      "torque": "Couple",
+      "torqueHighLimit": "Couple maximal",
+      "torqueLowLimit": "Couple minimal",
+      "angle": "Angle",
+      "angleHighLimit": "Angle maximal",
+      "angleLowLimit": "Angle minimal",
+      "print": "Imprimer"
+    }
   }
