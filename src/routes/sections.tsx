@@ -16,6 +16,7 @@ export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const ResultsPage = lazy(() => import('src/pages/results'));
+export const NokTrendPage = lazy(() => import('src/pages/nok-trend'));
 export const Menu = lazy(() => import('src/pages/menu'));
 
 // ----------------------------------------------------------------------
@@ -49,6 +50,7 @@ export function Router() {
       children: [
         { element: <HomePage />, index: true },
         { path: 'results', element: <ResultsPage /> },
+        { path: 'noktrend', element: <NokTrendPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'menu', element: <Menu />, 
