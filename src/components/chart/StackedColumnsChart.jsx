@@ -1,3 +1,4 @@
+// charts stacked
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import ReactApexChart from 'react-apexcharts';
@@ -9,11 +10,18 @@ const stackedChartOptions = {
     type: 'bar',
     stacked: true, // Habilita colunas empilhadas
     toolbar: {
-      show: true,
+      show: false,
+      tools: {
+        download: true,
+        selection: true,
+        zoom: true,
+        pan: true,
+        reset: true,
+      },
     },
   },
   dataLabels: {
-    enabled: false,
+    enabled: true,
   },
   stroke: {
     width: 1, // Reduz a largura da borda para visualização de colunas
@@ -34,7 +42,7 @@ const stackedChartOptions = {
   },
   tooltip: {
     y: {
-      formatter: function (val) {
+      formatter (val) {
         return val;
       },
     },

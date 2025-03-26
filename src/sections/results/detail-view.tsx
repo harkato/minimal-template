@@ -281,16 +281,16 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                         <>
                           <Typography variant="subtitle1">{t('details.program')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.programID')}
+                            {t('details.programID')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.jobNumber')}
+                            {t('details.jobNumber')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.jobCount')}
+                            {t('details.jobCount')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.jobSize')}
+                            {t('details.jobSize')}
                           </Typography>
                         </>
                       }
@@ -331,10 +331,10 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                         <>
                           <Typography variant="subtitle1">{t('details.torque')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.torqueHighLimit')}
+                            {t('details.torqueHighLimit')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.torqueLowLimit')}
+                            {t('details.torqueLowLimit')}
                           </Typography>
                         </>
                       }
@@ -360,10 +360,10 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                         <>
                           <Typography variant="subtitle1">{t('details.angle')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.angleHighLimit')}
+                            {t('details.angleHighLimit')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                          {t('details.angleLowLimit')}
+                            {t('details.angleLowLimit')}
                           </Typography>
                         </>
                       }
@@ -389,7 +389,7 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
           </Grid>
         </DialogContent>
         <Button onClick={handlePrint} className="no-print">
-        {t('details.print')}
+          {t('details.print')}
         </Button>
       </Dialog>
     </>

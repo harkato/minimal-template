@@ -3,25 +3,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { format } from 'date-fns';
 import {
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
-  Toolbar,
-  Tooltip,
   IconButton,
   SelectChangeEvent,
-  TablePagination,
-  CircularProgress,
   DialogTitle,
   DialogContent,
+  Alert,
+  Stack,
+  Grid,
+  Card,
 } from '@mui/material';
-import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -32,7 +23,6 @@ import {
   fetchProgramsData,
   useResultAmount,
 } from 'src/routes/hooks/api';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { useQuery } from '@tanstack/react-query';
 import FiltersNokTrend from './components/filter-nok-trend';
 import { printAllPages } from 'src/utils/print-table';
@@ -165,7 +155,7 @@ export default function NokTrendPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [openStack, setOpenStack] = useState(false);
-  const [openDialogResults, setOpenDialogResults] = useState(false)
+  const [openDialogResults, setOpenDialogResults] = useState(false);
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -454,7 +444,7 @@ export default function NokTrendPage() {
     setFilters({ ...filters, blockSearch: false });
     refetch();
     setPage(0);
-    handleOpenResults()
+    handleOpenResults();
   };
 
   // Gerencia a mudança de página
@@ -543,22 +533,34 @@ export default function NokTrendPage() {
         setSelectedPeriod={setSelectedPeriod}
         openStack={openStack}
       />
-
-      {/* Gráfico Stacked Columns */}
-      <StackedColumnsChart/>
+      <Grid container sx={{ mt: 1 }}>
+        <Grid item xs={12} md={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Stack sx={{ width: '80%' }} spacing={2}>
+            <Alert
+              variant="filled"
+              severity="info"
+              sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              A pesquisa retornou mais dados do que podem ser visualizados. Mostrando apenas os 48
+              últimos valores
+            </Alert>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} md={12} lg={12}>
+          {/* Gráfico Stacked Columns */}
+          <Card>
+            <StackedColumnsChart />
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Tabela de Dados */}
-      <Dialog
-        open={openDialogResults}
-        onClose={handleCloseDialogResults}
-        fullWidth
-        maxWidth="xl"
-      >
+      <Dialog open={openDialogResults} onClose={handleCloseDialogResults} fullWidth maxWidth="xl">
         <DialogTitle sx={{ backgroundColor: '#00477A', color: 'white' }}>
           Resultados
           <IconButton
             aria-label="close"
-            onClick={handleCloseDialogResults} 
+            onClick={handleCloseDialogResults}
             sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
             className="no-print"
           >

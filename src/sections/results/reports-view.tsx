@@ -42,6 +42,7 @@ import 'material-react-toastify/dist/ReactToastify.css';
 import Dialog from '@mui/material/Dialog';
 import { DetailsPage } from './detail-view';
 import { ResultDataRow } from 'src/types/DataRow';
+import ResultsTable from './components/ResultsTable';
 
 interface DataRow {
   dateTime: string;
@@ -532,7 +533,22 @@ export default function ResultPage() {
       />
 
       {/* Tabela de Dados */}
-      <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef} className="no-print">
+      <ResultsTable
+                  data={data}
+                  isLoadingResult={isLoadingResult}
+                  filters={filters}
+                  totalCount={totalCount}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  handleChangePage={handleChangePage}
+                  handleChangeRowsPerPage={handleChangeRowsPerPage}
+                  downloadCSV={downloadCSV}
+                  printAllPages={handlePrintAllPages}
+                  handleOpenDialog={handleOpenDialog}
+                  resultData={resultData}
+                />
+
+      {/* <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef} className="no-print">
         <Toolbar
           sx={{
             height: 50,
@@ -567,7 +583,6 @@ export default function ResultPage() {
         />
         <div ref={tableRef}>
           <Table stickyHeader sx={{ minWidth: 650 }} size="small">
-            {/* Head da tabela */}
             <TableHead>
               <TableRow>
                 {isLoadingResult ? (
@@ -593,7 +608,6 @@ export default function ResultPage() {
                 )}
               </TableRow>
             </TableHead>
-            {/* Corpo da tabela */}
             {!isLoadingResult && (
               <TableBody>
                 {data.map((row, index) => (
@@ -601,9 +615,7 @@ export default function ResultPage() {
                     key={index}
                     sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
                   >
-                    {/* <TableCell sx={{ textAlign: 'center' }}>{row.dateTime}</TableCell> */}
                     <TableCell sx={{ textAlign: 'left' }}>
-                      {/* link para a pagina de detalhes */}
                       <Box
                         sx={{
                           display: 'inline-block',
@@ -613,9 +625,7 @@ export default function ResultPage() {
                           textAlign: 'center',
                           fontWeight: 'bold',
                         }}
-                        // onClick={() => handleNavigation('/detail')}
                         onClick={() => {
-                          // console.log(JSON.stringify(resultData[index]));
                           handleOpenDialog(resultData[index] as ResultDataRow);
                         }}
                       >
@@ -691,7 +701,7 @@ export default function ResultPage() {
           labelRowsPerPage={t('results.rowsPerPage')}
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
         />
-      </TableContainer>
+      </TableContainer> */}
       <Dialog fullScreen open={openDialog} onClose={handleCloseDialog}>
         {selectedRowData && <DetailsPage dataRow={selectedRowData} onClose={handleCloseDialog} />}
       </Dialog>

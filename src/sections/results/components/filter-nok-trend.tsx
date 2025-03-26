@@ -37,7 +37,6 @@ const FiltersNokTrend: React.FC<FiltersMenuProps> = ({
   setSelectedPrograms,
   toolsData,
   programsData,
-  handleFilterChange,
   handleSelectionChange,
   handleGroupBy,
   handleDateChange,
@@ -56,18 +55,6 @@ const FiltersNokTrend: React.FC<FiltersMenuProps> = ({
       sx={{ borderRadius: '8px', padding: 2, marginBottom: 2, backgroundColor: '#fefefe' }}
       // className="no-print"
     >
-      {/* ID sai */}
-      {/* <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-        <TextField
-          label={t('results.identifier')}
-          name="identifier"
-          variant="outlined"
-          value={filters.identifier}
-          onChange={handleFilterChange}
-          fullWidth
-        />
-      </Grid> */}
-
       {/* Ferramentas */}
       <Grid size={{ xs: 12, sm: 6, md: 6 }}>
         {toolsData[0] !== '' ? ( // Verifica se toolsData existe e não está vazio
