@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 
 // Define uma interface NavItem para descrever a estrutura de cada item de navegação
-interface NavItem {
+export interface NavItem {
   title: string;
-  path: string;
-  icon: React.ReactNode;
+  path?: string;
+  icon?: React.ReactNode;
   info?: React.ReactNode;
+  children?: NavItem[];
 }
 
 const icon = (name: string) => (
@@ -32,6 +33,10 @@ export const ConfigNavDashboard = (): { navData: NavItem[] } => {
     // path: '/menu',
     path: '/results',
     icon: icon('ic-reports'),
+    children: [
+      { title: 'Resultados', path: '/results'},
+      { title: 'Tendência NOK', path: '/nok'},
+    ]
   },
   // {
   //   title: t('navigation.statistics'),
