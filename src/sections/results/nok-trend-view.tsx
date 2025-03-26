@@ -44,6 +44,7 @@ import { DetailsPage } from './detail-view';
 import { ResultDataRow } from 'src/types/DataRow';
 import ResultsTable from './components/ResultsTable';
 import CloseIcon from '@mui/icons-material/Close';
+import StackedColumnsChart from 'src/components/chart/StackedColumnsChart';
 
 interface DataRow {
   dateTime: string;
@@ -542,6 +543,9 @@ export default function NokTrendPage() {
         setSelectedPeriod={setSelectedPeriod}
         openStack={openStack}
       />
+
+      {/* Gráfico Stacked Columns */}
+      <StackedColumnsChart/>
 
       {/* Tabela de Dados */}
       <Dialog
