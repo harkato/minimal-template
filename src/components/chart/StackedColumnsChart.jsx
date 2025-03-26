@@ -34,7 +34,7 @@ const stackedChartOptions = {
   },
   tooltip: {
     y: {
-      formatter: function (val) {
+      formatter(val) {
         return val;
       },
     },

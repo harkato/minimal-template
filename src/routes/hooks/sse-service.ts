@@ -1,44 +1,16 @@
-import { handleApiError } from './api';
-import { toast } from 'material-react-toastify';
-
-const displayedToasts: Record<string, NodeJS.Timeout> = {};
-
-/**
- * Exibe um toast de erro apenas se ainda não tiver sido exibido recentemente.
- *
- * @param message - Mensagem do erro a ser exibida
- * @param context - Identificador do erro (ex: endpoint da API ou URL do SSE)
- * @param duration - Tempo em milissegundos para reexibir o mesmo erro (padrão: 1 min)
- */
-export const showToastOnce = (message: string, context: string, duration: number = 60000) => {
-  const cacheKey = `${context}:${message}`;
-
-  if (!displayedToasts[cacheKey]) {
-    toast.error(message, {
-      position: 'bottom-left',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-
-    displayedToasts[cacheKey] = setTimeout(() => {
-      delete displayedToasts[cacheKey]; // Remove do cache após o tempo definido
-    }, duration);
-  }
-};
-
+import { displayedToasts, handleApiError, showToastOnce } from './api';
 
 const listeners: Set<(data: any) => void> = new Set();
 let eventSource: EventSource | null = null;
 let retryTimeout: NodeJS.Timeout | null = null;
-const MAX_RETRIES = 5; // Número máximo de tentativas de reconexão
+const MAX_RETRIES = 5;
 let retryCount = 0;
+let pingInterval: NodeJS.Timeout | null = null;
+const cache = displayedToasts;
 
 export const startSSE = (url: string) => {
   if (eventSource) {
-    eventSource.close();
+    return;
   }
 
   eventSource = new EventSource(url);
@@ -62,7 +34,8 @@ export const startSSE = (url: string) => {
 
   eventSource.onerror = (event) => {
     handleSSEError(event, url);
-    console.error('Erro na conexão SSE. Tentando reconectar...');
+    eventSource?.close();
+    eventSource = null;
 
     if (retryTimeout) clearTimeout(retryTimeout);
 
@@ -73,16 +46,49 @@ export const startSSE = (url: string) => {
           startSSE(url);
         },
         2 ** retryCount * 1000
-      ); // Backoff exponencial
+      );
     } else {
       console.error('Número máximo de tentativas de reconexão atingido.');
-      eventSource?.close();
     }
   };
 
   eventSource.onopen = () => {
-    retryCount = 0; // Reseta tentativas após conexão bem-sucedida
+    console.log('Conexão SSE reestabelecida com sucesso!');
+    retryCount = 0;
+    startPingCheck(url);
   };
+
+  // Adiciona os event listeners para detectar mudanças na conectividade
+  window.addEventListener('online', () => {
+    console.log('Internet restaurada. Tentando reconectar o SSE...');
+    retryCount = 0;
+    if (!eventSource) startSSE(url);
+  });
+
+  window.addEventListener('offline', () => {
+    console.warn('Cliente ficou offline. Aguardando reconexão da internet...');
+  });
+};
+
+// Inicia um mecanismo de "ping" para detectar falhas na conexão
+const startPingCheck = (url: string) => {
+  if (pingInterval) clearInterval(pingInterval);
+
+  pingInterval = setInterval(async () => {
+    if (!navigator.onLine) return; // Se o cliente estiver offline, evita requisições
+
+    try {
+      const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      if (!response.ok) throw new Error(`Servidor retornou ${response.status}`);
+
+      console.log('Ping bem-sucedido.');
+    } catch (error) {
+      console.warn('Ping falhou. Tentando reconectar o SSE...');
+      eventSource?.close();
+      eventSource = null;
+      startSSE(url);
+    }
+  }, 10000);
 };
 
 export const addSSEListener = (callback: (data: any) => void) => {
@@ -95,6 +101,7 @@ export const removeSSEListener = (callback: (data: any) => void) => {
 
 export const closeSSE = () => {
   console.log('Fechando conexão SSE...');
+  if (pingInterval) clearInterval(pingInterval);
   eventSource?.close();
   eventSource = null;
 };

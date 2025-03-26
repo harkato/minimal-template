@@ -21,15 +21,17 @@ import { NavUpgrade } from '../components/nav-upgrade';
 import { WorkspacesPopover } from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
+import { NavItem } from '../config-nav-dashboard';
 
 // ----------------------------------------------------------------------
 
 export type NavContentProps = {
   data: {
-    path: string;
+    path?: string;
     title: string;
-    icon: React.ReactNode;
+    icon?: React.ReactNode;
     info?: React.ReactNode;
+    children?: NavItem[];
   }[];
   slots?: {
     topArea?: React.ReactNode;
@@ -106,7 +108,7 @@ export function NavDesktop({
                   <ListItemButton
                     disableGutters
                     component={RouterLink}
-                    href={item.path}
+                    href={item.path ?? '#'}
                     sx={{
                       justifyContent: 'center',
                       pl: isExpanded ? 2 : 1.5,
@@ -232,7 +234,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                   <ListItemButton
                     disableGutters
                     component={RouterLink}
-                    href={item.path}
+                    href={item.path ?? '#'}
                     sx={{
                       pl: 2,
                       py: 1,
