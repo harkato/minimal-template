@@ -148,15 +148,17 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Style
        *************************************** */
       cssVars={{
-        '--layout-nav-vertical-width': isExpanded? '300px' : '72px',
+        '--layout-nav-vertical-width': isExpanded ? '300px' : '72px',
         '--layout-dashboard-content-pt': theme.spacing(1),
         '--layout-dashboard-content-pb': theme.spacing(8),
         '--layout-dashboard-content-px': theme.spacing(5),
       }}
       sx={{
+        transition: 'padding-left 0.3s ease-in-out',
         [`& .${layoutClasses.hasSidebar}`]: {
           [theme.breakpoints.up(layoutQuery)]: {
             pl: 'var(--layout-nav-vertical-width)',
+            transition: 'padding-left 0.3s ease-in-out',
           },
         },
         ...sx,

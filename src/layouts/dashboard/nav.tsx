@@ -95,7 +95,7 @@ export function NavDesktop({
           display: 'flex',
         },
         transition: theme.transitions.create('width', {
-          duration: theme.transitions.duration.standard,
+          duration: theme.transitions.duration.short,
         }),
         ...sx,
       }}
@@ -108,7 +108,7 @@ export function NavDesktop({
           justifyContent: isExpanded ? 'flex-start' : 'center',
           mb: 2,
           transition: theme.transitions.create(['justify-content', 'width'], {
-            duration: theme.transitions.duration.standard,
+            duration: theme.transitions.duration.short,
           }),
         }}
       >
@@ -153,7 +153,7 @@ export function NavDesktop({
                           bgcolor: 'var(--layout-nav-item-hover-bg)',
                         },
                         transition: theme.transitions.create('width', {
-                          duration: theme.transitions.duration.standard,
+                          duration: theme.transitions.duration.short,
                         }),
                       }}
                     >
