@@ -24,6 +24,7 @@ import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
 import { NavItem } from '../config-nav-dashboard';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
+import { set } from 'date-fns';
 
 // ----------------------------------------------------------------------
 
@@ -61,11 +62,18 @@ export function NavDesktop({
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   const handleToggle = (title: string) => {
-    setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
-
     if (!isExpanded) {
-      setIsExpanded(true); // Expande a sidebar se estiver colapsada
+      // Se estiver colapsado, expande e abre o submenu
+      setIsExpanded(true);
+      setOpenMenus((prev) => ({ ...prev, [title]: true }));
+    } else {
+      // Alterna o submenu quando a sidebar já está expandida
+      setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
     }
+  };
+
+  const handleCloseMenu = () => {
+    setIsExpanded(false);
   };
 
   return (
@@ -127,7 +135,7 @@ export function NavDesktop({
                       disableGutters
                       component={hasChildren ? 'button' : RouterLink}
                       href={!hasChildren ? (item.path ?? '#') : undefined}
-                      onClick={() => handleToggle(item.title)}
+                      onClick={hasChildren ? () => handleToggle(item.title) : handleCloseMenu}
                       sx={{
                         justifyContent: 'center',
                         pl: isExpanded ? 2 : 1.5,
@@ -186,6 +194,7 @@ export function NavDesktop({
                                 disableGutters
                                 component={RouterLink}
                                 href={child.path ?? '#'}
+                                onClick={handleCloseMenu}
                                 sx={{
                                   pl: isExpanded ? 4 : 3,
                                   pr: 1.5,
@@ -222,7 +231,6 @@ export function NavDesktop({
     </Box>
   );
 }
-
 
 // ----------------------------------------------------------------------
 
@@ -283,8 +291,11 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
             {data.map((item) => {
-              const isActive = item.path === pathname;
               const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+              const isChildActive = hasChildren
+                ? item.children?.some((child) => child.path === pathname)
+                : false;
+              const isActive = item.path === pathname || isChildActive;
               const isOpen = openMenus[item.title] ?? false;
 
               return (
