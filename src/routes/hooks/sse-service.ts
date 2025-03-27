@@ -107,9 +107,7 @@ export const closeSSE = () => {
 };
 
 export const handleSSEError = (event: Event, url: string) => {
-  console.error('Erro na conexão SSE:', event);
-
-  const errorMessage = 'Erro na conexão em tempo real. Tentando reconectar...';
+  const errorMessage = 'Erro na conexão com o servidor. Tentando reconectar...';
 
   showToastOnce(errorMessage, url);
 };
