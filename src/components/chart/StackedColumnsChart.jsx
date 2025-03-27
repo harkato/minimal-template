@@ -10,7 +10,7 @@ const stackedChartOptions = {
     type: 'bar',
     stacked: true, // Habilita colunas empilhadas
     toolbar: {
-      show: false,
+      show: true,
       tools: {
         download: true,
         selection: true,
@@ -30,10 +30,33 @@ const stackedChartOptions = {
   plotOptions: {
     bar: {
       horizontal: false,
+      dataLabels: {
+        total: {
+          enabled: true,
+          style: {
+            fontSize: '13px',
+            fontWeight: 600,
+          },
+        },
+      },
     },
   },
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    categories: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
+    tickPlacement: 'on',
   },
   yaxis: {
     title: {
@@ -42,7 +65,7 @@ const stackedChartOptions = {
   },
   tooltip: {
     y: {
-      formatter (val) {
+      formatter(val) {
         return val;
       },
     },
@@ -107,7 +130,7 @@ export default function StackedColumnsChart() {
       ...prevState,
       yaxis: {
         title: {
-          text: "Total de apertos NOK", // Título do eixo Y
+          text: 'Total de apertos NOK', // Título do eixo Y
         },
         labels: {
           style: {
