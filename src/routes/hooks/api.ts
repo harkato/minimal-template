@@ -5,7 +5,6 @@ import qs from 'qs';
 import { toast } from 'material-react-toastify';
 
 export const displayedToasts: Record<string, NodeJS.Timeout> = {};
-
 /**
  * Exibe um toast de erro apenas se ainda não tiver sido exibido recentemente.
  *
@@ -13,8 +12,7 @@ export const displayedToasts: Record<string, NodeJS.Timeout> = {};
  * @param context - Identificador do erro (ex: endpoint da API ou URL do SSE)
  * @param duration - Tempo em milissegundos para reexibir o mesmo erro (padrão: 1 min)
  */
-
-const showToastOnce = (message: string, context: string, duration: number = 60000) => {
+export const showToastOnce = (message: string, context: string, duration: number = 60000) => {
   const cacheKey = `${context}:${message}`;
 
   if (!displayedToasts[cacheKey]) {
@@ -33,9 +31,18 @@ const showToastOnce = (message: string, context: string, duration: number = 6000
   }
 };
 
+/**
+ * Trata erros de requisições da API, como erros do Axios ou genéricos.
+ *
+ * @param {AxiosError | any} error - Objeto de erro retornado pela requisição.
+ * @param {string} endpoint - Endpoint que gerou o erro, usado para identificar no cache de notificações.
+ * @param {boolean} [toolName] - Se true, indica erro ao carregar dados de ferramenta.
+ * @param {boolean} [showToast=true] - Define se o erro gerará notificações (padrão: true).
+ */
+
 export const handleApiError = (
   error: AxiosError | any,
-  endpoint: string, 
+  endpoint: string,
   toolName?: boolean,
   showToast = true
 ) => {
@@ -87,7 +94,7 @@ const fetchData = async (endpoint: string) => {
     const response = await axios.get(`${apiConfig.API_URL}/${endpoint}`);
     return response.data;
   } catch (error: any) {
-    handleApiError(error, endpoint); // Exibe o toast e lança o erro    
+    handleApiError(error, endpoint); // Exibe o toast e lança o erro
     return Promise.resolve([]);
   }
 };
@@ -133,7 +140,7 @@ export const fetchDataFilters = async (
     );
     return response.data;
   } catch (error) {
-    handleApiError(error, endpoint);    
+    handleApiError(error, endpoint);
     return Promise.resolve([]);
   }
 };
@@ -241,7 +248,6 @@ const fetchDataTop5 = async (endpoint: string) => {
 export function useTopNokOk(finalDateTime: string, switchTop5: any) {
   // Lista do TOP5 QUARKUS
   return useQuery({
-    // queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryFn: () => fetchDataTop5(`tools/topNokOkRate`),
     queryKey: ['topNokOk_data'],
     refetchInterval: 15000, // Refetch a cada 30 segundos
@@ -256,13 +262,16 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
     // const response = await axios.get(
     //   `${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`
     // );
-    const response = await axios.get(`${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`, {
-      params: {
-        finalDateTime: '2022-10-24T10:00:00',
-        initialDateTime: '2022-09-24T06:00:00',
-        amount: 5,
-      },
-    });
+    const response = await axios.get(
+      `${apiConfig.API_URL}/${endpoint}/${toolId}/${toolRevision}/info`,
+      {
+        params: {
+          finalDateTime: '2022-10-24T10:00:00',
+          initialDateTime: '2022-09-24T06:00:00',
+          amount: 5,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     const toolIdentifier = `${endpoint}-${toolId}-${toolRevision}`;
@@ -281,7 +290,7 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
 //   } catch (error) {
 //     const toolIdentifier = `SSE-${toolIds.join('-')}`;
 //     handleApiError(error, toolIdentifier, true);
-//     return Promise.resolve([]);	
+//     return Promise.resolve([]);
 //   }
 // }
 
@@ -294,7 +303,7 @@ const fetchToolsInfo = async (endpoint: string, toolId: number, toolRevision: nu
 //       staleTime: 1000 * 60 * 5,
 //       retry: false,
 //     });
-    
+
 //   return toolQuery;
 // }
 
@@ -319,6 +328,8 @@ const fetchDetailsInfo = async (endpoint: string, tId: number, graphType?: strin
     });
     return response.data;
   } catch (error) {
+    console.log('Details error');
+
     const toolIdentifier = `${endpoint}-${tId}-${graphType}`;
     handleApiError(error, toolIdentifier, true);
     return Promise.resolve([]);
@@ -330,7 +341,7 @@ export function useDetailsInfo(tId: number) {
     queryFn: () => fetchDetailsInfo('resultdetails/all', tId),
     queryKey: ['details', tId],
     select: (data) => {
-      if (data) {
+      if (data.AnglePoints) {
         return {
           // ...data,
           // Torque: data.Torque.map((item: { value: number }) => item.value),
@@ -341,8 +352,6 @@ export function useDetailsInfo(tId: number) {
           Time: data.TimePoints,
         };
       }
-      console.log('data ================', data);
-      
       return data;
     },
   });
@@ -370,14 +379,14 @@ export function useCombinedDetailsInfo(tId: number) {
   const combinedData = queryResults.every((result) => result.data)
     ? {
         TracePoints: {
-          time: queryResults[0].data.TracePoints.map((point: { X: any; }) => point.X),
-          torque: queryResults[0].data.TracePoints.map((point: { Y: any; }) => point.Y),
-          angle: queryResults[1].data.TracePoints.map((point: { Y: any; }) => point.Y),
+          time: queryResults[0].data.TracePoints.map((point: { X: any }) => point.X),
+          torque: queryResults[0].data.TracePoints.map((point: { Y: any }) => point.Y),
+          angle: queryResults[1].data.TracePoints.map((point: { Y: any }) => point.Y),
         },
       }
     : undefined;
   // console.log('combinedData', combinedData?.TracePoints);
-  
+
   return {
     data: combinedData,
     isLoading,

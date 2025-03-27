@@ -21,15 +21,20 @@ import { NavUpgrade } from '../components/nav-upgrade';
 import { WorkspacesPopover } from '../components/workspaces-popover';
 
 import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
+import { NavItem } from '../config-nav-dashboard';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Collapse } from '@mui/material';
+import { set } from 'date-fns';
 
 // ----------------------------------------------------------------------
 
 export type NavContentProps = {
   data: {
-    path: string;
+    path?: string;
     title: string;
-    icon: React.ReactNode;
+    icon?: React.ReactNode;
     info?: React.ReactNode;
+    children?: NavItem[];
   }[];
   slots?: {
     topArea?: React.ReactNode;
@@ -45,10 +50,31 @@ export function NavDesktop({
   slots,
   workspaces,
   isExpanded,
+  setIsExpanded,
   layoutQuery,
-}: NavContentProps & { isExpanded: boolean; layoutQuery: Breakpoint }) {
+}: NavContentProps & {
+  isExpanded: boolean;
+  setIsExpanded: (value: boolean) => void;
+  layoutQuery: Breakpoint;
+}) {
   const theme = useTheme();
   const pathname = usePathname();
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+  const handleToggle = (title: string) => {
+    if (!isExpanded) {
+      // Se estiver colapsado, expande e abre o submenu
+      setIsExpanded(true);
+      setOpenMenus((prev) => ({ ...prev, [title]: true }));
+    } else {
+      // Alterna o submenu quando a sidebar já está expandida
+      setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
+    }
+  };
+
+  const handleCloseMenu = () => {
+    setIsExpanded(false);
+  };
 
   return (
     <Box
@@ -64,7 +90,7 @@ export function NavDesktop({
         bgcolor: 'var(--layout-nav-bg)',
         zIndex: 'var(--layout-nav-zIndex)',
         width: isExpanded ? 'var(--layout-nav-vertical-width)' : 72,
-        borderRight: `1px solid var(--layout-nav-border-color, ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)})`,
+        borderRight: `1px solid var(--layout-nav-border-color, ${theme.vars.palette.grey['500Channel']} / 0.12)`,
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
         },
@@ -91,73 +117,110 @@ export function NavDesktop({
 
       {slots?.topArea}
 
-      {/* Popover dos workspaces */}
-      {/* {isExpanded && <WorkspacesPopover data={workspaces} sx={{ my: 2 }} />} */}
-
-      {/* Scrollbar para a lista de navegação */}
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
             {data.map((item) => {
-              const isActived = item.path === pathname;
+              const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+              const isChildActive = hasChildren
+                ? item.children?.some((child) => child.path === pathname)
+                : false;
+              const isActive = item.path === pathname || isChildActive;
+              const isOpen = openMenus[item.title] ?? false;
 
               return (
-                <ListItem disableGutters disablePadding key={item.title}>
-                  <ListItemButton
-                    disableGutters
-                    component={RouterLink}
-                    href={item.path}
-                    sx={{
-                      justifyContent: 'center',
-                      pl: isExpanded ? 2 : 1.5,
-                      py: 1,
-                      gap: isExpanded ? 2 : 0,
-                      pr: 1.5,
-                      borderRadius: 0.75,
-                      typography: isExpanded ? 'body2' : 'caption',
-                      fontWeight: isActived ? 'fontWeightSemiBold' : 'fontWeightMedium',
-                      color: isActived
-                        ? 'var(--layout-nav-item-active-color)'
-                        : 'var(--layout-nav-item-color)',
-                      bgcolor: isActived ? 'var(--layout-nav-item-active-bg)' : 'transparent',
-                      '&:hover': {
-                        bgcolor: 'var(--layout-nav-item-hover-bg)',
-                      },
-                      transition: theme.transitions.create('width', {
-                        duration: theme.transitions.duration.standard,
-                      }),
-                    }}
-                  >
-                    <Box
-                      component="span"
+                <Box key={item.title} component="li">
+                  <ListItem disableGutters disablePadding>
+                    <ListItemButton
+                      disableGutters
+                      component={hasChildren ? 'button' : RouterLink}
+                      href={!hasChildren ? (item.path ?? '#') : undefined}
+                      onClick={hasChildren ? () => handleToggle(item.title) : handleCloseMenu}
                       sx={{
-                        width: 24,
-                        height: 24,
-                        display: 'flex',
-                        alignItems: 'center',
                         justifyContent: 'center',
+                        pl: isExpanded ? 2 : 1.5,
+                        py: 1,
+                        gap: isExpanded ? 2 : 0,
+                        pr: 1.5,
+                        borderRadius: 0.75,
+                        typography: isExpanded ? 'body2' : 'caption',
+                        fontWeight: isActive ? 'fontWeightSemiBold' : 'fontWeightMedium',
+                        color: isActive
+                          ? 'var(--layout-nav-item-active-color)'
+                          : 'var(--layout-nav-item-color)',
+                        bgcolor: isActive ? 'var(--layout-nav-item-active-bg)' : 'transparent',
+                        '&:hover': {
+                          bgcolor: 'var(--layout-nav-item-hover-bg)',
+                        },
+                        transition: theme.transitions.create('width', {
+                          duration: theme.transitions.duration.standard,
+                        }),
                       }}
                     >
-                      {item.icon}
-                    </Box>
-
-                    {isExpanded && (
                       <Box
                         component="span"
-                        flexGrow={1}
                         sx={{
-                          transition: theme.transitions.create('width', {
-                            duration: theme.transitions.duration.standard,
-                          }),
+                          width: 24,
+                          height: 24,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                         }}
                       >
-                        {item.title}
+                        {item.icon}
                       </Box>
-                    )}
 
-                    {isExpanded && item.info && item.info}
-                  </ListItemButton>
-                </ListItem>
+                      {isExpanded && (
+                        <Box component="span" flexGrow={1}>
+                          {item.title}
+                        </Box>
+                      )}
+
+                      {isExpanded && hasChildren && (
+                        <Box component="span">{isOpen ? <ExpandLess /> : <ExpandMore />}</Box>
+                      )}
+                    </ListItemButton>
+                  </ListItem>
+
+                  {/* Submenu */}
+                  {hasChildren && isExpanded && (
+                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                      <Box component="ul" sx={{ pl: 3 }}>
+                        {item.children?.map((child) => {
+                          const isChildActive = child.path === pathname;
+                          return (
+                            <ListItem disableGutters disablePadding key={child.title}>
+                              <ListItemButton
+                                disableGutters
+                                component={RouterLink}
+                                href={child.path ?? '#'}
+                                onClick={handleCloseMenu}
+                                sx={{
+                                  pl: isExpanded ? 4 : 3,
+                                  pr: 1.5,
+                                  py: 1,
+                                  typography: 'body2',
+                                  fontWeight: isChildActive ? 'fontWeightBold' : 'fontWeightMedium',
+                                  color: isChildActive
+                                    ? 'var(--layout-nav-item-active-color)'
+                                    : 'var(--layout-nav-item-color)',
+                                  '&:hover': {
+                                    color: 'var(--layout-nav-item-hover-color)',
+                                  },
+                                  minHeight: 'var(--layout-nav-item-height)',
+                                }}
+                              >
+                                <Box component="span" flexGrow={1}>
+                                  {child.title}
+                                </Box>
+                              </ListItemButton>
+                            </ListItem>
+                          );
+                        })}
+                      </Box>
+                    </Collapse>
+                  )}
+                </Box>
               );
             })}
           </Box>
@@ -212,6 +275,11 @@ export function NavMobile({
 
 export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
   const pathname = usePathname();
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+  const handleToggle = (title: string) => {
+    setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
 
   return (
     <>
@@ -219,51 +287,95 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
       {slots?.topArea}
 
-      {/* <WorkspacesPopover data={workspaces} sx={{ my: 2 }} /> */}
-
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
             {data.map((item) => {
-              const isActived = item.path === pathname;
+              const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+              const isChildActive = hasChildren
+                ? item.children?.some((child) => child.path === pathname)
+                : false;
+              const isActive = item.path === pathname || isChildActive;
+              const isOpen = openMenus[item.title] ?? false;
 
               return (
-                <ListItem disableGutters disablePadding key={item.title}>
-                  <ListItemButton
-                    disableGutters
-                    component={RouterLink}
-                    href={item.path}
-                    sx={{
-                      pl: 2,
-                      py: 1,
-                      gap: 2,
-                      pr: 1.5,
-                      borderRadius: 0.75,
-                      typography: 'body2',
-                      fontWeight: 'fontWeightMedium',
-                      color: 'var(--layout-nav-item-color)',
-                      minHeight: 'var(--layout-nav-item-height)',
-                      ...(isActived && {
-                        fontWeight: 'fontWeightSemiBold',
-                        bgcolor: 'var(--layout-nav-item-active-bg)',
-                        color: 'var(--layout-nav-item-active-color)',
-                        '&:hover': {
-                          bgcolor: 'var(--layout-nav-item-hover-bg)',
-                        },
-                      }),
-                    }}
-                  >
-                    <Box component="span" sx={{ width: 24, height: 24 }}>
-                      {item.icon}
-                    </Box>
+                <Box key={item.title} component="li">
+                  <ListItem disableGutters disablePadding>
+                    <ListItemButton
+                      disableGutters
+                      component={!hasChildren ? RouterLink : 'button'}
+                      href={!hasChildren ? (item.path ?? '#') : undefined}
+                      onClick={hasChildren ? () => handleToggle(item.title) : undefined}
+                      sx={{
+                        pl: 2,
+                        py: 1,
+                        gap: 2,
+                        pr: 1.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                        fontWeight: 'fontWeightMedium',
+                        color: 'var(--layout-nav-item-color)',
+                        minHeight: 'var(--layout-nav-item-height)',
+                        ...(isActive && {
+                          fontWeight: 'fontWeightSemiBold',
+                          bgcolor: 'var(--layout-nav-item-active-bg)',
+                          color: 'var(--layout-nav-item-active-color)',
+                          '&:hover': {
+                            bgcolor: 'var(--layout-nav-item-hover-bg)',
+                          },
+                        }),
+                      }}
+                    >
+                      <Box component="span" sx={{ width: 24, height: 24 }}>
+                        {item.icon}
+                      </Box>
 
-                    <Box component="span" flexGrow={1}>
-                      {item.title}
-                    </Box>
+                      <Box component="span" flexGrow={1}>
+                        {item.title}
+                      </Box>
 
-                    {item.info && item.info}
-                  </ListItemButton>
-                </ListItem>
+                      {hasChildren ? isOpen ? <ExpandLess /> : <ExpandMore /> : item.info}
+                    </ListItemButton>
+                  </ListItem>
+
+                  {/* Submenu */}
+                  {hasChildren && (
+                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                      <Box component="ul" sx={{ pl: 4 }}>
+                        {item.children?.map((child) => {
+                          const isChildActive = child.path === pathname;
+                          return (
+                            <ListItem disableGutters disablePadding key={child.title}>
+                              <ListItemButton
+                                disableGutters
+                                component={RouterLink}
+                                href={child.path ?? '#'}
+                                sx={{
+                                  pl: 4, // Mantém alinhamento da hierarquia
+                                  pr: 1.5,
+                                  py: 1,
+                                  typography: 'body2',
+                                  fontWeight: isChildActive ? 'fontWeightBold' : 'fontWeightMedium', // Apenas negrito no ativo
+                                  color: isChildActive
+                                    ? 'var(--layout-nav-item-active-color)' // Cor de destaque no ativo
+                                    : 'var(--layout-nav-item-color)',
+                                  '&:hover': {
+                                    color: 'var(--layout-nav-item-hover-color)', // Destaque no hover
+                                  },
+                                  minHeight: 'var(--layout-nav-item-height)', // Padroniza altura
+                                }}
+                              >
+                                <Box component="span" flexGrow={1}>
+                                  {child.title}
+                                </Box>
+                              </ListItemButton>
+                            </ListItem>
+                          );
+                        })}
+                      </Box>
+                    </Collapse>
+                  )}
+                </Box>
               );
             })}
           </Box>
@@ -271,8 +383,6 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
       </Scrollbar>
 
       {slots?.bottomArea}
-
-      {/* <NavUpgrade /> */}
     </>
   );
 }

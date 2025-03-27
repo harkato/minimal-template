@@ -3,23 +3,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { format } from 'date-fns';
 import {
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
-  Toolbar,
-  Tooltip,
   IconButton,
   SelectChangeEvent,
-  TablePagination,
-  CircularProgress,
+  DialogTitle,
+  DialogContent,
+  Alert,
+  Stack,
+  Grid,
+  Card,
 } from '@mui/material';
-import { Iconify } from 'src/components/iconify';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -29,12 +22,9 @@ import {
   useResultPaginate,
   fetchProgramsData,
   useResultAmount,
-  useCombinedDetailsInfo,
-  useDetailsInfo,
 } from 'src/routes/hooks/api';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { useQuery } from '@tanstack/react-query';
-import FiltersMenu from './components/filter-menu';
+import FiltersNokTrend from './components/filter-nok-trend';
 import { printAllPages } from 'src/utils/print-table';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'material-react-toastify';
@@ -43,6 +33,8 @@ import Dialog from '@mui/material/Dialog';
 import { DetailsPage } from './detail-view';
 import { ResultDataRow } from 'src/types/DataRow';
 import ResultsTable from './components/ResultsTable';
+import CloseIcon from '@mui/icons-material/Close';
+import StackedColumnsChart from 'src/components/chart/StackedColumnsChart';
 
 interface DataRow {
   dateTime: string;
@@ -144,7 +136,7 @@ const transformDate = (dateString: string): string => {
   return format(date, 'dd/MM/yyyy HH:mm:ss');
 };
 
-export default function ResultPage() {
+export default function NokTrendPage() {
   const { t } = useTranslation();
   const tableRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<DataRow[]>([]); // Resultados
@@ -163,6 +155,7 @@ export default function ResultPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('');
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [openStack, setOpenStack] = useState(false);
+  const [openDialogResults, setOpenDialogResults] = useState(false);
 
   // Recebe a quantidade total de itens da busca
   const { data: resultPgDataAmount } = useResultAmount(filters);
@@ -207,6 +200,14 @@ export default function ResultPage() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedRowData(null);
+  };
+
+  const handleOpenResults = () => {
+    setOpenDialogResults(true);
+  };
+
+  const handleCloseDialogResults = () => {
+    setOpenDialogResults(false);
   };
 
   // Atualiza o filtro de ferramentas
@@ -382,7 +383,7 @@ export default function ResultPage() {
   };
 
   // Gerencia o filtro de status
-  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGroupBy = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (value === '0' || value === '1') {
       setFilters({
@@ -443,6 +444,7 @@ export default function ResultPage() {
     setFilters({ ...filters, blockSearch: false });
     refetch();
     setPage(0);
+    handleOpenResults();
   };
 
   // Gerencia a mudança de página
@@ -508,11 +510,11 @@ export default function ResultPage() {
       />
       {/* ================================================================== titulo da pagina ============================================= */}
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }, ml: 4 }} className="no-print">
-        {t('results.results')}
+        Tendência NOK
       </Typography>
 
       {/* Menu de Filtros */}
-      <FiltersMenu
+      <FiltersNokTrend
         filters={filters}
         selectedTools={selectedTools}
         setSelectedTools={setSelectedTools}
@@ -522,7 +524,7 @@ export default function ResultPage() {
         programsData={programsData}
         handleFilterChange={handleFilterChange}
         handleSelectionChange={handleSelectionChange}
-        handleStatusChange={handleStatusChange}
+        handleGroupBy={handleGroupBy}
         handleDateChange={handleDateChange}
         handleDateChangePeriod={handleDateChangePeriod}
         handleResetFilters={handleResetFilters}
@@ -531,177 +533,59 @@ export default function ResultPage() {
         setSelectedPeriod={setSelectedPeriod}
         openStack={openStack}
       />
+      <Grid container sx={{ mt: 1 }}>
+        <Grid item xs={12} md={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Stack sx={{ width: '80%' }} spacing={2}>
+            <Alert
+              variant="filled"
+              severity="info"
+              sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              A pesquisa retornou mais dados do que podem ser visualizados. Mostrando apenas os 48
+              últimos valores
+            </Alert>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} md={12} lg={12}>
+          {/* Gráfico Stacked Columns */}
+          <Card>
+            <StackedColumnsChart />
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Tabela de Dados */}
-      <ResultsTable
-                  data={data}
-                  isLoadingResult={isLoadingResult}
-                  filters={filters}
-                  totalCount={totalCount}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  handleChangePage={handleChangePage}
-                  handleChangeRowsPerPage={handleChangeRowsPerPage}
-                  downloadCSV={downloadCSV}
-                  printAllPages={handlePrintAllPages}
-                  handleOpenDialog={handleOpenDialog}
-                  resultData={resultData}
-                />
+      <Dialog open={openDialogResults} onClose={handleCloseDialogResults} fullWidth maxWidth="xl">
+        <DialogTitle sx={{ backgroundColor: '#00477A', color: 'white' }}>
+          Resultados
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialogResults}
+            sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+            className="no-print"
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-      {/* <TableContainer component={Paper} sx={{ maxHeight: 440 }} ref={tableContainerRef} className="no-print">
-        <Toolbar
-          sx={{
-            height: 50,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            p: (theme) => theme.spacing(0, 1, 0, 3),
-          }}
-        >
-          <div>
-            <Tooltip title={t('results.saveExport')}>
-              <IconButton onClick={() => downloadCSV(data)}>
-                <Iconify icon="material-symbols:save" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('results.print')}>
-              <IconButton onClick={handlePrintAllPages}>
-                <Iconify icon="material-symbols:print" />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </Toolbar>
-        <TablePagination
-          component="div"
-          page={page}
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25, 50, 100, 200]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={t('results.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
-        />
-        <div ref={tableRef}>
-          <Table stickyHeader sx={{ minWidth: 650 }} size="small">
-            <TableHead>
-              <TableRow>
-                {isLoadingResult ? (
-                  <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
-                    <CircularProgress />
-                  </TableCell>
-                ) : !filters.blockSearch && resultData.length === 0 ? (
-                  <TableCell colSpan={9} sx={{ textAlign: 'center' }}>
-                    {t('results.noRecords')}
-                  </TableCell>
-                ) : (
-                  <>
-                    <TableCell align="center">{t('results.date')}</TableCell>
-                    <TableCell align="center">Id</TableCell>
-                    <TableCell align="center">{t('results.tools')}</TableCell>
-                    <TableCell align="center">{t('results.job')}</TableCell>
-                    <TableCell align="center">{t('results.programs')}</TableCell>
-                    <TableCell align="center">{t('results.spindle')}</TableCell>
-                    <TableCell align="center">{t('results.generalStatus')}</TableCell>
-                    <TableCell align="center">Torque</TableCell>
-                    <TableCell align="center">{t('results.angle')}</TableCell>
-                  </>
-                )}
-              </TableRow>
-            </TableHead>
-            {!isLoadingResult && (
-              <TableBody>
-                {data.map((row, index) => (
-                  <TableRow
-                    key={index}
-                    sx={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f5f5f5' }}
-                  >
-                    <TableCell sx={{ textAlign: 'left' }}>
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '2px 8px',
-                          borderRadius: '8px',
-                          color: 'white',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}
-                        onClick={() => {
-                          handleOpenDialog(resultData[index] as ResultDataRow);
-                        }}
-                      >
-                        <AddBoxOutlinedIcon sx={{ color: '#00477A' }} />
-                      </Box>
-                      {row.dateTime}
-                    </TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{row.tid}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{row.toolName}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{row.job}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{row.programName}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{row.fuso}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '2px 8px',
-                          borderRadius: '8px',
-                          color: 'white',
-                          backgroundColor: row.generalStatus === 'OK' ? '#20878b' : '#f24f4f',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {row.generalStatus}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '2px 8px',
-                          borderRadius: '8px',
-                          color: 'white',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {getStatusIcon(row.torqueStatus)}
-                      </Box>
-                      {row.torque}
-                    </TableCell>
+        <DialogContent>
+          <ResultsTable
+            data={data}
+            isLoadingResult={isLoadingResult}
+            filters={filters}
+            totalCount={totalCount}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            downloadCSV={downloadCSV}
+            printAllPages={handlePrintAllPages}
+            handleOpenDialog={handleOpenDialog}
+            resultData={resultData}
+          />
+        </DialogContent>
+      </Dialog>
 
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: 'inline-block',
-                          padding: '2px 8px',
-                          borderRadius: '8px',
-                          color: 'white',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {getStatusIcon(row.angleStatus)}
-                      </Box>
-                      {row.angle}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            )}
-          </Table>
-        </div>
-        <TablePagination
-          component="div"
-          page={page}
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25, 50, 100, 200]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={t('results.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) => `${from}–${to} ${t('de')} ${count}`}
-        />
-      </TableContainer> */}
       <Dialog fullScreen open={openDialog} onClose={handleCloseDialog}>
         {selectedRowData && <DetailsPage dataRow={selectedRowData} onClose={handleCloseDialog} />}
       </Dialog>

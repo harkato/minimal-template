@@ -81,10 +81,12 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (fetchDetailsData && fetchDetailsData.Torque.length > 0) {
-      setData(fetchDetailsData);
-    } else {
-      setData(null);
+    if (fetchDetailsData) {
+      if (fetchDetailsData && fetchDetailsData.Torque?.length > 0) {
+        setData(fetchDetailsData);
+      } else {
+        setData(null);
+      }
     }
   }, [fetchDetailsData]);
 
@@ -100,17 +102,16 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
 
   const handlePrint = () => {
     setIsPrinting(true);
-    setTimeout(() => {
-      window.print();
-    }, 1000);
+    // setTimeout(() => {
+    window.print();
+    // }, 1000);
   };
 
   return (
-    // <PrintModal open onClose={onClose}>
     <>
       <Dialog open onClose={onClose} fullWidth maxWidth="xl">
         <DialogTitle sx={{ backgroundColor: '#00477A', color: 'white' }}>
-          {`DETALHES DE RESULTADO -  ${dataRow.toolDTO?.toolName || ''}  ${transformDate(dataRow.dateTime) || ''}`}
+          {`${t('details.resultDetails')} - ${dataRow.toolDTO?.toolName || ''} ${transformDate(dataRow.dateTime) || ''}`}
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -143,44 +144,42 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                   </Box>
                 ) : isErrorFetchDetailsData || !data ? (
                   (() => (
-                      <Alert
-                        variant="filled"
-                        severity="error"
-                        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                      >
-                        falha ao carregar os dados
-                      </Alert>
-                    )
-                  )()
+                    <Alert
+                      variant="filled"
+                      severity="error"
+                      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      {t('details.failedToLoadData')}
+                    </Alert>
+                  ))()
                 ) : (
                   <>
-                    {/* {isPrinting ? ( */}
-                      <>
-                        <div style={{ pageBreakInside: 'avoid' }}>
-                          <Box display="flex" justifyContent="center">
-                            <Typography variant="h4" style={{ color: '#00477A' }}>
-                              TORQUE X TEMPO
-                            </Typography>
-                          </Box>
-                          <IncomeAreaChart slot="TORQUE" grip={data} />
-                        </div>
-                        <div style={{ pageBreakInside: 'avoid' }}>
-                          <Box display="flex" justifyContent="center">
-                            <Typography variant="h4" style={{ color: '#00477A' }}>
-                              ÂNGULO X TEMPO
-                            </Typography>
-                          </Box>
-                          <IncomeAreaChart slot="ÂNGULO" grip={data} />
-                        </div>
-                        <div style={{ pageBreakInside: 'avoid' }}>
-                          <Box display="flex" justifyContent="center">
-                            <Typography variant="h4" style={{ color: '#00477A' }}>
-                              TORQUE X ÂNGULO
-                            </Typography>
-                          </Box>
-                          <IncomeAreaChart slot="TORQUE X ÂNGULO" grip={data} />
-                        </div>
-                      </>
+                    <>
+                      <div style={{ pageBreakInside: 'avoid' }}>
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                            {t('details.torqueTime')}
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="TORQUE" grip={data} />
+                      </div>
+                      <div style={{ pageBreakInside: 'avoid' }}>
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                            {t('details.angleTime')}
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="ÂNGULO" grip={data} />
+                      </div>
+                      <div style={{ pageBreakInside: 'avoid' }}>
+                        <Box display="flex" justifyContent="center">
+                          <Typography variant="h4" style={{ color: '#00477A' }}>
+                            {t('details.torqueAngle')}
+                          </Typography>
+                        </Box>
+                        <IncomeAreaChart slot="TORQUE X ÂNGULO" grip={data} />
+                      </div>
+                    </>
                     {/* ) : (
                       <AreaChartNew grip={data} />
                     )} */}
@@ -189,9 +188,9 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
               </Card>
             </Grid>
             <Grid item xs={12} md={12} lg={4} xl={3}>
-              {' '}
+              {/* {' '} */}
               {/* Grid para a lista (ocupa 4 colunas em telas médias e maiores, 12 em telas menores) */}
-              <Card style={{ pageBreakBefore: 'always' }} >
+              <Card style={{ pageBreakBefore: 'always' }}>
                 <List>
                   <ListItem divider>
                     <ListItemText
@@ -212,27 +211,27 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                     <ListItemText
                       primary={
                         <>
-                          <Typography variant="subtitle1">Ferramenta</Typography>
+                          <Typography variant="subtitle1">{t('details.tool')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            ID Ferramenta
+                            {t('details.toolID')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Nº de série
+                            {t('details.serialNumber')}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          {/* <Typography variant="body2" color="text.secondary">
                             Veículo
+                          </Typography> */}
+                          <Typography variant="body2" color="text.secondary">
+                            {t('details.Identifier')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Identificador
+                            {t('details.additionalID1')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Identificador adic. 1
+                            {t('details.additionalID2')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Identificador adic. 2
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Identificador adic. 3
+                            {t('details.additionalID3')}
                           </Typography>
                         </>
                       }
@@ -258,9 +257,9 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                         <Typography variant="body2" color="text.secondary" noWrap>
                           {dataRow.toolDTO?.toolSerialNumber || '*'}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap>
+                        {/* <Typography variant="body2" color="text.secondary" noWrap>
                           {dataRow.tid || '*'}
-                        </Typography>
+                        </Typography> */}
                         <Typography variant="body2" color="text.secondary" noWrap>
                           {dataRow.identifier || '*'}
                         </Typography>
@@ -280,18 +279,18 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                     <ListItemText
                       primary={
                         <>
-                          <Typography variant="subtitle1">Programa</Typography>
+                          <Typography variant="subtitle1">{t('details.program')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            ID Programa
+                            {t('details.programID')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Nº Job
+                            {t('details.jobNumber')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Contagem Job
+                            {t('details.jobCount')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Tamanho Job
+                            {t('details.jobSize')}
                           </Typography>
                         </>
                       }
@@ -330,12 +329,12 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                     <ListItemText
                       primary={
                         <>
-                          <Typography variant="subtitle1">Torque</Typography>
+                          <Typography variant="subtitle1">{t('details.torque')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Torque máximo
+                            {t('details.torqueHighLimit')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Torque mínimo
+                            {t('details.torqueLowLimit')}
                           </Typography>
                         </>
                       }
@@ -359,12 +358,12 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
                     <ListItemText
                       primary={
                         <>
-                          <Typography variant="subtitle1">Ângulo</Typography>
+                          <Typography variant="subtitle1">{t('details.angle')}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Ângulo máximo
+                            {t('details.angleHighLimit')}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            Ângulo mínimo
+                            {t('details.angleLowLimit')}
                           </Typography>
                         </>
                       }
@@ -390,7 +389,7 @@ export function DetailsPage({ dataRow, onClose }: DetailsPageProps) {
           </Grid>
         </DialogContent>
         <Button onClick={handlePrint} className="no-print">
-          Imprimir
+          {t('details.print')}
         </Button>
       </Dialog>
     </>

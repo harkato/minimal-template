@@ -134,6 +134,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
       sidebarSection={
         <NavDesktop
           isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
           data={navData}
           layoutQuery={layoutQuery}
           workspaces={_workspaces}

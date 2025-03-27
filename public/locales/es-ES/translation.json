@@ -31,7 +31,13 @@
     "charts": {
       "seatsFailureRate": "Asientos - Tasa de Fallo",
       "time": "Hora",
-      "rate": "Tasa"
+      "rate": "Tasa",
+      "angle": "Ángulo",
+      "torque": "Torque",
+      "times": "Tiempo",
+      "torqueTime": "Torque X Tiempo",
+      "angleTime": "Ángulo X Tiempo",
+      "torqueAngle": "Torque X Ángulo"
     },
 
     "navigation": {
@@ -109,5 +115,31 @@
       "noRecords": "No se encontraron registros.",
       "rowsPerPage": "Filas por página:",
       "of": "de"
+    },
+    "details": {
+      "resultDetails": "DETALLES DEL RESULTADO",
+      "failedToLoadData": "Error al cargar los datos",
+      "torqueTime": "TORQUE X TIEMPO",
+      "angleTime": "ÁNGULO X TIEMPO",
+      "torqueAngle": "TORQUE X ÁNGULO",
+      "tool": "Herramienta",
+      "toolID": "ID de Herramienta",
+      "serialNumber": "Nº de serie",
+      "Identifier": "Identificador",
+      "additionalID1": "Identificador adic. 1",
+      "additionalID2": "Identificador adic. 2",
+      "additionalID3": "Identificador adic. 3",
+      "program": "Programa",
+      "programID": "ID Programa",
+      "jobNumber": "Nº de Trabajo",
+      "jobCount": "Conteo de Trabajo",
+      "jobSize": "Tamaño de Trabajo",
+      "torque": "Torque",
+      "torqueHighLimit": "Torque máximo",
+      "torqueLowLimit": "Torque mínimo",
+      "angle": "Ángulo",
+      "angleHighLimit": "Ángulo máximo",
+      "angleLowLimit": "Ángulo mínimo",
+      "print": "Imprimir"
     }
   }

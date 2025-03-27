@@ -31,7 +31,13 @@
     "charts": {
       "seatsFailureRate": "Bancos - Taxa de Falha",
       "time": "Horário",
-      "rate": "Taxa"
+      "rate": "Taxa",
+      "angle": "Ângulo",
+      "torque": "Torque",
+      "times": "TEMPO",
+      "torqueTime": "TORQUE X TEMPO",
+      "angleTime": "ÂNGULO X TEMPO",
+      "torqueAngle": "TORQUE X ÂNGULO"
     },
 
     "navigation": {
@@ -113,5 +119,31 @@
       "noRecords": "Não foram encontrados registros.",
       "rowsPerPage": "Linhas por página:",
       "of": "de"
+    },
+    "details":{
+      "resultDetails": "DETALHES DE RESULTADO",
+      "failedToLoadData": "Falha ao carregar os dados",
+      "torqueTime": "TORQUE X TEMPO",
+      "angleTime": "ÂNGULO X TEMPO",
+      "torqueAngle": "TORQUE X ÂNGULO",
+      "tool": "Ferramenta",
+      "toolID": "ID da Ferramenta",
+      "serialNumber": "Nº de série",
+      "Identifier": "Identificador",
+      "additionalID1": "Identificador adic. 1",
+      "additionalID2": "Identificador adic. 2",
+      "additionalID3": "Identificador adic. 3",
+      "program": "Programa",
+      "programID": "ID Programa",
+      "jobNumber": "Nº Job",
+      "jobCount": "Contagem Job",
+      "jobSize": "Tamanho Job",
+      "torque": "Torque",
+      "torqueHighLimit": "Torque máximo",
+      "torqueLowLimit": "Torque mínimo",
+      "angle": "Ângulo",
+      "angleHighLimit": "Ângulo máximo",
+      "angleLowLimit": "Ângulo mínimo",
+      "print": "Imprimir"
     }
    }
