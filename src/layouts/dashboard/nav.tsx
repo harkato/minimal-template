@@ -129,7 +129,7 @@ export function NavDesktop({
               const isOpen = openMenus[item.title] ?? false;
 
               return (
-                <Box key={item.title} component="li">
+                <Box key={item.title} component="ul">
                   <ListItem disableGutters disablePadding>
                     <ListItemButton
                       disableGutters
